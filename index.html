@@ -12,7 +12,7 @@
 body{margin:0;background:var(--bg);font:12px Tahoma,Arial,sans-serif;color:#172b45}
 button,input,select,textarea{font:inherit}
 button{cursor:pointer}
-button:focus,input:focus,select:focus,textarea:focus{outline:1px solid #2469c8}
+button:focus,input:focus,select:focus,textarea:focus{outline:2px solid #2469c8;outline-offset:1px}
 .app{max-width:1600px;margin:auto;background:#e9eef5;min-height:100vh;border:1px solid #526b89}
 .titlebar{background:linear-gradient(#426da3,#183e70);color:#fff;padding:9px 12px;display:flex;justify-content:space-between;align-items:center;gap:8px}
 .brand{font-weight:bold;font-size:18px;letter-spacing:.5px}.brand small{display:block;font-size:10px;font-weight:normal;margin-top:3px}
@@ -50,7 +50,7 @@ th{background:linear-gradient(#eaf1fa,#cbd9e9);color:#173b67;text-align:left}
 th,td{border:1px solid #c4cfdd;padding:7px 8px}
 tbody tr:nth-child(even){background:#f0f5fb}tbody tr:hover{background:#fff1c9}
 .empty{text-align:center;color:#66788c;padding:25px}.row-actions{display:flex;gap:4px}.row-actions .btn{padding:4px 7px}
-.notice{padding:9px;border:1px solid #a4b7cb;background:#edf4fc;margin-bottom:8px;line-height:1.5}
+.notice{padding:9px;border:1px solid #a4b7cb;background:#edf4fc;margin-bottom:8px;line-height:1.6}
 .right-box{padding:8px;border-bottom:1px solid #e0e6ed}.right-box button{width:100%;margin-bottom:5px;text-align:left}
 .muted{color:#6a7c91}.total-box{background:#edf3fa;border:1px solid #a5b4c6;padding:10px;text-align:right;font-weight:bold;line-height:1.8}
 .statusline{background:#e4ebf4;border-top:1px solid #9eafc5;padding:7px 10px;display:flex;justify-content:space-between;gap:6px;flex-wrap:wrap}
@@ -126,6 +126,7 @@ tbody tr:nth-child(even){background:#f0f5fb}tbody tr:hover{background:#fff1c9}
 </div>
 <div class="statusline"><span id="statusCompany"></span><span id="statusText">Ready</span><span id="statusDate"></span></div>
 </div>
+
 <script>
 "use strict";
 const KEY="shree_erp_purple_v2";
@@ -135,6 +136,7 @@ const money=n=>"₹"+(Number(n)||0).toLocaleString("en-IN",{minimumFractionDigit
 const uid=()=>"id-"+Date.now().toString(36)+"-"+Math.random().toString(36).slice(2,8);
 const today=()=>new Date().toISOString().slice(0,10);
 const blank=()=>({company:{name:"My Business",address:"",phone:"",gstin:""},items:[],parties:[],bills:[],receipts:[],payments:[],purchases:[]});
+
 function load(){
  try{
   const d=JSON.parse(localStorage.getItem(KEY)||"null");
@@ -144,7 +146,12 @@ function load(){
   return b;
  }catch(e){return blank()}
 }
+
 let db=load(),view="dashboard",billLines=[],editItemId=null;
+let viewHistory=[];
+let itemReturnDraft=null;
+let partyReturnView=null;
+
 function save(){
  try{localStorage.setItem(KEY,JSON.stringify(db));$("statusText").textContent="Saved";}
  catch(e){alert("Storage unavailable/full. Backup নাও।")}
@@ -154,11 +161,31 @@ function updateStatus(){
  $("statusCompany").textContent="Company: "+(db.company.name||"My Business");
  $("statusDate").textContent=new Date().toLocaleDateString("en-IN");
 }
-function go(v){
- view=v;billLines=[];editItemId=null;
+
+/* Navigation */
+function go(v,options={}){
+ if(!options.skipHistory&&view!==v)viewHistory.push(view);
+ if(!options.preserveLines)billLines=[];
+ view=v;
+ editItemId=null;
  document.querySelectorAll("[data-view]").forEach(b=>b.classList.toggle("active",b.dataset.view===v));
  document.querySelectorAll("[data-side]").forEach(b=>b.classList.toggle("active",b.dataset.side===v));
- render();window.scrollTo({top:0,behavior:"smooth"});
+ render();
+ window.scrollTo({top:0,behavior:"smooth"});
+}
+function goBack(){
+ if(itemReturnDraft&&view==="items"){
+  returnFromItemEntry(false);
+  return;
+ }
+ if(partyReturnView){
+  const target=partyReturnView;
+  partyReturnView=null;
+  go(target,{skipHistory:true});
+  return;
+ }
+ const previous=viewHistory.pop();
+ go(previous&&previous!==view?previous:"dashboard",{skipHistory:true});
 }
 function head(title,sub=""){
  return `<div class="view-head"><div><h2>${esc(title)}</h2>${sub?`<div class="muted" style="margin-top:4px">${esc(sub)}</div>`:""}</div><button class="btn" onclick="go('dashboard')">⌂ Home</button></div>`;
@@ -180,6 +207,8 @@ function render(){
  else if(["reports","daily","gst","links"].includes(view))$("main").innerHTML=reportsPage(view);
  else $("main").innerHTML=dashboard();
 }
+
+/* Dashboard */
 function dashboard(){
  const sales=db.bills.reduce((s,b)=>s+(Number(b.total)||0),0);
  const purchases=db.purchases.reduce((s,b)=>s+(Number(b.total)||0),0);
@@ -197,16 +226,20 @@ function dashboard(){
  <button class="btn" onclick="go('receipt')">↓ Receipt Entry</button>
  <button class="btn" onclick="go('payment')">↑ Payment Entry</button>
  <button class="btn" onclick="go('items')">▤ Item Master</button>
+ <button class="btn" onclick="openCustomerEntry()">♙ F2 Customer Entry</button>
  </div></div>
  <div class="card"><h3>Recent Transactions</h3>${table(["Date","Type","Voucher No.","Party","Amount"],rows,"No transactions yet")}</div>
- <div class="notice">প্রথমে Item Master-এ পণ্য এবং Party Master-এ customer/supplier যোগ করো। তারপর billing শুরু করো।</div>`;
+ <div class="notice">Dashboard-এ F2 চাপলে Customer Entry খুলবে। Retail Sales-এ F2 চাপলে Product Entry খুলবে। F3 দিয়ে Customer Rename করা যাবে।</div>`;
 }
+
+/* Item Master */
 function itemsPage(){
  const q=($("itemSearch")?.value||"").toLowerCase();
  const list=db.items.filter(x=>[x.name,x.code,x.company,x.type].some(v=>String(v||"").toLowerCase().includes(q)));
  const rows=list.map(x=>`<tr><td>${esc(x.code||"")}</td><td>${esc(x.name)}</td><td>${esc(x.type||"Others")}</td><td>${esc(x.company||"")}</td><td>${esc(x.unit||"PCS")}</td><td>${money(x.rate)}</td><td>${Number(x.qty)||0}</td><td><button class="btn" onclick="editItem('${esc(x.id)}')">Edit</button> <button class="btn danger" onclick="deleteRecord('items','${esc(x.id)}')">Del</button></td></tr>`).join("");
- return `${head("Item Master","Product / Inventory Master")}
- <div class="card"><h3>Add / Edit Item</h3><form onsubmit="saveItem(event)">
+ return `${head(itemReturnDraft?"Product Entry — Retail Billing":"Item Master","Product / Inventory Master")}
+ ${itemReturnDraft?'<div class="notice">নতুন Product Save করলে আগের Retail Billing-এ ফিরে যাবে। Esc চাপলে Save না করেও Billing-এ ফিরতে পারবে।</div>':""}
+ <div class="card"><h3>Add / Edit Item</h3><form id="itemForm" onsubmit="saveItem(event)">
  <input type="hidden" id="iId" value="${esc(editItemId||"")}">
  <div class="formgrid">
  <div class="field"><label>Item Code</label><input id="iCode" placeholder="ITM001"></div>
@@ -217,40 +250,124 @@ function itemsPage(){
  <div class="field"><label>Sale Rate (₹)</label><input id="iRate" type="number" min="0" step=".01" value="0"></div>
  <div class="field"><label>Stock</label><input id="iQty" type="number" step=".01" value="0"></div>
  <div class="field"><label>Purchase Rate (₹)</label><input id="iPurchaseRate" type="number" min="0" step=".01" value="0"></div>
- </div><div class="form-actions"><button class="btn primary">Save Item</button><button class="btn" type="button" onclick="go('items')">Clear</button></div></form></div>
+ </div><div class="form-actions"><button class="btn primary" type="submit">Save Item</button><button class="btn" type="button" onclick="clearItemForm()">Clear</button><button class="btn" type="button" onclick="goBack()">Esc · Back</button></div></form></div>
  <div class="card"><div class="view-head"><h3>Item List (${list.length})</h3><input class="searchbox" style="max-width:220px" id="itemSearch" placeholder="Search item..." oninput="refreshItems()"></div>${table(["Code","Item Name","Type","Company","Unit","Rate","Stock","Action"],rows)}</div>`;
 }
-function refreshItems(){const v=$("itemSearch").value;render();$("itemSearch").value=v;$("itemSearch").focus();$("itemSearch").setSelectionRange(v.length,v.length)}
+function refreshItems(){
+ const v=$("itemSearch").value;
+ render();
+ $("itemSearch").value=v;
+ $("itemSearch").focus();
+ $("itemSearch").setSelectionRange(v.length,v.length);
+}
+function clearItemForm(){
+ if(itemReturnDraft){$("iId").value="";$("iCode").value="";$("iName").value="";$("iType").value="Others";$("iCompany").value="";$("iUnit").value="PCS";$("iRate").value="0";$("iQty").value="0";$("iPurchaseRate").value="0";$("iName").focus();return}
+ go("items");
+}
 function saveItem(e){
- e.preventDefault();const id=$("iId").value||uid();
+ e.preventDefault();
+ const id=$("iId").value||uid();
  const x={id,code:$("iCode").value.trim(),name:$("iName").value.trim(),type:$("iType").value,company:$("iCompany").value.trim(),unit:$("iUnit").value.trim()||"PCS",rate:Number($("iRate").value)||0,qty:Number($("iQty").value)||0,purchaseRate:Number($("iPurchaseRate").value)||0};
  if(!x.name)return alert("Item name লিখো।");
  if(db.items.some(a=>a.id===id))db.items=db.items.map(a=>a.id===id?x:a);else db.items.push(x);
- save();go("items");alert("Item saved.");
+ save();
+ if(itemReturnDraft){
+  const newId=x.id;
+  returnFromItemEntry(true,newId,x.rate);
+  alert("Product saved. Retail Billing-এ ফিরে এসেছ।");
+ }else{
+  go("items");
+  alert("Item saved.");
+ }
 }
 function editItem(id){
  const x=db.items.find(a=>a.id===id);if(!x)return;
  editItemId=x.id;render();
  $("iId").value=x.id;$("iCode").value=x.code||"";$("iName").value=x.name||"";$("iType").value=x.type||"Others";$("iCompany").value=x.company||"";$("iUnit").value=x.unit||"PCS";$("iRate").value=x.rate||0;$("iQty").value=x.qty||0;$("iPurchaseRate").value=x.purchaseRate||0;$("iName").focus();
 }
+
+/* Customer / Party Master */
 function partiesPage(){
- const rows=db.parties.map(x=>`<tr><td>${esc(x.name)}</td><td>${esc(x.type||"Customer")}</td><td>${esc(x.phone||"")}</td><td>${esc(x.gstin||"")}</td><td>${money(x.balance)}</td><td><button class="btn" onclick="editParty('${esc(x.id)}')">Edit</button> <button class="btn danger" onclick="deleteRecord('parties','${esc(x.id)}')">Del</button></td></tr>`).join("");
- return `${head("Party Master","Customer / Supplier Account")}<div class="card"><h3>Add / Edit Party</h3><form onsubmit="saveParty(event)"><input type="hidden" id="pId">
- <div class="formgrid"><div class="field"><label>Party Name *</label><input id="pName" required></div>
+ const rows=db.parties.map(x=>`<tr><td>${esc(x.name)}</td><td>${esc(x.type||"Customer")}</td><td>${esc(x.phone||"")}</td><td>${esc(x.address||"")}</td><td>${esc(x.gstin||"")}</td><td>${esc(x.dlNo||"")}</td><td>${money(x.balance)}</td><td><button class="btn" onclick="editParty('${esc(x.id)}')">Edit</button> <button class="btn danger" onclick="deleteRecord('parties','${esc(x.id)}')">Del</button></td></tr>`).join("");
+ return `${head("Party Master","Customer / Supplier Account")}
+ <div class="card"><h3>Add / Edit Party</h3><form id="partyForm" onsubmit="saveParty(event)"><input type="hidden" id="pId">
+ <div class="formgrid">
+ <div class="field"><label>Party Name *</label><input id="pName" required></div>
  <div class="field"><label>Party Type</label><select id="pType"><option>Customer</option><option>Supplier</option><option>Both</option></select></div>
- <div class="field"><label>Phone</label><input id="pPhone" inputmode="tel"></div>
+ <div class="field"><label>Phone / Mobile</label><input id="pPhone" inputmode="tel"></div>
+ <div class="field"><label>Address</label><input id="pAddress" placeholder="Customer address"></div>
  <div class="field"><label>GSTIN</label><input id="pGstin"></div>
- <div class="field"><label>Opening Balance (₹)</label><input id="pBalance" type="number" step=".01" value="0"></div></div>
- <div class="form-actions"><button class="btn primary">Save Party</button><button class="btn" type="button" onclick="go('parties')">Clear</button></div></form></div>
- <div class="card"><h3>Party List (${db.parties.length})</h3>${table(["Party Name","Type","Phone","GSTIN","Balance","Action"],rows)}</div>`;
+ <div class="field"><label>DL Number</label><input id="pDL" placeholder="Drug licence / DL no."></div>
+ <div class="field"><label>Opening Balance (₹)</label><input id="pBalance" type="number" step=".01" value="0"></div>
+ </div>
+ <div class="form-actions"><button class="btn primary" type="submit">Save Party</button><button class="btn" type="button" onclick="clearPartyForm()">Clear</button><button class="btn" type="button" onclick="goBack()">Esc · Back</button></div></form></div>
+ <div class="card"><h3>Party List (${db.parties.length})</h3>${table(["Party Name","Type","Phone","Address","GSTIN","DL No.","Balance","Action"],rows)}</div>`;
+}
+function openCustomerEntry(){
+ partyReturnView="dashboard";
+ go("parties");
+ setTimeout(()=>{if($("pName"))$("pName").focus()},0);
+}
+function clearPartyForm(){
+ $("pId").value="";$("pName").value="";$("pType").value="Customer";$("pPhone").value="";$("pAddress").value="";$("pGstin").value="";$("pDL").value="";$("pBalance").value="0";$("pName").focus();
 }
 function saveParty(e){
- e.preventDefault();const id=$("pId").value||uid(),x={id,name:$("pName").value.trim(),type:$("pType").value,phone:$("pPhone").value.trim(),gstin:$("pGstin").value.trim(),balance:Number($("pBalance").value)||0};
+ e.preventDefault();
+ const id=$("pId").value||uid();
+ const x={id,name:$("pName").value.trim(),type:$("pType").value,phone:$("pPhone").value.trim(),address:$("pAddress").value.trim(),gstin:$("pGstin").value.trim(),dlNo:$("pDL").value.trim(),balance:Number($("pBalance").value)||0};
  if(!x.name)return alert("Party name লিখো।");
- if(db.parties.some(p=>p.id===id))db.parties=db.parties.map(p=>p.id===id?x:p);else db.parties.push(x);
- save();go("parties");
+ const duplicate=db.parties.some(p=>p.id!==id&&p.name.trim().toLowerCase()===x.name.toLowerCase());
+ if(duplicate&&!confirm("এই নামে Customer আগে আছে। তবুও Save করবে?"))return;
+ if(db.parties.some(p=>p.id===id))db.parties=db.parties.map(p=>p.id===id?{...p,...x}:p);else db.parties.push(x);
+ save();
+ if(partyReturnView){
+  const target=partyReturnView;partyReturnView=null;
+  go(target,{skipHistory:true});
+  alert("Customer saved.");
+ }else{
+  go("parties");
+  alert("Party saved.");
+ }
 }
-function editParty(id){const x=db.parties.find(p=>p.id===id);if(!x)return;render();$("pId").value=x.id;$("pName").value=x.name||"";$("pType").value=x.type||"Customer";$("pPhone").value=x.phone||"";$("pGstin").value=x.gstin||"";$("pBalance").value=x.balance||0;$("pName").focus()}
+function editParty(id){
+ const x=db.parties.find(p=>p.id===id);if(!x)return;
+ render();
+ $("pId").value=x.id;$("pName").value=x.name||"";$("pType").value=x.type||"Customer";$("pPhone").value=x.phone||"";$("pAddress").value=x.address||"";$("pGstin").value=x.gstin||"";$("pDL").value=x.dlNo||"";$("pBalance").value=x.balance||0;$("pName").focus();
+}
+
+/* F3 Customer Rename */
+function renameCustomer(){
+ let oldName="";
+ const selected=$("tParty");
+ if(["retail","wholesale"].includes(view)&&selected&&selected.value)oldName=selected.value;
+ if(!oldName)oldName=prompt("যে Customer-এর নাম বদলাবে, তার বর্তমান নাম লিখো:");
+ if(oldName===null||!String(oldName).trim())return;
+ oldName=String(oldName).trim();
+ const party=db.parties.find(p=>p.name.trim().toLowerCase()===oldName.toLowerCase()&&["Customer","Both",undefined,""].includes(p.type));
+ if(!party){
+  alert("এই নামে Customer পাওয়া যায়নি। Party Master-এ আগে Customer যোগ করো।");
+  return;
+ }
+ const newName=prompt("নতুন Customer নাম লিখো:",party.name);
+ if(newName===null)return;
+ const clean=newName.trim();
+ if(!clean)return alert("নতুন নাম লিখো।");
+ if(db.parties.some(p=>p.id!==party.id&&p.name.trim().toLowerCase()===clean.toLowerCase()))return alert("এই নামে আরেকটি Party আগে থেকেই আছে।");
+ const previous=party.name;
+ party.name=clean;
+ ["bills","purchases","receipts","payments"].forEach(k=>{
+  db[k].forEach(r=>{if(String(r.party||"").toLowerCase()===previous.toLowerCase())r.party=clean});
+ });
+ save();
+ if(selected){
+  const opt=[...selected.options].find(o=>o.value===previous);
+  if(opt){opt.textContent=clean;opt.value=clean;selected.value=clean}
+ }
+ if(view==="parties")render();
+ alert("Customer name updated.");
+}
+
+/* Company & Settings */
 function companyPage(){return `${head("Company Information","Business Profile")}<div class="card"><form onsubmit="saveCompany(event)"><div class="formgrid">
  <div class="field"><label>Company Name *</label><input id="cName" required value="${esc(db.company.name||"")}"></div>
  <div class="field"><label>Phone</label><input id="cPhone" value="${esc(db.company.phone||"")}"></div>
@@ -260,18 +377,19 @@ function companyPage(){return `${head("Company Information","Business Profile")}
 function saveCompany(e){e.preventDefault();db.company={name:$("cName").value.trim(),phone:$("cPhone").value.trim(),gstin:$("cGstin").value.trim(),address:$("cAddress").value.trim()};save();go("company");alert("Company saved")}
 function settingsPage(){return `${head("Settings & Data Tools","Local browser storage")}<div class="card"><h3>Backup & Restore</h3><p>নিয়মিত JSON backup ডাউনলোড করে রাখো।</p><button class="btn primary" onclick="backup()">Export Backup</button> <button class="btn" onclick="$('restoreFile').click()">Import Backup</button><p>Storage key: <b>${KEY}</b></p><p>Items: ${db.items.length} · Parties: ${db.parties.length} · Sales: ${db.bills.length} · Purchases: ${db.purchases.length}</p></div><div class="card"><h3>Danger Zone</h3><button class="btn danger" onclick="clearData()">Clear All ERP Data</button></div>`}
 
-/* MULTI-ITEM BILLING */
+/* Multi-item billing */
 function transactionPage(kind){
  const purchase=kind==="purchase",title=purchase?"Purchase Entry":kind==="wholesale"?"Wholesale Sales":"Retail Sales",key=purchase?"purchases":"bills";
  const records=db[key].slice().reverse().map(x=>`<tr><td>${esc(x.date||"")}</td><td>${esc(x.no||"")}</td><td>${esc(x.party||"")}</td><td>${money(x.total)}</td><td><button class="btn" onclick="printVoucher('${key}','${esc(x.id)}')">Print</button> <button class="btn danger" onclick="deleteRecord('${key}','${esc(x.id)}')">Del</button></td></tr>`).join("");
+ const partyType=purchase?["Supplier","Both"]:["Customer","Both"];
  return `${head(title,"Multi-item billing · Stock · GST")}
- <div class="card"><form onsubmit="saveMultiBill(event,'${kind}')">
+ <div class="card"><form id="billForm" onsubmit="saveMultiBill(event,'${kind}')">
  <div class="formgrid">
  <div class="field"><label>Bill / Voucher No. *</label><input id="tNo" required value="${purchase?"PUR":kind==="wholesale"?"WS":"RS"}-${Date.now().toString().slice(-6)}"></div>
  <div class="field"><label>Date</label><input id="tDate" type="date" value="${today()}" required></div>
- <div class="field"><label>${purchase?"Supplier":"Customer"}</label><select id="tParty"><option value="">Cash / Walk-in</option>${db.parties.filter(p=>purchase?["Supplier","Both"].includes(p.type):["Customer","Both"].includes(p.type)).map(p=>`<option>${esc(p.name)}</option>`).join("")}</select></div>
+ <div class="field"><label>${purchase?"Supplier":"Customer"}</label><select id="tParty"><option value="">Cash / Walk-in</option>${db.parties.filter(p=>partyType.includes(p.type||"Customer")).map(p=>`<option value="${esc(p.name)}">${esc(p.name)}</option>`).join("")}</select></div>
  </div>
- <div class="notice">F2: Party Master · F3: Item Master · F4: Retail Billing · Esc: Dashboard</div>
+ <div class="notice">${kind==="retail"?"F2: Product Entry · F3: Customer Rename":"F2: Party Master · F3: Customer Rename"} · F4: Retail Billing · Enter: Next Field · Esc: Back</div>
  <div class="formgrid">
  <div class="field"><label>Item *</label><select id="lineItem"><option value="">Select Item</option>${db.items.map(i=>`<option value="${esc(i.id)}">${esc(i.name)} — Stock: ${Number(i.qty)||0}</option>`).join("")}</select></div>
  <div class="field"><label>Batch No.</label><input id="lineBatch" placeholder="Batch number"></div>
@@ -286,13 +404,47 @@ function transactionPage(kind){
  <div class="table-wrap" style="margin-top:12px"><table><thead><tr><th>Item</th><th>Batch</th><th>Expiry</th><th>Qty</th><th>Free</th><th>Rate</th><th>Disc%</th><th>GST%</th><th>Amount</th><th>Action</th></tr></thead><tbody id="billLinesBody"><tr><td colspan="10" class="empty">Add items to begin billing</td></tr></tbody></table></div>
  <div class="formgrid" style="margin-top:12px"><div class="field"><label>Bill Discount (₹)</label><input id="billDiscount" type="number" min="0" step=".01" value="0" oninput="updateBillTotal()"></div><div class="field"><label>Round Off (₹)</label><input id="billRound" type="number" step=".01" value="0" oninput="updateBillTotal()"></div></div>
  <div class="total-box" style="margin-top:12px">Subtotal: <span id="billSubtotal">${money(0)}</span><br>Discount: <span id="billDiscountDisplay">${money(0)}</span><br>GST: <span id="billGSTDisplay">${money(0)}</span><br><span style="font-size:16px">Grand Total: <span id="billGrandTotal">${money(0)}</span></span></div>
- <div class="form-actions"><button class="btn primary" type="submit">Save Bill</button><button class="btn" type="button" onclick="clearBillForm('${kind}')">New Bill</button><button class="btn" type="button" onclick="go('dashboard')">Esc · Back</button></div>
+ <div class="form-actions"><button class="btn primary" type="submit">Save Bill</button><button class="btn" type="button" onclick="clearBillForm('${kind}')">New Bill</button><button class="btn" type="button" onclick="goBack()">Esc · Back</button></div>
  </form></div><div class="card"><h3>Voucher Register (${db[key].length})</h3>${table(["Date","Voucher No.","Party","Total","Action"],records)}</div>`;
 }
+
+/* Save draft before Product Entry */
+function openItemEntryFromBilling(){
+ if(view!=="retail")return;
+ itemReturnDraft={
+  view:"retail",
+  fields:{},
+  lines:billLines.map(x=>({...x}))
+ };
+ ["tNo","tDate","tParty","lineItem","lineBatch","lineExpiry","lineQty","lineFree","lineRate","lineDiscount","lineGST","billDiscount","billRound"].forEach(id=>{
+  const el=$(id);
+  if(el)itemReturnDraft.fields[id]=el.value;
+ });
+ go("items",{preserveLines:true});
+ setTimeout(()=>{if($("iName"))$("iName").focus()},0);
+}
+function returnFromItemEntry(saved,newId,newRate){
+ if(!itemReturnDraft){go("items");return}
+ const draft=itemReturnDraft;
+ itemReturnDraft=null;
+ billLines=draft.lines.map(x=>({...x}));
+ go("retail",{skipHistory:true,preserveLines:true});
+ Object.entries(draft.fields).forEach(([id,value])=>{
+  const el=$(id);if(el)el.value=value;
+ });
+ if(saved&&newId){
+  $("lineItem").value=newId;
+  $("lineRate").value=Number(newRate)||0;
+ }
+ renderBillLines();
+ if(saved){$("lineBatch").focus()}else $("lineItem").focus();
+}
+
+/* Auto-fill selected product rate */
 document.addEventListener("change",function(e){
  if(e.target.id==="lineItem"){
   const item=db.items.find(i=>i.id===e.target.value);
-  if(item){$("lineRate").value=view==="purchase"?(Number(item.purchaseRate)||Number(item.rate)||0):(Number(item.rate)||0)}
+  if(item)$("lineRate").value=view==="purchase"?(Number(item.purchaseRate)||Number(item.rate)||0):(Number(item.rate)||0);
  }
 });
 function addBillLine(){
@@ -342,8 +494,9 @@ function saveMultiBill(e,kind){
  billLines=[];go(kind);
  if(confirm("Bill saved. Print করতে চাও?"))printObject(printCopy);
 }
-function clearBillForm(kind){if(billLines.length&&!confirm("Unsaved bill clear করবে?"))return;go(kind)}
+function clearBillForm(kind){if(billLines.length&&!confirm("Unsaved bill clear করবে?"))return;billLines=[];go(kind)}
 
+/* Receipt / Payment */
 function accountPage(kind){
  const key=kind==="receipt"?"receipts":"payments",title=kind==="receipt"?"Receipt Entry":"Payment Entry";
  const rows=db[key].slice().reverse().map(x=>`<tr><td>${esc(x.date)}</td><td>${esc(x.no)}</td><td>${esc(x.party)}</td><td>${esc(x.mode||"Cash")}</td><td>${money(x.amount)}</td><td><button class="btn danger" onclick="deleteRecord('${key}','${esc(x.id)}')">Del</button></td></tr>`).join("");
@@ -353,10 +506,16 @@ function accountPage(kind){
  <div class="field"><label>Party / Account</label><select id="aParty"><option>Cash Account</option>${db.parties.map(p=>`<option>${esc(p.name)}</option>`).join("")}</select></div>
  <div class="field"><label>Mode</label><select id="aMode"><option>Cash</option><option>Bank</option><option>UPI</option><option>Cheque</option></select></div>
  <div class="field"><label>Amount (₹) *</label><input id="aAmount" type="number" min=".01" step=".01" required></div>
- <div class="field"><label>Narration</label><input id="aNote"></div></div><div class="form-actions"><button class="btn primary">Save Entry</button></div></form></div>
+ <div class="field"><label>Narration</label><input id="aNote"></div></div><div class="form-actions"><button class="btn primary">Save Entry</button><button class="btn" type="button" onclick="goBack()">Esc · Back</button></div></form></div>
  <div class="card"><h3>Register</h3>${table(["Date","Voucher","Party","Mode","Amount","Action"],rows)}</div>`;
 }
-function saveAccount(e,key){e.preventDefault();const amount=Number($("aAmount").value);if(amount<=0)return alert("Valid amount লিখো।");db[key].push({id:uid(),no:$("aNo").value.trim(),date:$("aDate").value,party:$("aParty").value,mode:$("aMode").value,amount,note:$("aNote").value,createdAt:new Date().toISOString()});save();go(view)}
+function saveAccount(e,key){
+ e.preventDefault();const amount=Number($("aAmount").value);if(amount<=0)return alert("Valid amount লিখো।");
+ db[key].push({id:uid(),no:$("aNo").value.trim(),date:$("aDate").value,party:$("aParty").value,mode:$("aMode").value,amount,note:$("aNote").value,createdAt:new Date().toISOString()});
+ save();go(view);
+}
+
+/* Stock and Reports */
 function stockPage(){
  const rows=db.items.map(i=>`<tr><td>${esc(i.code||"")}</td><td>${esc(i.name)}</td><td>${esc(i.type||"")}</td><td>${esc(i.unit||"PCS")}</td><td>${Number(i.qty)||0}</td><td>${money(i.rate)}</td><td>${money((Number(i.qty)||0)*(Number(i.rate)||0))}</td></tr>`).join("");
  const total=db.items.reduce((s,i)=>s+(Number(i.qty)||0)*(Number(i.rate)||0),0);
@@ -388,6 +547,8 @@ function deleteRecord(key,id){
  }
  db[key]=db[key].filter(r=>r.id!==id);save();render();
 }
+
+/* Backup and Restore */
 function backup(){
  const blob=new Blob([JSON.stringify(db,null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");
  a.href=url;a.download="SHREE-ERP-backup-"+today()+".json";a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
@@ -407,9 +568,13 @@ function restoreBackup(e){
   e.target.value="";
  };reader.readAsText(file);
 }
-function clearData(){if(!confirm("সব ERP data মুছবে?"))return;if(!confirm("শেষবার নিশ্চিত করো। Backup নিয়েছ?"))return;db=blank();save();go("dashboard")}
+function clearData(){
+ if(!confirm("সব ERP data মুছবে?"))return;
+ if(!confirm("শেষবার নিশ্চিত করো। Backup নিয়েছ?"))return;
+ db=blank();save();billLines=[];itemReturnDraft=null;viewHistory=[];go("dashboard");
+}
 
-/* Print supports old single-item and new multi-item invoices */
+/* Print */
 function printVoucher(key,id){const x=db[key].find(r=>r.id===id);if(x)printObject({...x,company:db.company})}
 function printObject(x){
  const company=x.company||db.company||{},lines=Array.isArray(x.items)&&x.items.length?x.items:[{item:x.item||"",qty:x.qty||0,free:0,rate:x.rate||0,discount:0,gst:0,amount:x.total||0,batch:"",expiry:""}];
@@ -421,20 +586,61 @@ function printObject(x){
  w.document.close();
 }
 
-/* Keyboard shortcuts */
+/* Keyboard shortcuts and Enter-to-next-field */
 document.addEventListener("keydown",e=>{
  const tag=document.activeElement?.tagName;
  const typing=["INPUT","SELECT","TEXTAREA"].includes(tag);
- if(e.key==="Escape"){if(view!=="dashboard"){e.preventDefault();go("dashboard")}return}
- if(typing)return;
- if(e.key==="F2"){e.preventDefault();go("parties")}
- if(e.key==="F3"){e.preventDefault();go("items")}
- if(e.key==="F4"){e.preventDefault();go("retail")}
+
+ if(e.key==="F2"){
+  e.preventDefault();
+  if(view==="dashboard")openCustomerEntry();
+  else if(view==="retail")openItemEntryFromBilling();
+  else if(view==="items"&&itemReturnDraft){if($("iName"))$("iName").focus()}
+  else{partyReturnView=view;go("parties");setTimeout(()=>{$("pName")?.focus()},0)}
+  return;
+ }
+ if(e.key==="F3"){
+  e.preventDefault();
+  renameCustomer();
+  return;
+ }
+ if(e.key==="F4"){
+  e.preventDefault();
+  go("retail");
+  return;
+ }
+ if(e.key==="Escape"){
+  if(view!=="dashboard"){
+   e.preventDefault();
+   goBack();
+  }
+  return;
+ }
+ if(e.key==="Enter"&&typing&&tag!=="TEXTAREA"){
+  const el=document.activeElement;
+  const form=el.closest("form");
+  if(!form)return;
+  if(el.tagName==="INPUT"&&el.type==="hidden")return;
+  const controls=[...form.querySelectorAll("input:not([type=hidden]):not([disabled]),select:not([disabled]),textarea:not([disabled]),button:not([disabled])")]
+   .filter(x=>x.offsetParent!==null&&x.type!=="button"&&x.type!=="reset");
+  const index=controls.indexOf(el);
+  if(index!==-1){
+   e.preventDefault();
+   const next=controls[index+1];
+   if(next)next.focus();
+   else{
+    const submit=form.querySelector('button[type="submit"],button:not([type]),input[type="submit"]');
+    if(submit)submit.focus();
+   }
+  }
+ }
 });
+
 render();updateStatus();
 </script>
 </body>
 </html>
+
 
 
 
