@@ -1,873 +1,1106 @@
 
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#102c55">
-<title>SHREE ERP | Business Management System</title>
+<meta name="theme-color" content="#123d70">
+<title>SHREE ERP | Business Management</title>
 
 <style>
 :root{
- --navy:#102c55;
- --blue:#1769c2;
- --cyan:#11b8d4;
- --bg:#edf2f8;
- --white:#fff;
- --text:#25354a;
- --muted:#77869b;
- --border:#dce5f0;
- --green:#15966b;
- --orange:#ed9636;
- --red:#dc4e59;
- --shadow:0 5px 20px #17365d0c;
+  --navy:#123d70;
+  --blue:#1769aa;
+  --light:#edf3fa;
+  --line:#d5deea;
+  --text:#26374b;
+  --muted:#728096;
+  --white:#fff;
+  --green:#16845d;
+  --orange:#e58b25;
+  --red:#ce4444;
 }
 *{box-sizing:border-box}
 body{
- margin:0;background:var(--bg);color:var(--text);
- font-family:Arial,"Noto Sans Bengali",sans-serif;
- font-size:13px
+  margin:0;background:#e9eef5;color:var(--text);
+  font:13px "Segoe UI",Arial,sans-serif;
 }
 button,input,select,textarea{font:inherit}
 button{cursor:pointer}
 button:focus-visible,input:focus-visible,select:focus-visible{
- outline:2px solid var(--cyan);outline-offset:2px
+  outline:2px solid #4097ed;outline-offset:2px
 }
 .topbar{
- height:57px;background:var(--navy);color:white;
- display:flex;align-items:center;gap:14px;padding:0 18px;
- position:sticky;top:0;z-index:20;
- box-shadow:0 3px 12px #071a3433
+  height:56px;background:linear-gradient(100deg,#102e53,#1765a4);
+  color:white;display:flex;align-items:center;gap:12px;
+  padding:0 16px;position:sticky;top:0;z-index:10;
+  box-shadow:0 3px 12px #102e5330;
 }
-.brand{display:flex;align-items:center;gap:10px;min-width:195px}
-.brand-icon{
- width:37px;height:37px;border-radius:11px;
- background:linear-gradient(135deg,#22d3ee,#1971d4);
- display:grid;place-items:center;font-weight:900;font-size:21px;
- box-shadow:0 4px 12px #00c7ff30
+.logo{
+  font-size:22px;font-weight:900;letter-spacing:1px;
+  white-space:nowrap
 }
-.brand-name{font-size:19px;font-weight:900;letter-spacing:1.4px}
-.brand-sub{font-size:9px;color:#9bbde6;margin-top:3px;letter-spacing:1.3px}
-.top-search{flex:1;max-width:450px;position:relative}
+.logo span{color:#ffc85b}
+.top-sub{font-size:10px;color:#d9e7f7;margin-top:2px}
+.top-search{flex:1;max-width:400px;margin-left:auto}
 .top-search input{
- width:100%;padding:10px 14px 10px 36px;
- border:1px solid #426080;border-radius:8px;
- color:white;background:#203d63;outline:none
+  width:100%;padding:9px 12px;border-radius:6px;
+  border:1px solid #ffffff60;background:#ffffff16;color:white;
 }
-.top-search input::placeholder{color:#b4c6dd}
-.search-symbol{position:absolute;left:12px;top:10px;font-size:15px}
-.top-right{margin-left:auto;display:flex;align-items:center;gap:12px}
+.top-search input::placeholder{color:#d6e5f5}
 .top-btn{
- border:1px solid #436183;background:#203d63;color:white;
- padding:9px 11px;border-radius:7px
+  padding:9px 12px;background:#ffffff18;color:white;
+  border:1px solid #ffffff45;border-radius:5px
 }
-.avatar{
- width:34px;height:34px;border-radius:50%;
- display:grid;place-items:center;background:#d5e9ff;color:var(--navy);
- font-weight:bold
+.top-btn:hover{background:#ffffff30}
+.top-menu{
+  display:flex;gap:0;background:#fff;border-bottom:1px solid var(--line);
+  overflow-x:auto;white-space:nowrap;position:sticky;top:56px;z-index:9
 }
-.menubar{
- background:white;display:flex;gap:0;overflow-x:auto;
- border-bottom:1px solid var(--border);padding:0 12px;
- scrollbar-width:thin
+.top-menu button{
+  border:0;border-right:1px solid #e7ebf1;background:white;
+  padding:12px 15px;color:#334b65;font-weight:600
 }
-.menubar button{
- white-space:nowrap;border:0;background:white;color:#40536d;
- padding:12px 14px;border-bottom:3px solid transparent;font-weight:600
+.top-menu button:hover,.top-menu button.active{
+  background:#e2efff;color:#0c5ca4
 }
-.menubar button:hover,.menubar button.active{
- color:var(--blue);border-bottom-color:var(--blue);background:#f6faff
+.layout{
+  display:grid;grid-template-columns:240px minmax(300px,1fr) 238px;
+  gap:10px;padding:10px;align-items:start
 }
-.app{display:flex;min-height:calc(100vh - 94px)}
-.sidebar{
- width:226px;flex-shrink:0;background:#fff;
- border-right:1px solid var(--border);padding:15px 11px
+.panel,.card{
+  background:white;border:1px solid var(--line);
+  border-radius:7px;overflow:hidden
 }
-.side-title{
- padding:8px 10px;color:#96a4b7;font-size:10px;
- font-weight:800;letter-spacing:1.2px
+.panel-title{
+  padding:11px 12px;background:#f5f8fc;border-bottom:1px solid var(--line);
+  font-weight:800;color:#234363
 }
-.nav-item{
- width:100%;display:flex;align-items:center;gap:11px;
- text-align:left;border:0;background:transparent;
- color:#52647a;padding:10px 11px;border-radius:7px;
- margin:2px 0;font-weight:600
+.panel-title small{color:var(--muted);font-weight:400}
+.left-panel,.right-panel{min-width:0}
+.section-label{
+  padding:10px 12px 5px;font-weight:800;color:#6d7c91;
+  font-size:10px;text-transform:uppercase;letter-spacing:.6px
 }
-.nav-item .ico{width:19px;text-align:center;font-size:16px}
-.nav-item:hover,.nav-item.active{background:#eaf3ff;color:#1467bd}
-.nav-item.active{box-shadow:inset 3px 0 #1673d1}
-.nav-count{
- margin-left:auto;background:#e3efff;color:#1769c2;
- border-radius:5px;padding:3px 6px;font-size:10px
+.report-link{
+  display:block;width:100%;text-align:left;background:white;
+  border:0;border-bottom:1px solid #f0f3f7;padding:8px 12px;
+  color:#334b65
 }
-.sidebar-footer{
- margin-top:24px;background:#f2f7ff;border:1px solid #dceaff;
- padding:13px;border-radius:10px;line-height:1.7
+.report-link:hover{background:#eaf4ff;color:#075ca5}
+.report-link .ico{display:inline-block;width:23px;color:#2b75bb}
+.report-link.hidden{display:none}
+.left-foot{
+  padding:12px;background:#f8fafc;color:#748398;
+  font-size:11px;line-height:1.6
 }
-.sidebar-footer b{color:var(--navy)}
-.main{flex:1;min-width:0;padding:20px}
-.page-head{
- display:flex;justify-content:space-between;align-items:center;
- gap:12px;margin-bottom:19px;flex-wrap:wrap
+.company-banner{
+  background:linear-gradient(120deg,#102f54,#1c67a8);
+  color:white;padding:18px;border-radius:7px;position:relative;
+  overflow:hidden;box-shadow:0 4px 12px #163a6520
 }
-.eyebrow{color:var(--blue);font-weight:bold;font-size:10px;letter-spacing:1.5px}
-h1{font-size:23px;margin:6px 0;color:#172f50}
-.subtitle{color:var(--muted);font-size:12px}
-.head-actions{display:flex;gap:8px;flex-wrap:wrap}
-.btn{
- border:1px solid var(--border);background:white;color:#344b68;
- padding:10px 13px;border-radius:7px;font-weight:700
+.company-banner:after{
+  content:"";position:absolute;width:180px;height:180px;
+  border:25px solid #ffffff0d;border-radius:50%;
+  right:-55px;top:-65px
 }
-.btn:hover{filter:brightness(.97)}
-.btn-primary{background:var(--blue);color:white;border-color:var(--blue)}
-.btn-dark{background:var(--navy);color:white;border-color:var(--navy)}
-.btn-success{background:var(--green);color:white;border-color:var(--green)}
-.stats{
- display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
- gap:13px;margin-bottom:17px
+.company-banner h2{font-size:22px;margin:0 0 7px;position:relative;z-index:1}
+.company-banner p{margin:4px 0;color:#d8e9fb;position:relative;z-index:1}
+.company-banner .fy{
+  margin-top:12px;padding-top:10px;border-top:1px solid #ffffff35;
+  font-weight:700;color:#ffdc8d
+}
+.quick-stats{
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:8px;margin:10px 0
 }
 .stat{
- background:white;border:1px solid var(--border);border-radius:11px;
- padding:17px;box-shadow:var(--shadow);position:relative;overflow:hidden
+  background:white;border:1px solid var(--line);border-radius:7px;
+  padding:12px;min-width:0
 }
-.stat-top{display:flex;justify-content:space-between;align-items:center}
-.stat-label{color:#718198;font-size:12px;font-weight:600}
-.stat-icon{
- width:38px;height:38px;border-radius:10px;display:grid;place-items:center;
- font-size:18px;background:#e8f2ff;color:#1769c2
+.stat .sicon{font-size:19px}
+.stat .label{color:var(--muted);font-size:11px;margin:7px 0}
+.stat .value{font-size:17px;font-weight:800;color:#234363}
+.stat .hint{font-size:10px;color:#8592a3;margin-top:5px}
+.section-heading{
+  display:flex;justify-content:space-between;align-items:center;
+  gap:8px;margin:18px 0 9px;font-size:15px;font-weight:800
 }
-.stat-value{font-size:25px;font-weight:800;margin:15px 0 8px;color:#1a3457}
-.stat-foot{font-size:11px;color:#8492a4}
-.green{color:var(--green)!important}
-.orange{color:#d98b26!important}
-.blue{color:var(--blue)!important}
-.red{color:var(--red)!important}
-.section-grid{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(255px,1fr);gap:15px}
-.panel{
- background:white;border:1px solid var(--border);border-radius:11px;
- padding:17px;box-shadow:var(--shadow);margin-bottom:16px;min-width:0
+.section-heading small{font-size:11px;color:var(--muted);font-weight:400}
+.action-grid{
+  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px
 }
-.panel-head{
- display:flex;align-items:center;justify-content:space-between;
- gap:10px;margin-bottom:17px;flex-wrap:wrap
+.action{
+  background:white;border:1px solid var(--line);border-radius:7px;
+  padding:14px 6px;text-align:center;color:#2d455e;
+  min-width:0;transition:.15s
 }
-.panel-title{font-size:15px;font-weight:800;color:#1b3454}
-.panel-note{font-size:11px;color:var(--muted);margin-top:5px}
-.pill{
- border-radius:20px;padding:5px 9px;background:#eaf4ff;color:#1769c2;
- font-size:10px;font-weight:bold
+.action:hover{
+  border-color:#76aee6;background:#f1f7ff;transform:translateY(-1px)
 }
-.chart{
- height:190px;display:flex;align-items:end;gap:12px;
- border-bottom:1px solid var(--border);
- background:repeating-linear-gradient(to bottom,transparent 0,transparent 46px,#edf1f6 47px);
- padding:8px 8px 0
+.action .big{font-size:25px;display:block;margin-bottom:8px}
+.action b{font-size:12px;display:block}
+.action small{font-size:10px;color:#8592a3;display:block;margin-top:5px}
+.action.primary{border-top:3px solid #2876bd}
+.action.green{border-top:3px solid #249c71}
+.action.orange{border-top:3px solid #e49a36}
+.action.purple{border-top:3px solid #8966ce}
+.action.red{border-top:3px solid #dc6767}
+.promo{
+  margin-top:12px;background:linear-gradient(110deg,#fff6e6,#ffecd0);
+  border:1px solid #f4d6a2;border-radius:7px;padding:14px;
+  display:flex;align-items:center;justify-content:space-between;gap:10px
 }
-.chart-col{height:100%;flex:1;display:flex;flex-direction:column;justify-content:end;align-items:center;gap:7px}
-.bar-pair{height:155px;width:100%;display:flex;align-items:end;justify-content:center;gap:4px}
-.bar{width:35%;max-width:23px;border-radius:5px 5px 0 0;background:#4f91e6;min-height:4px}
-.bar.alt{background:#25c2cf}
-.chart-label{font-size:10px;color:#8090a3;padding-bottom:8px}
-.legend{display:flex;gap:16px;margin-top:15px;color:#74849a;font-size:11px}
-.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px}
-.quick-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
-.quick{
- border:1px solid #e3eaf3;background:#fff;border-radius:9px;
- padding:13px 5px;text-align:center;color:#40546e;
- font-weight:700;min-height:87px
+.promo strong{font-size:14px;color:#7a4c0d}
+.promo p{margin:5px 0 0;color:#876b42;font-size:11px}
+.promo button{
+  background:#9a5a12;color:white;border:0;border-radius:5px;
+  padding:9px 12px;white-space:nowrap
 }
-.quick:hover{border-color:#86b6f0;background:#f3f8ff;transform:translateY(-1px)}
-.quick-icon{font-size:22px;display:block;margin-bottom:9px}
-.quick span:last-child{font-size:11px}
-.table-wrap{width:100%;overflow-x:auto}
-table{width:100%;border-collapse:collapse;white-space:nowrap}
-th{
- background:#f6f9fd;color:#78899e;font-size:10px;
- text-transform:uppercase;letter-spacing:.4px;text-align:left
+.right-group{padding:8px}
+.right-action{
+  display:flex;align-items:center;gap:10px;width:100%;
+  background:white;border:1px solid #e5ebf2;border-radius:5px;
+  margin-bottom:6px;padding:9px;text-align:left;color:#344b64
 }
-th,td{padding:12px 10px;border-bottom:1px solid #edf1f6}
-td{font-size:12px}
-tbody tr:hover{background:#f9fbfe}
-.status{font-size:10px;padding:5px 8px;border-radius:5px;font-weight:bold}
-.status-paid{color:#12855e;background:#e2f7ed}
-.status-pending{color:#c37a19;background:#fff2d9}
-.status-cancel{color:#c13e4d;background:#ffeaed}
-.customer{display:flex;align-items:center;gap:9px}
-.mini-avatar{
- width:30px;height:30px;border-radius:8px;background:#e8f2ff;
- color:#1769c2;display:grid;place-items:center;font-weight:bold
+.right-action:hover{background:#edf5ff;border-color:#b9d5f1}
+.right-action .ri{
+  display:grid;place-items:center;width:30px;height:30px;
+  background:#eaf2fc;border-radius:6px;font-size:17px;flex-shrink:0
 }
-.action-list{display:grid;gap:12px}
-.action-row{display:flex;gap:11px;align-items:center}
-.action-ico{
- width:37px;height:37px;border-radius:9px;background:#eff5ff;
- display:grid;place-items:center;font-size:17px
+.right-action strong{font-size:12px;display:block}
+.right-action small{font-size:10px;color:#8491a2}
+.right-action .arrow{margin-left:auto;color:#8a9ab0}
+.datebox{
+  padding:12px;background:#f7f9fc;border-top:1px solid var(--line);
+  line-height:1.8
 }
-.action-info{flex:1}
-.action-info b{font-size:12px}
-.action-info div{color:#8a98a9;font-size:11px;margin-top:4px}
-.action-amount{font-weight:bold}
-.bottom-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}
-.stock-line{margin:16px 0}
-.stock-info{display:flex;justify-content:space-between;margin-bottom:8px;gap:10px}
-.track{height:7px;background:#edf1f7;border-radius:8px;overflow:hidden}
-.track div{height:100%;border-radius:8px;background:#3589df}
-.track .low{background:#e89b35}
-.footer{
- text-align:center;color:#92a0b2;font-size:11px;padding:20px 10px
+.datebox b{font-size:14px;color:#234363}
+.datebox span{color:var(--muted)}
+.bottom-status{
+  margin:0 10px 10px;background:#173755;color:#e4eef8;
+  border-radius:5px;padding:9px 12px;display:flex;gap:16px;
+  justify-content:space-between;flex-wrap:wrap;font-size:11px
 }
-.page{display:none}
-.page.show{display:block}
-.empty{text-align:center;padding:35px;color:#8492a4}
-.modal-backdrop{
- position:fixed;inset:0;background:#0b1d36a8;z-index:50;
- display:none;align-items:center;justify-content:center;padding:15px
+.dot{color:#67e2a6}
+.page-view{display:none;min-height:300px}
+.page-view.active{display:block}
+.page-card{
+  background:white;border:1px solid var(--line);border-radius:7px;
+  padding:18px;margin-top:10px
 }
-.modal-backdrop.open{display:flex}
-.modal{
- background:white;width:100%;max-width:560px;max-height:90vh;
- overflow:auto;border-radius:13px;box-shadow:0 20px 70px #071a3450
+.page-card h2{margin:0 0 7px;font-size:20px;color:#234363}
+.muted{color:var(--muted)}
+.form-grid{
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px
 }
-.modal-head{
- display:flex;align-items:center;justify-content:space-between;
- padding:18px;border-bottom:1px solid var(--border)
-}
-.modal-head h2{margin:0;font-size:18px}
-.close{
- border:0;background:#eef2f7;width:32px;height:32px;
- border-radius:7px;font-size:19px
-}
-.modal-body{padding:18px}
-.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}
-.field{display:flex;flex-direction:column;gap:7px}
-.field.full{grid-column:1/-1}
-.field label{font-size:12px;font-weight:700;color:#53647a}
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-weight:700;color:#50657d}
 .field input,.field select,.field textarea{
- width:100%;padding:11px;border:1px solid #d8e2ee;
- border-radius:7px;background:white;color:#24364c
+  width:100%;padding:10px;border:1px solid #ccd7e5;border-radius:5px;
+  background:white;color:var(--text)
 }
-.modal-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:18px}
+.field textarea{min-height:70px;resize:vertical}
+.btn{
+  background:#1769aa;color:white;border:0;border-radius:5px;
+  padding:10px 15px;font-weight:700
+}
+.btn.secondary{background:#edf2f8;color:#36516e;border:1px solid var(--line)}
+.btn.danger{background:#b83c3c}
+.form-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.table-wrap{overflow:auto;margin-top:12px}
+table{border-collapse:collapse;width:100%;min-width:520px}
+th,td{border:1px solid #dce4ee;padding:10px;text-align:left}
+th{background:#edf3fa;color:#38516d}
+.empty{text-align:center;color:#8290a2;padding:24px}
 .toast{
- position:fixed;right:20px;bottom:20px;z-index:100;
- background:#15385e;color:white;padding:13px 18px;border-radius:9px;
- box-shadow:0 8px 30px #102c5533;display:none;max-width:90vw
+  position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+  background:#173755;color:white;padding:12px 18px;border-radius:7px;
+  box-shadow:0 5px 25px #0003;z-index:50;max-width:90vw;
+  display:none
 }
 .toast.show{display:block}
-.mobile-menu{display:none}
-@media(max-width:1100px){
- .sidebar{width:195px}
- .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
- .section-grid{grid-template-columns:1fr}
+dialog{
+  border:0;border-radius:9px;width:min(540px,94vw);padding:0;
+  box-shadow:0 15px 55px #102e5350;color:var(--text)
 }
-@media(max-width:700px){
- .topbar{padding:0 10px;gap:9px;height:56px}
- .brand{min-width:0}
- .brand-name{font-size:15px}
- .brand-sub{font-size:8px}
- .brand-icon{width:33px;height:33px}
- .top-search{display:none}
- .top-right{gap:6px}
- .top-btn{padding:8px;font-size:11px}
- .top-right .user-label{display:none}
- .menubar{padding:0 4px}
- .menubar button{padding:11px 10px;font-size:11px}
- .app{display:block}
- .sidebar{
-  display:none;position:fixed;z-index:30;left:0;top:56px;bottom:0;
-  width:260px;overflow-y:auto;box-shadow:8px 0 25px #102c5520
- }
- .sidebar.mobile-open{display:block}
- .main{padding:13px 10px}
- .page-head{align-items:flex-start}
- h1{font-size:21px}
- .stats{gap:9px}
- .stat{padding:12px}
- .stat-value{font-size:21px}
- .stat-icon{width:32px;height:32px}
- .stat-label{font-size:11px}
- .section-grid,.bottom-grid{grid-template-columns:1fr;gap:0}
- .panel{padding:13px}
- .quick-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
- .quick{padding:10px 3px;min-height:78px}
- .quick-icon{font-size:20px}
- .quick span:last-child{font-size:10px}
- .form-grid{grid-template-columns:1fr}
- .field.full{grid-column:auto}
- .mobile-menu{display:inline-flex}
+dialog::backdrop{background:#091b31a8}
+.modal-head{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:14px 17px;background:#edf3fa;border-bottom:1px solid var(--line)
 }
-@media(max-width:360px){
- .stats{grid-template-columns:1fr 1fr}
- .stat-value{font-size:18px}
- .brand-name{font-size:13px}
+.modal-head strong{font-size:16px}
+.close{
+  background:transparent;border:0;font-size:22px;color:#5b6b7f
+}
+.modal-body{padding:17px;line-height:1.7}
+.modal-foot{padding:12px 17px;border-top:1px solid var(--line);text-align:right}
+@media(max-width:1050px){
+  .layout{grid-template-columns:210px minmax(280px,1fr)}
+  .right-panel{grid-column:1/-1}
+  .right-group{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+  .right-action{margin:0}
+  .datebox{grid-column:1/-1}
+}
+@media(max-width:650px){
+  .topbar{height:auto;min-height:55px;padding:9px;gap:8px;flex-wrap:wrap}
+  .logo{font-size:19px}
+  .top-sub{display:none}
+  .top-search{order:3;max-width:none;flex-basis:100%;margin:0}
+  .top-btn{padding:8px;font-size:11px}
+  .top-menu{top:0}
+  .top-menu button{padding:11px 12px}
+  .layout{display:flex;flex-direction:column;padding:7px;gap:9px}
+  .center-panel,.left-panel,.right-panel{width:100%}
+  .center-panel{order:1}
+  .right-panel{order:2}
+  .left-panel{order:3}
+  .quick-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .action-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .right-group{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .form-grid{grid-template-columns:1fr}
+  .company-banner h2{font-size:19px}
+  .bottom-status{margin:0 7px 7px}
 }
 </style>
 </head>
 <body>
 
 <header class="topbar">
- <button class="top-btn mobile-menu" onclick="toggleSidebar()" aria-label="Open menu">☰</button>
- <div class="brand">
-  <div class="brand-icon">S</div>
   <div>
-   <div class="brand-name">SHREE ERP</div>
-   <div class="brand-sub">SMART BUSINESS MANAGEMENT</div>
+    <div class="logo">SHREE <span>ERP</span></div>
+    <div class="top-sub">SMART BUSINESS MANAGEMENT</div>
   </div>
- </div>
- <div class="top-search">
-  <span class="search-symbol">⌕</span>
-  <input id="globalSearch" placeholder="Search bills, customers, products..." onkeydown="if(event.key==='Enter')searchEverything(this.value)">
- </div>
- <div class="top-right">
-  <button class="top-btn" onclick="showToast('Demo notification: সবকিছু আপডেট আছে।')">♧ <span class="user-label">Alerts</span></button>
-  <button class="top-btn" onclick="openModal('Company Settings')">⚙</button>
-  <div class="avatar">S</div>
-  <div class="user-label"><b>Admin</b><div style="font-size:10px;color:#b6cae4;margin-top:3px">Administrator</div></div>
- </div>
+  <div class="top-search">
+    <input id="globalSearch" type="search"
+      placeholder="Search reports, bills, stock..."
+      aria-label="Search ERP" autocomplete="off">
+  </div>
+  <button class="top-btn" onclick="openPage('company')">🏢 Company</button>
+  <button class="top-btn" onclick="openPage('settings')">⚙ Settings</button>
 </header>
 
-<nav class="menubar">
- <button class="active" onclick="showPage('dashboard',this)">Dashboard</button>
- <button onclick="showPage('sales',this)">Sales</button>
- <button onclick="showPage('purchase',this)">Purchase</button>
- <button onclick="showPage('inventory',this)">Inventory</button>
- <button onclick="showPage('accounts',this)">Accounts</button>
- <button onclick="showPage('reports',this)">Reports</button>
- <button onclick="showPage('settings',this)">Settings</button>
+<nav class="top-menu" id="mainMenu">
+  <button class="active" data-page="dashboard">⌂ Dashboard</button>
+  <button data-page="masters">▦ Masters</button>
+  <button data-page="transactions">⇄ Transactions</button>
+  <button data-page="accounts">₹ Accounts</button>
+  <button data-page="digital">▤ Digital Books</button>
+  <button data-page="reports">▥ Final Reports</button>
+  <button data-page="gst">GST</button>
+  <button data-page="stock">▣ Stocks</button>
+  <button data-page="daily">▤ Daily Reports</button>
+  <button data-page="links">↗ Links</button>
+  <button data-page="exit">⏻ Exit</button>
 </nav>
 
-<div class="app">
-<aside class="sidebar" id="sidebar">
- <div class="side-title">WORKSPACE</div>
- <button class="nav-item active" data-page="dashboard" onclick="showPage('dashboard')"><span class="ico">▦</span> Dashboard</button>
- <button class="nav-item" data-page="sales" onclick="showPage('sales')"><span class="ico">🧾</span> Sales & Billing <span class="nav-count" id="salesCount">0</span></button>
- <button class="nav-item" data-page="purchase" onclick="showPage('purchase')"><span class="ico">🛒</span> Purchase</button>
- <button class="nav-item" data-page="inventory" onclick="showPage('inventory')"><span class="ico">▤</span> Inventory & Stock</button>
- <button class="nav-item" data-page="customers" onclick="showPage('customers')"><span class="ico">♙</span> Customers</button>
- <button class="nav-item" data-page="suppliers" onclick="showPage('suppliers')"><span class="ico">♧</span> Suppliers</button>
- <div class="side-title">FINANCE & REPORTS</div>
- <button class="nav-item" data-page="accounts" onclick="showPage('accounts')"><span class="ico">₹</span> Accounts & Cashbook</button>
- <button class="nav-item" data-page="outstanding" onclick="showPage('outstanding')"><span class="ico">◷</span> Outstanding</button>
- <button class="nav-item" data-page="reports" onclick="showPage('reports')"><span class="ico">▥</span> Business Reports</button>
- <div class="side-title">MANAGEMENT</div>
- <button class="nav-item" data-page="settings" onclick="showPage('settings')"><span class="ico">⚙</span> Company Settings</button>
- <button class="nav-item" onclick="exportData()"><span class="ico">⇩</span> Export Data</button>
- <div class="sidebar-footer">
-  <b>SHREE ERP PRO</b><br>
-  <span style="color:#718198">Multi-Business Edition</span><br>
-  <span style="color:#15966b">● Demo System Active</span>
- </div>
+<div class="layout">
+
+<!-- LEFT: REPORTS -->
+<aside class="panel left-panel">
+  <div class="panel-title">☷ Report Centre</div>
+  <div class="section-label">Most Viewed Reports</div>
+  <div id="mostViewed">
+    <button class="report-link" data-report="Wholesale: Bill"><span class="ico">▤</span>Wholesale: Bill</button>
+    <button class="report-link" data-report="GSTR 1 (Outward Supply)"><span class="ico">▥</span>GSTR 1 (Outward Supply)</button>
+    <button class="report-link" data-report="Wholesale"><span class="ico">▤</span>Wholesale</button>
+    <button class="report-link" data-report="Party/Item Wise Sale"><span class="ico">▦</span>Party/Item Wise Sale</button>
+    <button class="report-link" data-report="GSTR 3B"><span class="ico">▥</span>GSTR 3B</button>
+    <button class="report-link" data-report="Wholesale: C/Note"><span class="ico">↩</span>Wholesale: C/Note</button>
+    <button class="report-link" data-report="Wallet"><span class="ico">▣</span>Wallet</button>
+    <button class="report-link" data-report="Message"><span class="ico">✉</span>Message</button>
+    <button class="report-link" data-report="ERP-to Distrib"><span class="ico">⇄</span>ERP-to Distrib</button>
+  </div>
+
+  <div class="section-label">Recently Viewed Reports</div>
+  <div id="recentReports">
+    <button class="report-link" data-report="Wholesale: Bill"><span class="ico">▤</span>Wholesale: Bill</button>
+    <button class="report-link" data-report="Wholesale"><span class="ico">▤</span>Wholesale</button>
+    <button class="report-link" data-report="Party/Item Wise Sale"><span class="ico">▦</span>Party/Item Wise Sale</button>
+    <button class="report-link" data-report="Sale Book"><span class="ico">▥</span>Sale Book</button>
+    <button class="report-link" data-report="GSTR 3B"><span class="ico">▥</span>GSTR 3B</button>
+    <button class="report-link" data-report="GSTR 1 (Outward Supply)"><span class="ico">▥</span>GSTR 1 (Outward Supply)</button>
+    <button class="report-link" data-report="Wholesale: C/Note"><span class="ico">↩</span>Wholesale: C/Note</button>
+    <button class="report-link" data-report="Retail: C/Note"><span class="ico">↩</span>Retail: C/Note</button>
+    <button class="report-link" data-report="Stock Valuation"><span class="ico">▣</span>Stock Valuation</button>
+    <button class="report-link" data-report="Purchase Register"><span class="ico">▥</span>Purchase Register</button>
+    <button class="report-link" data-report="Creditors Ledgers"><span class="ico">₹</span>Creditors Ledgers</button>
+    <button class="report-link" data-report="Wholesale: D/Note"><span class="ico">↪</span>Wholesale: D/Note</button>
+    <button class="report-link" data-report="Receive Orders"><span class="ico">⇩</span>Receive Orders</button>
+  </div>
+  <div class="left-foot">
+    <b>SHREE ERP</b><br>
+    Business Management System<br>
+    Version 1.0 · Demo Edition
+  </div>
 </aside>
 
-<main class="main">
+<!-- CENTRE -->
+<main class="center-panel">
 
-<!-- DASHBOARD -->
-<section class="page show" id="page-dashboard">
- <div class="page-head">
-  <div>
-   <div class="eyebrow">BUSINESS OVERVIEW / 01</div>
-   <h1>Dashboard Overview</h1>
-   <div class="subtitle">Welcome back, Admin. Here's your business summary.</div>
-  </div>
-  <div class="head-actions">
-   <button class="btn" onclick="showToast('Demo dashboard refreshed.')">↻ Refresh</button>
-   <button class="btn btn-primary" onclick="openModal('Sales Bill')">＋ New Transaction</button>
-  </div>
- </div>
-
- <div class="stats">
-  <div class="stat">
-   <div class="stat-top"><span class="stat-label">Total Sales</span><span class="stat-icon">↗</span></div>
-   <div class="stat-value" id="totalSales">₹0</div>
-   <div class="stat-foot"><span class="green">●</span> Recorded sales</div>
-  </div>
-  <div class="stat">
-   <div class="stat-top"><span class="stat-label">Total Purchase</span><span class="stat-icon" style="background:#fff2df;color:#d88a26">▣</span></div>
-   <div class="stat-value" id="totalPurchase">₹0</div>
-   <div class="stat-foot">Recorded purchases</div>
-  </div>
-  <div class="stat">
-   <div class="stat-top"><span class="stat-label">Stock Value</span><span class="stat-icon" style="background:#e0f8f4;color:#159b85">▤</span></div>
-   <div class="stat-value" id="stockValue">₹0</div>
-   <div class="stat-foot"><span id="stockCount">0</span> product types in inventory</div>
-  </div>
-  <div class="stat">
-   <div class="stat-top"><span class="stat-label">Receivables</span><span class="stat-icon" style="background:#f0eaff;color:#8062c8">◷</span></div>
-   <div class="stat-value" id="receivables">₹0</div>
-   <div class="stat-foot">Outstanding customer balance</div>
-  </div>
- </div>
-
- <div class="section-grid">
-  <div>
-   <div class="panel">
-    <div class="panel-head">
-     <div><div class="panel-title">Sales & Purchase Analysis</div><div class="panel-note">Monthly comparison · Demo visualization</div></div>
-     <span class="pill">OVERVIEW</span>
-    </div>
-    <div class="chart" id="chart">
-     <div class="chart-col"><div class="bar-pair"><div class="bar" style="height:45%"></div><div class="bar alt" style="height:30%"></div></div><div class="chart-label">Jan</div></div>
-     <div class="chart-col"><div class="bar-pair"><div class="bar" style="height:65%"></div><div class="bar alt" style="height:40%"></div></div><div class="chart-label">Feb</div></div>
-     <div class="chart-col"><div class="bar-pair"><div class="bar" style="height:55%"></div><div class="bar alt" style="height:46%"></div></div><div class="chart-label">Mar</div></div>
-     <div class="chart-col"><div class="bar-pair"><div class="bar" style="height:80%"></div><div class="bar alt" style="height:54%"></div></div><div class="chart-label">Apr</div></div>
-     <div class="chart-col"><div class="bar-pair"><div class="bar" style="height:68%"></div><div class="bar alt" style="height:45%"></div></div><div class="chart-label">May</div></div>
-     <div class="chart-col"><div class="bar-pair"><div class="bar" style="height:95%"></div><div class="bar alt" style="height:65%"></div></div><div class="chart-label">Jun</div></div>
-    </div>
-    <div class="legend"><span><i class="dot" style="background:#4f91e6"></i>Sales</span><span><i class="dot" style="background:#25c2cf"></i>Purchase</span></div>
-   </div>
-
-   <div class="panel">
-    <div class="panel-head">
-     <div><div class="panel-title">Recent Transactions</div><div class="panel-note">Your latest sales and purchase entries</div></div>
-     <button class="btn" onclick="showPage('sales')">View All →</button>
-    </div>
-    <div class="table-wrap">
-     <table>
-      <thead><tr><th>Bill No.</th><th>Party Name</th><th>Type</th><th>Date</th><th>Amount</th><th>Status</th></tr></thead>
-      <tbody id="recentRows"></tbody>
-     </table>
-    </div>
-   </div>
+<section id="dashboard" class="page-view active">
+  <div class="company-banner">
+    <h2 id="bannerCompany">SHREE ERP BUSINESS</h2>
+    <p id="bannerAddress">Your business address</p>
+    <p id="bannerGST">GSTIN: Not configured</p>
+    <div class="fy" id="financialYear">Financial Year: 2026–2027</div>
   </div>
 
-  <div>
-   <div class="panel">
-    <div class="panel-head"><div><div class="panel-title">Quick Actions</div><div class="panel-note">Frequently used operations</div></div></div>
-    <div class="quick-grid">
-     <button class="quick" onclick="openModal('Sales Bill')"><span class="quick-icon">🧾</span><span>Sales Bill</span></button>
-     <button class="quick" onclick="openModal('Purchase Bill')"><span class="quick-icon">🛒</span><span>Purchase</span></button>
-     <button class="quick" onclick="openModal('Receipt')"><span class="quick-icon">💵</span><span>Receipt</span></button>
-     <button class="quick" onclick="openModal('Payment')"><span class="quick-icon">💳</span><span>Payment</span></button>
-     <button class="quick" onclick="openModal('Add Product')"><span class="quick-icon">📦</span><span>Add Stock</span></button>
-     <button class="quick" onclick="openModal('Add Customer')"><span class="quick-icon">👤</span><span>Customer</span></button>
-     <button class="quick" onclick="openModal('Add Supplier')"><span class="quick-icon">🏢</span><span>Supplier</span></button>
-     <button class="quick" onclick="showPage('reports')"><span class="quick-icon">📊</span><span>Reports</span></button>
-     <button class="quick" onclick="exportData()"><span class="quick-icon">📥</span><span>Export</span></button>
+  <div class="quick-stats">
+    <div class="stat">
+      <div class="sicon">💵</div><div class="label">Today's Sales</div>
+      <div class="value" id="statSales">₹0.00</div>
+      <div class="hint">Demo transaction data</div>
     </div>
-   </div>
-   <div class="panel">
-    <div class="panel-head"><div><div class="panel-title">Stock Summary</div><div class="panel-note">Inventory levels</div></div><button class="btn" onclick="showPage('inventory')">Details</button></div>
-    <div id="stockSummary"></div>
-   </div>
-   <div class="panel">
-    <div class="panel-title">Business Information</div>
-    <div class="action-list" style="margin-top:15px">
-     <div class="action-row"><div class="action-ico">🏢</div><div class="action-info"><b id="companyNameMini">SHREE ERP Demo Company</b><div>Company profile</div></div></div>
-     <div class="action-row"><div class="action-ico">📅</div><div class="action-info"><b id="todayDate"></b><div>Current working date</div></div></div>
-     <div class="action-row"><div class="action-ico">🔒</div><div class="action-info"><b>Local Demo Mode</b><div>Data saved in this browser</div></div></div>
+    <div class="stat">
+      <div class="sicon">🧾</div><div class="label">Bills Created</div>
+      <div class="value" id="statBills">0</div>
+      <div class="hint">Saved in this browser</div>
     </div>
-   </div>
+    <div class="stat">
+      <div class="sicon">📦</div><div class="label">Stock Items</div>
+      <div class="value" id="statItems">0</div>
+      <div class="hint">Local demo records</div>
+    </div>
+    <div class="stat">
+      <div class="sicon">👥</div><div class="label">Parties</div>
+      <div class="value" id="statParties">0</div>
+      <div class="hint">Customer/supplier records</div>
+    </div>
   </div>
- </div>
+
+  <div class="section-heading">⚡ Quick Transactions <small>Open a module</small></div>
+  <div class="action-grid">
+    <button class="action primary" onclick="openPage('retail')"><span class="big">🧾</span><b>Bill-Retail</b><small>Retail invoice</small></button>
+    <button class="action primary" onclick="openPage('wholesale')"><span class="big">📋</span><b>Bill-Wholesale</b><small>Wholesale invoice</small></button>
+    <button class="action green" onclick="openPage('receipt')"><span class="big">💰</span><b>Receipt</b><small>Money received</small></button>
+    <button class="action orange" onclick="openPage('payment')"><span class="big">💸</span><b>Payment</b><small>Money paid</small></button>
+    <button class="action purple" onclick="openPage('purchase')"><span class="big">📥</span><b>Purchase</b><small>Purchase entry</small></button>
+    <button class="action green" onclick="openPage('parties')"><span class="big">👥</span><b>Party Master</b><small>Customers</small></button>
+    <button class="action orange" onclick="openPage('items')"><span class="big">📦</span><b>Item Master</b><small>Products & rates</small></button>
+    <button class="action purple" onclick="openPage('reports')"><span class="big">📊</span><b>Reports</b><small>Business reports</small></button>
+  </div>
+
+  <div class="section-heading">📚 Business & Accounts</div>
+  <div class="action-grid">
+    <button class="action" onclick="openPage('ledger')"><span class="big">📒</span><b>Ledger A/c</b><small>Account ledger</small></button>
+    <button class="action" onclick="openPage('outstanding')"><span class="big">₹</span><b>Outstanding</b><small>Due summary</small></button>
+    <button class="action" onclick="openPage('stock')"><span class="big">🏬</span><b>Stock Status</b><small>Available quantity</small></button>
+    <button class="action" onclick="openPage('purchase')"><span class="big">🛒</span><b>Purchase Register</b><small>Purchase entries</small></button>
+    <button class="action" onclick="openPage('sales')"><span class="big">📈</span><b>Sales Book</b><small>Sales entries</small></button>
+    <button class="action" onclick="openPage('gst')"><span class="big">🧮</span><b>GST Centre</b><small>GST summaries</small></button>
+    <button class="action" onclick="openPage('daily')"><span class="big">📅</span><b>Daily Analysis</b><small>Daily activity</small></button>
+    <button class="action" onclick="openPage('company')"><span class="big">🏢</span><b>Company</b><small>Company profile</small></button>
+  </div>
+
+  <div class="promo">
+    <div><strong>🚀 Welcome to SHREE ERP</strong>
+      <p>Manage your bills, parties, products and reports in one place.</p>
+    </div>
+    <button onclick="openPage('settings')">Configure ERP</button>
+  </div>
 </section>
 
-<!-- SALES -->
-<section class="page" id="page-sales">
- <div class="page-head"><div><div class="eyebrow">TRANSACTIONS / 02</div><h1>Sales & Billing</h1><div class="subtitle">Manage sales bills and customer transactions.</div></div><button class="btn btn-primary" onclick="openModal('Sales Bill')">＋ Create Sales Bill</button></div>
- <div class="panel"><div class="panel-head"><div class="panel-title">Sales Register</div><input id="salesFilter" placeholder="Search bills..." oninput="renderTables()" style="padding:9px;border:1px solid var(--border);border-radius:7px;max-width:220px"></div><div class="table-wrap"><table><thead><tr><th>Bill No.</th><th>Party</th><th>Type</th><th>Date</th><th>Amount</th><th>Status</th><th>Action</th></tr></thead><tbody id="salesRows"></tbody></table></div></div>
+<!-- GENERIC PAGE -->
+<section id="genericPage" class="page-view">
+  <div class="page-card">
+    <h2 id="genericTitle">Module</h2>
+    <p id="genericDesc" class="muted">Module description</p>
+    <div id="genericContent"></div>
+  </div>
+</section>
+
+<!-- COMPANY -->
+<section id="company" class="page-view">
+  <div class="page-card">
+    <h2>🏢 Company Configuration</h2>
+    <p class="muted">Enter your business details. Saved locally in this browser.</p>
+    <form id="companyForm">
+      <div class="form-grid">
+        <div class="field"><label>Company Name</label><input name="name" id="companyName" required value="SHREE ERP BUSINESS"></div>
+        <div class="field"><label>GSTIN</label><input name="gst" id="companyGST" placeholder="Enter GSTIN"></div>
+        <div class="field"><label>Phone</label><input name="phone" id="companyPhone" type="tel" placeholder="Business phone"></div>
+        <div class="field"><label>Financial Year</label><select name="fy" id="companyFY"><option>2026-2027</option><option>2025-2026</option><option>2027-2028</option></select></div>
+        <div class="field" style="grid-column:1/-1"><label>Business Address</label><textarea name="address" id="companyAddress" placeholder="Address, city, PIN"></textarea></div>
+      </div>
+      <div class="form-actions"><button class="btn" type="submit">Save Company</button></div>
+    </form>
+  </div>
+</section>
+
+<!-- ITEM MASTER -->
+<section id="items" class="page-view">
+  <div class="page-card">
+    <h2>📦 Item Master</h2>
+    <p class="muted">Add demo product records and stock quantities.</p>
+    <form id="itemForm">
+      <div class="form-grid">
+        <div class="field"><label>Item Name *</label><input id="itemName" required placeholder="Product name"></div>
+        <div class="field"><label>Item Code</label><input id="itemCode" placeholder="SKU-001"></div>
+        <div class="field"><label>Sale Rate (₹) *</label><input id="itemRate" type="number" min="0" step=".01" required></div>
+        <div class="field"><label>Opening Stock *</label><input id="itemQty" type="number" min="0" step=".001" required></div>
+        <div class="field"><label>GST Rate (%)</label><select id="itemTax"><option value="0">0%</option><option value="5">5%</option><option value="12">12%</option><option value="18">18%</option><option value="28">28%</option></select></div>
+        <div class="field"><label>Unit</label><select id="itemUnit"><option>Piece</option><option>Box</option><option>Strip</option><option>Bottle</option><option>Kg</option><option>Pack</option></select></div>
+      </div>
+      <div class="form-actions"><button class="btn">Add Item</button></div>
+    </form>
+    <div class="table-wrap"><table><thead><tr><th>Code</th><th>Item</th><th>Rate</th><th>Stock</th><th>GST</th><th>Action</th></tr></thead><tbody id="itemRows"></tbody></table></div>
+  </div>
+</section>
+
+<!-- PARTY MASTER -->
+<section id="parties" class="page-view">
+  <div class="page-card">
+    <h2>👥 Party Master</h2>
+    <p class="muted">Add customers or suppliers for demo transactions.</p>
+    <form id="partyForm">
+      <div class="form-grid">
+        <div class="field"><label>Party Name *</label><input id="partyName" required></div>
+        <div class="field"><label>Party Type</label><select id="partyType"><option>Customer</option><option>Supplier</option><option>Both</option></select></div>
+        <div class="field"><label>Phone</label><input id="partyPhone" type="tel"></div>
+        <div class="field"><label>GSTIN</label><input id="partyGST"></div>
+        <div class="field" style="grid-column:1/-1"><label>Address</label><input id="partyAddress"></div>
+      </div>
+      <div class="form-actions"><button class="btn">Add Party</button></div>
+    </form>
+    <div class="table-wrap"><table><thead><tr><th>Name</th><th>Type</th><th>Phone</th><th>GSTIN</th><th>Action</th></tr></thead><tbody id="partyRows"></tbody></table></div>
+  </div>
+</section>
+
+<!-- BILLING -->
+<section id="retail" class="page-view bill-page">
+  <div class="page-card">
+    <h2>🧾 Retail Bill</h2>
+    <p class="muted">Create a local demo invoice. Verify all tax settings before real-world use.</p>
+    <form id="billForm">
+      <div class="form-grid">
+        <div class="field"><label>Invoice Number</label><input id="billNo" readonly></div>
+        <div class="field"><label>Date</label><input id="billDate" type="date" required></div>
+        <div class="field"><label>Customer</label><select id="billParty"><option value="">Walk-in Customer</option></select></div>
+        <div class="field"><label>Item *</label><select id="billItem" required><option value="">Add items in Item Master first</option></select></div>
+        <div class="field"><label>Quantity *</label><input id="billQty" type="number" min=".001" step=".001" value="1" required></div>
+        <div class="field"><label>Unit Rate (₹)</label><input id="billRate" type="number" min="0" step=".01" required></div>
+        <div class="field"><label>GST (%)</label><input id="billTax" type="number" min="0" max="100" value="0" readonly></div>
+        <div class="field"><label>Payment Method</label><select id="billPayment"><option>Cash</option><option>UPI</option><option>Card</option><option>Credit</option><option>Bank</option></select></div>
+      </div>
+      <div class="page-card" style="margin-top:14px;background:#f7faff">
+        <div>Taxable Amount: <b id="billSubtotal">₹0.00</b></div>
+        <div>Estimated GST: <b id="billGST">₹0.00</b></div>
+        <h2 style="margin-top:10px">Total: <span id="billTotal">₹0.00</span></h2>
+      </div>
+      <div class="form-actions">
+        <button class="btn" type="submit">Save Demo Bill</button>
+        <button class="btn secondary" type="button" onclick="printLastBill()">Print Last Saved Bill</button>
+      </div>
+    </form>
+  </div>
+</section>
+
+<!-- RECEIPT -->
+<section id="receipt" class="page-view">
+  <div class="page-card">
+    <h2>💰 Receipt Entry</h2><p class="muted">Record money received (demo only).</p>
+    <form id="receiptForm">
+      <div class="form-grid">
+        <div class="field"><label>Party</label><select id="receiptParty"></select></div>
+        <div class="field"><label>Date</label><input id="receiptDate" type="date" required></div>
+        <div class="field"><label>Amount (₹)</label><input id="receiptAmount" type="number" min=".01" step=".01" required></div>
+        <div class="field"><label>Mode</label><select id="receiptMode"><option>Cash</option><option>UPI</option><option>Bank</option><option>Cheque</option></select></div>
+        <div class="field" style="grid-column:1/-1"><label>Narration</label><input id="receiptNote"></div>
+      </div>
+      <div class="form-actions"><button class="btn">Save Receipt</button></div>
+    </form>
+    <div class="table-wrap"><table><thead><tr><th>Date</th><th>Party</th><th>Mode</th><th>Amount</th></tr></thead><tbody id="receiptRows"></tbody></table></div>
+  </div>
+</section>
+
+<!-- PAYMENT -->
+<section id="payment" class="page-view">
+  <div class="page-card">
+    <h2>💸 Payment Entry</h2><p class="muted">Record money paid (demo only).</p>
+    <form id="paymentForm">
+      <div class="form-grid">
+        <div class="field"><label>Party</label><select id="paymentParty"></select></div>
+        <div class="field"><label>Date</label><input id="paymentDate" type="date" required></div>
+        <div class="field"><label>Amount (₹)</label><input id="paymentAmount" type="number" min=".01" step=".01" required></div>
+        <div class="field"><label>Mode</label><select id="paymentMode"><option>Cash</option><option>UPI</option><option>Bank</option><option>Cheque</option></select></div>
+        <div class="field" style="grid-column:1/-1"><label>Narration</label><input id="paymentNote"></div>
+      </div>
+      <div class="form-actions"><button class="btn">Save Payment</button></div>
+    </form>
+    <div class="table-wrap"><table><thead><tr><th>Date</th><th>Party</th><th>Mode</th><th>Amount</th></tr></thead><tbody id="paymentRows"></tbody></table></div>
+  </div>
 </section>
 
 <!-- PURCHASE -->
-<section class="page" id="page-purchase">
- <div class="page-head"><div><div class="eyebrow">PROCUREMENT / 03</div><h1>Purchase Management</h1><div class="subtitle">Record supplier purchases and expenses.</div></div><button class="btn btn-primary" onclick="openModal('Purchase Bill')">＋ New Purchase</button></div>
- <div class="panel"><div class="panel-title" style="margin-bottom:16px">Purchase Register</div><div class="table-wrap"><table><thead><tr><th>Bill No.</th><th>Supplier</th><th>Type</th><th>Date</th><th>Amount</th><th>Status</th></tr></thead><tbody id="purchaseRows"></tbody></table></div></div>
-</section>
-
-<!-- INVENTORY -->
-<section class="page" id="page-inventory">
- <div class="page-head"><div><div class="eyebrow">PRODUCT MANAGEMENT / 04</div><h1>Inventory & Stock</h1><div class="subtitle">Track products, quantity and stock value.</div></div><button class="btn btn-primary" onclick="openModal('Add Product')">＋ Add Product</button></div>
- <div class="stats">
-  <div class="stat"><div class="stat-label">Product Types</div><div class="stat-value" id="invCount">0</div></div>
-  <div class="stat"><div class="stat-label">Total Units</div><div class="stat-value" id="invUnits">0</div></div>
-  <div class="stat"><div class="stat-label">Inventory Value</div><div class="stat-value" id="invValue">₹0</div></div>
-  <div class="stat"><div class="stat-label">Low Stock Items</div><div class="stat-value orange" id="lowStock">0</div></div>
- </div>
- <div class="panel"><div class="panel-head"><div class="panel-title">Product Register</div><input id="productFilter" placeholder="Search products..." oninput="renderTables()" style="padding:9px;border:1px solid var(--border);border-radius:7px;max-width:220px"></div><div class="table-wrap"><table><thead><tr><th>Code</th><th>Product Name</th><th>Category</th><th>Qty</th><th>Rate</th><th>Stock Value</th><th>Action</th></tr></thead><tbody id="productRows"></tbody></table></div></div>
-</section>
-
-<!-- CUSTOMERS -->
-<section class="page" id="page-customers">
- <div class="page-head"><div><div class="eyebrow">PARTY MANAGEMENT</div><h1>Customers</h1><div class="subtitle">Maintain customer details and balances.</div></div><button class="btn btn-primary" onclick="openModal('Add Customer')">＋ Add Customer</button></div>
- <div class="panel"><div class="table-wrap"><table><thead><tr><th>Customer</th><th>Phone</th><th>Address</th><th>Action</th></tr></thead><tbody id="customerRows"></tbody></table></div></div>
-</section>
-
-<!-- SUPPLIERS -->
-<section class="page" id="page-suppliers">
- <div class="page-head"><div><div class="eyebrow">PARTY MANAGEMENT</div><h1>Suppliers</h1><div class="subtitle">Manage supplier contacts and records.</div></div><button class="btn btn-primary" onclick="openModal('Add Supplier')">＋ Add Supplier</button></div>
- <div class="panel"><div class="table-wrap"><table><thead><tr><th>Supplier</th><th>Phone</th><th>Address</th><th>Action</th></tr></thead><tbody id="supplierRows"></tbody></table></div></div>
-</section>
-
-<!-- ACCOUNTS -->
-<section class="page" id="page-accounts">
- <div class="page-head"><div><div class="eyebrow">FINANCIAL MANAGEMENT</div><h1>Accounts & Cashbook</h1><div class="subtitle">Track money received and paid.</div></div><div class="head-actions"><button class="btn btn-success" onclick="openModal('Receipt')">＋ Receipt</button><button class="btn btn-primary" onclick="openModal('Payment')">− Payment</button></div></div>
- <div class="stats">
-  <div class="stat"><div class="stat-label">Total Receipts</div><div class="stat-value green" id="receiptTotal">₹0</div></div>
-  <div class="stat"><div class="stat-label">Total Payments</div><div class="stat-value red" id="paymentTotal">₹0</div></div>
-  <div class="stat"><div class="stat-label">Net Cash Flow</div><div class="stat-value" id="cashBalance">₹0</div></div>
-  <div class="stat"><div class="stat-label">Transactions</div><div class="stat-value" id="cashCount">0</div></div>
- </div>
- <div class="panel"><div class="panel-title" style="margin-bottom:16px">Cashbook Register</div><div class="table-wrap"><table><thead><tr><th>Date</th><th>Type</th><th>Party</th><th>Reference</th><th>Amount</th></tr></thead><tbody id="cashRows"></tbody></table></div></div>
-</section>
-
-<!-- OUTSTANDING -->
-<section class="page" id="page-outstanding">
- <div class="page-head"><div><div class="eyebrow">CREDIT CONTROL</div><h1>Outstanding Balances</h1><div class="subtitle">Unpaid bills and party balances.</div></div><button class="btn btn-primary" onclick="openModal('Receipt')">＋ Receive Payment</button></div>
- <div class="panel"><div class="table-wrap"><table><thead><tr><th>Bill No.</th><th>Party</th><th>Type</th><th>Bill Amount</th><th>Paid</th><th>Due</th></tr></thead><tbody id="dueRows"></tbody></table></div></div>
-</section>
-
-<!-- REPORTS -->
-<section class="page" id="page-reports">
- <div class="page-head"><div><div class="eyebrow">ANALYTICS & INSIGHTS</div><h1>Business Reports</h1><div class="subtitle">Summary of recorded demo transactions.</div></div><button class="btn btn-primary" onclick="exportData()">⇩ Export JSON</button></div>
- <div class="stats">
-  <div class="stat"><div class="stat-label">Sales</div><div class="stat-value" id="repSales">₹0</div></div>
-  <div class="stat"><div class="stat-label">Purchase</div><div class="stat-value" id="repPurchase">₹0</div></div>
-  <div class="stat"><div class="stat-label">Gross Difference</div><div class="stat-value" id="repDifference">₹0</div></div>
-  <div class="stat"><div class="stat-label">Bills Recorded</div><div class="stat-value" id="repBills">0</div></div>
- </div>
- <div class="panel"><div class="panel-title" style="margin-bottom:15px">Report Summary</div><div id="reportSummary" class="action-list"></div></div>
+<section id="purchase" class="page-view">
+  <div class="page-card">
+    <h2>📥 Purchase Register</h2>
+    <p class="muted">Purchase-entry demo. Saves purchase records and increases stock.</p>
+    <form id="purchaseForm">
+      <div class="form-grid">
+        <div class="field"><label>Supplier</label><select id="purchaseParty"></select></div>
+        <div class="field"><label>Invoice Number</label><input id="purchaseNo" required></div>
+        <div class="field"><label>Item *</label><select id="purchaseItem" required></select></div>
+        <div class="field"><label>Quantity *</label><input id="purchaseQty" type="number" min=".001" step=".001" required></div>
+        <div class="field"><label>Unit Cost (₹) *</label><input id="purchaseRate" type="number" min="0" step=".01" required></div>
+        <div class="field"><label>Date</label><input id="purchaseDate" type="date" required></div>
+      </div>
+      <div class="form-actions"><button class="btn">Save Purchase</button></div>
+    </form>
+    <div class="table-wrap"><table><thead><tr><th>Date</th><th>Invoice</th><th>Supplier</th><th>Item</th><th>Qty</th><th>Total</th></tr></thead><tbody id="purchaseRows"></tbody></table></div>
+  </div>
 </section>
 
 <!-- SETTINGS -->
-<section class="page" id="page-settings">
- <div class="page-head"><div><div class="eyebrow">SYSTEM CONFIGURATION</div><h1>Company Settings</h1><div class="subtitle">Customize your SHREE ERP demo profile.</div></div></div>
- <div class="panel" style="max-width:650px">
-  <div class="panel-title" style="margin-bottom:17px">Business Profile</div>
-  <form id="settingsForm">
-   <div class="form-grid">
-    <div class="field full"><label>Company / Business Name</label><input name="company" id="settingCompany" required value="SHREE ERP Demo Company"></div>
-    <div class="field"><label>Owner / Administrator</label><input name="owner" id="settingOwner" value="Admin"></div>
-    <div class="field"><label>Phone Number</label><input name="phone" id="settingPhone" placeholder="Business contact"></div>
-    <div class="field"><label>GSTIN (optional)</label><input name="gstin" id="settingGstin" placeholder="Enter GSTIN"></div>
-    <div class="field"><label>Currency</label><select name="currency" id="settingCurrency"><option value="INR">INR (₹)</option></select></div>
-    <div class="field full"><label>Business Address</label><textarea name="address" id="settingAddress" rows="3" placeholder="Enter business address"></textarea></div>
-   </div>
-   <div class="modal-actions"><button class="btn btn-primary" type="submit">Save Settings</button></div>
-  </form>
-  <hr style="border:0;border-top:1px solid var(--border);margin:22px 0">
-  <div class="panel-title">Demo Data Management</div>
-  <p class="subtitle">Export your current demo data or reset all saved demo records.</p>
-  <div class="head-actions"><button class="btn" onclick="exportData()">Export Backup</button><button class="btn" style="color:#c13e4d" onclick="resetData()">Reset Demo Data</button></div>
- </div>
+<section id="settings" class="page-view">
+  <div class="page-card">
+    <h2>⚙ Settings & Data</h2>
+    <p class="muted">Local demo settings. Data is stored in this browser only.</p>
+    <div class="form-actions">
+      <button class="btn" onclick="exportData()">Export Demo Data (JSON)</button>
+      <button class="btn secondary" onclick="window.print()">Print Current Screen</button>
+    </div>
+    <hr style="border:0;border-top:1px solid #dce4ee;margin:20px 0">
+    <h3>Important limitations</h3>
+    <ul style="line-height:2">
+      <li>Records are not automatically synced between devices.</li>
+      <li>Browser storage is not a secure accounting database.</li>
+      <li>No live GST filing, e-invoice or e-way bill submission.</li>
+      <li>No real cloud backup or multi-user login yet.</li>
+    </ul>
+    <button class="btn danger" onclick="clearDemoData()">Clear All Local Demo Data</button>
+  </div>
 </section>
 
-<div class="footer">SHREE ERP · Smart Business Management · Responsive Demo Interface</div>
 </main>
+
+<!-- RIGHT: SHORTCUTS -->
+<aside class="panel right-panel">
+  <div class="panel-title">⚡ Quick Access</div>
+  <div class="right-group">
+    <button class="right-action" onclick="openPage('retail')"><span class="ri">🧾</span><span><strong>Bill-Retail</strong><small>Retail billing</small></span><span class="arrow">›</span></button>
+    <button class="right-action" onclick="openPage('wholesale')"><span class="ri">📋</span><span><strong>Bill-Wholesale</strong><small>Wholesale billing</small></span><span class="arrow">›</span></button>
+    <button class="right-action" onclick="openPage('stock')"><span class="ri">⏳</span><span><strong>S/R Expiry</strong><small>Expiry tracker demo</small></span><span class="arrow">›</span></button>
+    <button class="right-action" onclick="openPage('stock')"><span class="ri">📦</span><span><strong>P/R Expiry</strong><small>Product expiry demo</small></span><span class="arrow">›</span></button>
+    <button class="right-action" onclick="openPage('receipt')"><span class="ri">💰</span><span><strong>Receipt</strong><small>Money received</small></span><span class="arrow">›</span></button>
+    <button class="right-action" onclick="openPage('payment')"><span class="ri">💸</span><span><strong>Payment</strong><small>Money paid</small></span><span class="arrow">›</span></button>
+    <button class="right-action" onclick="openPage('ledger')"><span class="ri">📒</span><span><strong>Cash & Bank Book</strong><small>Account summary</small></span><span class="arrow">›</span></button>
+    <button class="right-action" onclick="openPage('ledger')"><span class="ri">📘</span><span><strong>Ledger A/c</strong><small>Ledger report</small></span><span class="arrow">›</span></button>
+    <button class="right-action" onclick="openPage('outstanding')"><span class="ri">₹</span><span><strong>Outstanding</strong><small>Due balances</small></span><span class="arrow">›</span></button>
+    <button class="right-action" onclick="openPage('stock')"><span class="ri">🏬</span><span><strong>Stock Status</strong><small>Item quantity</small></span><span class="arrow">›</span></button>
+    <button class="right-action" onclick="openPage('sales')"><span class="ri">📈</span><span><strong>Stock & Sales Analysis</strong><small>Sales summary</small></span><span class="arrow">›</span></button>
+    <button class="right-action" onclick="openPage('stock')"><span class="ri">🔔</span><span><strong>Re-Order</strong><small>Low stock</small></span><span class="arrow">›</span></button>
+    <button class="right-action" onclick="openPage('sales')"><span class="ri">📚</span><span><strong>Sales Book</strong><small>Invoice records</small></span><span class="arrow">›</span></button>
+    <button class="right-action" onclick="openPage('daily')"><span class="ri">🚚</span><span><strong>Dispatch Summary</strong><small>Dispatch demo</small></span><span class="arrow">›</span></button>
+    <button class="right-action" onclick="openPage('daily')"><span class="ri">📊</span><span><strong>Daily Analysis (MIS)</strong><small>Business analysis</small></span><span class="arrow">›</span></button>
+    <button class="right-action" onclick="openPage('daily')"><span class="ri">🧮</span><span><strong>Today's Gross Profit</strong><small>Estimate only</small></span><span class="arrow">›</span></button>
+    <button class="right-action" onclick="openPage('company')"><span class="ri">🏢</span><span><strong>Change Company</strong><small>Company settings</small></span><span class="arrow">›</span></button>
+    <button class="right-action" onclick="openPage('purchase')"><span class="ri">📥</span><span><strong>Purchase Import</strong><small>Manual entry demo</small></span><span class="arrow">›</span></button>
+    <button class="right-action" onclick="openPage('settings')"><span class="ri">☁️</span><span><strong>Backup</strong><small>Export local data</small></span><span class="arrow">›</span></button>
+  </div>
+  <div class="datebox">
+    <b id="todayDate">17 Oct, 2026</b><br>
+    <span id="todayDay">Saturday</span><br>
+    <span>Financial Year: <b>2026–27</b></span>
+  </div>
+</aside>
 </div>
 
-<!-- DYNAMIC FORM MODAL -->
-<div class="modal-backdrop" id="modalBackdrop" onclick="if(event.target===this)closeModal()">
- <div class="modal">
-  <div class="modal-head"><h2 id="modalTitle">New Entry</h2><button class="close" onclick="closeModal()">×</button></div>
-  <div class="modal-body"><form id="entryForm"><div class="form-grid" id="formFields"></div><div class="modal-actions"><button class="btn" type="button" onclick="closeModal()">Cancel</button><button class="btn btn-primary" type="submit">Save Entry</button></div></form></div>
- </div>
-</div>
-<div class="toast" id="toast"></div>
+<footer class="bottom-status">
+  <span><span class="dot">●</span> SHREE ERP Demo</span>
+  <span id="statusCompany">Company: SHREE ERP BUSINESS</span>
+  <span>Local Browser Mode</span>
+  <span id="clock">--:--:--</span>
+</footer>
+
+<dialog id="infoDialog">
+  <div class="modal-head"><strong id="dialogTitle">Information</strong><button class="close" onclick="closeDialog()">×</button></div>
+  <div class="modal-body" id="dialogBody"></div>
+  <div class="modal-foot"><button class="btn" onclick="closeDialog()">Close</button></div>
+</dialog>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <script>
 "use strict";
 
+/* SHREE ERP — frontend demo only.
+   Never store real customer or accounting data here. */
+
 const $ = id => document.getElementById(id);
-const money = n => "₹" + Number(n || 0).toLocaleString("en-IN",{maximumFractionDigits:2});
-const today = () => new Date().toISOString().slice(0,10);
-
-const STORAGE_KEY = "shree_erp_demo_v1";
-
-function freshData(){
- return {
-  company:{company:"SHREE ERP Demo Company",owner:"Admin",phone:"",gstin:"",currency:"INR",address:""},
-  products:[],
-  customers:[],
-  suppliers:[],
-  transactions:[],
-  cash:[]
- };
-}
-function loadData(){
- try{
-  const raw=localStorage.getItem(STORAGE_KEY);
-  if(raw){
-   const d=JSON.parse(raw);
-   if(d && d.company && Array.isArray(d.products) && Array.isArray(d.transactions)) return d;
-  }
- }catch(e){}
- return freshData();
-}
-let db=loadData();
-
-function saveData(){
- try{
-  localStorage.setItem(STORAGE_KEY,JSON.stringify(db));
-  return true;
- }catch(e){
-  showToast("Storage unavailable. Export your data as a backup.");
-  return false;
- }
-}
-function esc(v){
- return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-}
-function sum(arr,fn){return arr.reduce((total,item)=>total+Number(fn(item)||0),0)}
-function showToast(message){
- const t=$("toast");
- t.textContent=message;t.classList.add("show");
- clearTimeout(showToast.timer);
- showToast.timer=setTimeout(()=>t.classList.remove("show"),2800);
-}
-function toggleSidebar(){$("sidebar").classList.toggle("mobile-open")}
-
-const pageNames={
- dashboard:"Dashboard Overview",sales:"Sales & Billing",purchase:"Purchase Management",
- inventory:"Inventory & Stock",customers:"Customers",suppliers:"Suppliers",
- accounts:"Accounts & Cashbook",outstanding:"Outstanding Balances",
- reports:"Business Reports",settings:"Company Settings"
+const money = n => "₹" + Number(n || 0).toLocaleString("en-IN", {
+  minimumFractionDigits:2, maximumFractionDigits:2
+});
+const today = () => {
+  const d = new Date();
+  return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
 };
-function showPage(name,button){
- const page=$("page-"+name);
- if(!page){showToast("This section is not available.");return}
- document.querySelectorAll(".page").forEach(p=>p.classList.remove("show"));
- page.classList.add("show");
- document.querySelectorAll(".nav-item").forEach(b=>b.classList.toggle("active",b.dataset.page===name));
- document.querySelectorAll(".menubar button").forEach(b=>b.classList.remove("active"));
- if(button && button.closest(".menubar"))button.classList.add("active");
- else{
-  const menu=[...document.querySelectorAll(".menubar button")].find(b=>b.textContent.trim()===name.charAt(0).toUpperCase()+name.slice(1));
-  if(menu)menu.classList.add("active");
-  if(name==="dashboard")document.querySelector(".menubar button").classList.add("active");
- }
- $("sidebar").classList.remove("mobile-open");
- window.scrollTo({top:0,behavior:"smooth"});
- renderAll();
-}
-function openModal(type){
- $("modalTitle").textContent=type;
- const fields=$("formFields");
- fields.innerHTML="";
- const add=(name,label,kind="text",opts={})=>{
-  const wrap=document.createElement("div");
-  wrap.className="field "+(opts.full?"full":"");
-  const lab=document.createElement("label");
-  lab.textContent=label;
-  const input=document.createElement(kind==="textarea"?"textarea":kind==="select"?"select":"input");
-  input.name=name;
-  if(kind==="select"){
-   opts.options.forEach(([v,t])=>{const o=document.createElement("option");o.value=v;o.textContent=t;input.appendChild(o)});
-  }else if(kind!=="textarea"){
-   input.type=kind;
+const escapeHTML = value => String(value ?? "").replace(/[&<>"']/g, ch => ({
+  "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+}[ch]));
+
+const DBKEY = "shree_erp_demo_v1";
+let db = {company:{name:"SHREE ERP BUSINESS",address:"Your business address",gst:"",phone:"",fy:"2026-2027"},items:[],parties:[],bills:[],receipts:[],payments:[],purchases:[]};
+let lastBill = null;
+
+function loadDB(){
+  try {
+    const raw = localStorage.getItem(DBKEY);
+    if(raw){
+      const parsed = JSON.parse(raw);
+      db = {...db,...parsed};
+      ["items","parties","bills","receipts","payments","purchases"].forEach(k=>{
+        if(!Array.isArray(db[k])) db[k]=[];
+      });
+      db.company={...{name:"SHREE ERP BUSINESS",address:"",gst:"",phone:"",fy:"2026-2027"},...(db.company||{})};
+    }
+  } catch(e) {
+    notify("Could not load saved demo data.");
   }
-  if(opts.value!==undefined)input.value=opts.value;
-  if(opts.required)input.required=true;
-  if(opts.min!==undefined)input.min=opts.min;
-  if(opts.step!==undefined)input.step=opts.step;
-  if(opts.placeholder)input.placeholder=opts.placeholder;
-  if(opts.readonly)input.readOnly=true;
-  if(opts.full)wrap.classList.add("full");
-  wrap.append(lab,input);fields.appendChild(wrap);
- };
- if(type==="Sales Bill"||type==="Purchase Bill"){
-  const sales=type==="Sales Bill";
-  add("party",sales?"Customer Name":"Supplier Name","text",{required:true,placeholder:"Enter party name"});
-  add("date","Bill Date","date",{value:today(),required:true});
-  add("item","Product / Description","text",{required:true,placeholder:"Item name"});
-  add("qty","Quantity","number",{value:1,min:0.01,step:"any",required:true});
-  add("rate","Rate (₹)","number",{value:0,min:0,step:"any",required:true});
-  add("paid","Amount Paid (₹)","number",{value:0,min:0,step:"any",required:true});
-  add("note","Notes","text",{full:true,placeholder:"Optional reference"});
- }else if(type==="Receipt"||type==="Payment"){
-  add("party","Party Name","text",{required:true});
-  add("date","Date","date",{value:today(),required:true});
-  add("amount","Amount (₹)","number",{min:0.01,step:"any",required:true});
-  add("reference","Reference / Method","text",{placeholder:"Cash, bank, UPI..."});
- }else if(type==="Add Product"){
-  add("name","Product Name","text",{required:true});
-  add("code","Product Code","text",{placeholder:"Optional code"});
-  add("category","Category","text",{value:"General"});
-  add("qty","Opening Quantity","number",{value:0,min:0,step:"any",required:true});
-  add("rate","Selling Rate (₹)","number",{value:0,min:0,step:"any",required:true});
-  add("cost","Purchase Cost (₹)","number",{value:0,min:0,step:"any",required:true});
-  add("minStock","Low Stock Alert Level","number",{value:5,min:0,step:"any"});
- }else if(type==="Add Customer"||type==="Add Supplier"){
-  add("name","Name","text",{required:true});
-  add("phone","Phone Number","tel",{placeholder:"Optional phone"});
-  add("address","Address","text",{full:true,placeholder:"Optional address"});
- }else if(type==="Company Settings"){
-  closeModal();showPage("settings");return;
- }else{
-  showToast("Unsupported entry type.");return;
- }
- $("entryForm").dataset.type=type;
- $("modalBackdrop").classList.add("open");
 }
-function closeModal(){$("modalBackdrop").classList.remove("open")}
-$("entryForm").addEventListener("submit",function(e){
- e.preventDefault();
- const type=this.dataset.type;
- const f=Object.fromEntries(new FormData(this).entries());
- if(type==="Sales Bill"||type==="Purchase Bill"){
-  const qty=Number(f.qty),rate=Number(f.rate),paid=Number(f.paid);
-  if(qty<=0||rate<0||paid<0){showToast("Please enter valid amounts.");return}
-  const amount=Math.round(qty*rate*100)/100;
-  if(paid>amount){showToast("Paid amount cannot exceed the bill total.");return}
-  const sales=type==="Sales Bill";
-  const tx={
-   id:Date.now(),bill:(sales?"S":"P")+Date.now().toString().slice(-6),
-   party:f.party,item:f.item,qty,rate,amount,paid,
-   date:f.date,type:sales?"Sales":"Purchase",
-   status:paid>=amount?"Paid":paid>0?"Partial":"Pending",note:f.note||""
+function saveDB(){
+  try {
+    localStorage.setItem(DBKEY,JSON.stringify(db));
+    return true;
+  } catch(e) {
+    notify("Storage unavailable or full. Export your data and check browser settings.");
+    return false;
+  }
+}
+function notify(message){
+  const el=$("toast");
+  el.textContent=message;
+  el.classList.add("show");
+  clearTimeout(notify.timer);
+  notify.timer=setTimeout(()=>el.classList.remove("show"),2600);
+}
+function openDialog(title,body){
+  $("dialogTitle").textContent=title;
+  $("dialogBody").innerHTML=body;
+  $("infoDialog").showModal();
+}
+function closeDialog(){ $("infoDialog").close(); }
+
+const pages={
+ dashboard:["Dashboard","Business overview"],
+ masters:["Masters","Create and manage business master records."],
+ transactions:["Transactions","Billing, purchase, receipt and payment modules."],
+ accounts:["Accounts","Ledger, cash, bank and outstanding summaries."],
+ digital:["Digital Books","Digital business book shortcuts."],
+ reports:["Final Reports","View available demo reports."],
+ gst:["GST Centre","Local GST summaries only; no return filing."],
+ stock:["Stock Status","Inventory and reorder overview."],
+ daily:["Daily Reports","Business activity and demo analysis."],
+ links:["Links","Useful ERP module shortcuts."],
+ exit:["Exit","Exit the demo view."],
+ wholesale:["Wholesale Bill","Wholesale invoice entry."],
+ ledger:["Ledger A/c","Account and transaction overview."],
+ outstanding:["Outstanding","Demo customer and supplier due summary."],
+ sales:["Sales Book","Saved retail sales invoices."],
+};
+const knownPageIds=new Set(["dashboard","company","items","parties","retail","receipt","payment","purchase","settings"]);
+function openPage(id){
+  if(id==="exit"){
+    openDialog("Exit SHREE ERP",'<p>You can close this browser tab to exit the demo.</p>');
+    return;
+  }
+  if(id==="wholesale"){
+    openDialog("Wholesale Bill",'<p>The wholesale shortcut is ready. This demo currently uses the retail invoice form for saved invoices.</p><button class="btn" onclick="closeDialog();openPage(\\'retail\\')">Open Invoice Form</button>');
+    return;
+  }
+  document.querySelectorAll(".page-view").forEach(p=>p.classList.remove("active"));
+  let target;
+  if(knownPageIds.has(id)) target=$(id);
+  if(!target){
+    target=$("genericPage");
+    const data=pages[id]||[id,"Module overview"];
+    $("genericTitle").textContent=data[0];
+    $("genericDesc").textContent=data[1];
+    renderGeneric(id);
+  }
+  target.classList.add("active");
+  document.querySelectorAll("#mainMenu button").forEach(b=>{
+    b.classList.toggle("active",b.dataset.page===id);
+  });
+  if(id==="company") fillCompanyForm();
+  if(id==="items") renderItems();
+  if(id==="parties") renderParties();
+  if(id==="retail") prepareBill();
+  if(id==="receipt") renderMoneyRows("receipts","receiptRows");
+  if(id==="payment") renderMoneyRows("payments","paymentRows");
+  if(id==="purchase") renderPurchases();
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+$("mainMenu").addEventListener("click",e=>{
+  const b=e.target.closest("button[data-page]");
+  if(b) openPage(b.dataset.page);
+});
+
+function renderGeneric(id){
+  const box=$("genericContent");
+  const buttons={
+    masters:[["📦 Item Master","items"],["👥 Party Master","parties"],["🏢 Company","company"]],
+    transactions:[["🧾 Retail Bill","retail"],["📋 Wholesale Bill","wholesale"],["📥 Purchase","purchase"],["💰 Receipt","receipt"],["💸 Payment","payment"]],
+    accounts:[["📒 Ledger A/c","ledger"],["₹ Outstanding","outstanding"],["💰 Receipt","receipt"],["💸 Payment","payment"]],
+    digital:[["📚 Sales Book","sales"],["📥 Purchase Register","purchase"],["📊 Daily Analysis","daily"]],
+    reports:[["📚 Sales Book","sales"],["📦 Stock Status","stock"],["₹ Outstanding","outstanding"],["🧾 Party/Item Wise Sale","partyreport"],["📥 Purchase Register","purchase"]],
+    gst:[["📄 GSTR 1 (Outward Supply)","gstr1"],["📄 GSTR 3B","gstr3b"],["🧮 GST Summary","gstsummary"]],
+    stock:[["📦 Stock Valuation","valuation"],["🔔 Re-Order","reorder"],["⌛ Expiry Tracker","expiry"],["📦 Item Master","items"]],
+    daily:[["📊 Daily Analysis (MIS)","mis"],["💹 Today's Sales","sales"],["🚚 Dispatch Summary","dispatch"]],
+    links:[["🧾 Retail Bill","retail"],["📋 Wholesale Bill","wholesale"],["📦 Item Master","items"],["👥 Party Master","parties"]]
   };
-  db.transactions.unshift(tx);
-  if(sales){
-   let product=db.products.find(p=>p.name.toLowerCase()===f.item.trim().toLowerCase());
-   if(product)product.qty=Math.max(0,product.qty-qty);
+  if(id==="sales"){
+    box.innerHTML='<div class="table-wrap"><table><thead><tr><th>Invoice</th><th>Date</th><th>Customer</th><th>Total</th></tr></thead><tbody>'+
+      (db.bills.length?db.bills.map(b=>`<tr><td>${escapeHTML(b.no)}</td><td>${escapeHTML(b.date)}</td><td>${escapeHTML(b.party)}</td><td>${money(b.total)}</td></tr>`).join(""):'<tr><td colspan="4" class="empty">No saved invoices yet.</td></tr>')+
+      '</tbody></table></div>';
+    return;
+  }
+  if(id==="ledger"||id==="outstanding"||id==="accounts"){
+    box.innerHTML='<p>Demo account summary. These figures do not represent a complete double-entry accounting system.</p>'+
+      '<div class="quick-stats"><div class="stat"><div class="label">Receipts</div><div class="value">'+money(db.receipts.reduce((s,r)=>s+Number(r.amount),0))+'</div></div>'+
+      '<div class="stat"><div class="label">Payments</div><div class="value">'+money(db.payments.reduce((s,r)=>s+Number(r.amount),0))+'</div></div></div>'+
+      '<button class="btn" onclick="openPage(\\'receipt\\')">Receipt Entry</button> <button class="btn secondary" onclick="openPage(\\'payment\\')">Payment Entry</button>';
+    return;
+  }
+  if(["gstr1","gstr3b","gstsummary"].includes(id)){
+    const tax=db.bills.reduce((s,b)=>s+Number(b.tax||0),0);
+    box.innerHTML='<p><b>Estimated GST in saved demo invoices:</b> '+money(tax)+'</p><p class="muted">This is not a validated GST return. It excludes required statutory validations and other transaction types.</p><button class="btn" onclick="exportData()">Export Data</button>';
+    return;
+  }
+  if(["valuation","reorder","expiry","mis","dispatch","partyreport"].includes(id)){
+    if(id==="valuation"||id==="reorder"){
+      const rows=db.items.filter(i=>id==="valuation"||Number(i.qty)<=5);
+      box.innerHTML='<div class="table-wrap"><table><thead><tr><th>Item</th><th>Stock</th><th>Rate</th><th>Value</th></tr></thead><tbody>'+
+      (rows.length?rows.map(i=>`<tr><td>${escapeHTML(i.name)}</td><td>${i.qty}</td><td>${money(i.rate)}</td><td>${money(i.qty*i.rate)}</td></tr>`).join(""):'<tr><td colspan="4" class="empty">No matching items.</td></tr>')+
+      '</tbody></table></div>';
+    } else {
+      box.innerHTML='<p>This report needs additional data fields and business rules before it can provide reliable results.</p>';
+    }
+    return;
+  }
+  box.innerHTML='<div class="action-grid">'+(buttons[id]||[]).map(([label,page])=>
+    `<button class="action" onclick="openPage('${page}')"><span class="big">↗</span><b>${label}</b><small>Open module</small></button>`
+  ).join("")+'</div>';
+}
+
+/* COMPANY */
+function fillCompanyForm(){
+  ["name","address","gst","phone","fy"].forEach(k=>{
+    const el=$("company"+k[0].toUpperCase()+k.slice(1));
+    if(el) el.value=db.company[k]||"";
+  });
+}
+$("companyForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  db.company={
+    name:$("companyName").value.trim(),
+    address:$("companyAddress").value.trim(),
+    gst:$("companyGST").value.trim(),
+    phone:$("companyPhone").value.trim(),
+    fy:$("companyFY").value
+  };
+  if(saveDB()){ updateCompany();notify("Company details saved on this device."); }
+});
+function updateCompany(){
+  $("bannerCompany").textContent=db.company.name||"SHREE ERP BUSINESS";
+  $("bannerAddress").textContent=db.company.address||"Business address not configured";
+  $("bannerGST").textContent="GSTIN: "+(db.company.gst||"Not configured");
+  $("financialYear").textContent="Financial Year: "+(db.company.fy||"2026-2027").replace("-","–");
+  $("statusCompany").textContent="Company: "+(db.company.name||"SHREE ERP BUSINESS");
+}
+function updateDate(){
+  const d=new Date();
+  $("todayDate").textContent=d.toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"});
+  $("todayDay").textContent=d.toLocaleDateString("en-IN",{weekday:"long"});
+  $("clock").textContent=d.toLocaleTimeString("en-IN");
+  $("billDate").value ||= today();
+  $("receiptDate").value ||= today();
+  $("paymentDate").value ||= today();
+  $("purchaseDate").value ||= today();
+}
+
+/* ITEM MASTER */
+$("itemForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  const item={
+    id:crypto.randomUUID?crypto.randomUUID():String(Date.now()),
+    name:$("itemName").value.trim(),
+    code:$("itemCode").value.trim(),
+    rate:Number($("itemRate").value),
+    qty:Number($("itemQty").value),
+    tax:Number($("itemTax").value),
+    unit:$("itemUnit").value
+  };
+  if(!item.name||item.rate<0||item.qty<0) return notify("Check the item details.");
+  db.items.push(item);
+  if(saveDB()){
+    e.target.reset();renderItems();refreshSelectors();updateStats();
+    notify("Item added.");
+  }
+});
+function renderItems(){
+  $("itemRows").innerHTML=db.items.length?db.items.map(i=>`<tr>
+    <td>${escapeHTML(i.code||"-")}</td><td>${escapeHTML(i.name)}</td>
+    <td>${money(i.rate)}</td><td>${i.qty} ${escapeHTML(i.unit||"")}</td>
+    <td>${i.tax}%</td><td><button class="btn danger" onclick="deleteRecord('items','${i.id}')">Delete</button></td>
+  </tr>`).join(""):'<tr><td colspan="6" class="empty">No items added yet.</td></tr>';
+}
+
+/* PARTY MASTER */
+$("partyForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  db.parties.push({
+    id:crypto.randomUUID?crypto.randomUUID():String(Date.now()),
+    name:$("partyName").value.trim(),type:$("partyType").value,
+    phone:$("partyPhone").value.trim(),gst:$("partyGST").value.trim(),
+    address:$("partyAddress").value.trim()
+  });
+  if(saveDB()){
+    e.target.reset();renderParties();refreshSelectors();updateStats();
+    notify("Party added.");
+  }
+});
+function renderParties(){
+  $("partyRows").innerHTML=db.parties.length?db.parties.map(p=>`<tr>
+    <td>${escapeHTML(p.name)}</td><td>${escapeHTML(p.type)}</td>
+    <td>${escapeHTML(p.phone||"-")}</td><td>${escapeHTML(p.gst||"-")}</td>
+    <td><button class="btn danger" onclick="deleteRecord('parties','${p.id}')">Delete</button></td>
+  </tr>`).join(""):'<tr><td colspan="5" class="empty">No parties added yet.</td></tr>';
+}
+function deleteRecord(type,id){
+  if(!confirm("Delete this demo record?"))return;
+  db[type]=db[type].filter(r=>r.id!==id);
+  saveDB();
+  renderItems();renderParties();refreshSelectors();updateStats();
+  notify("Record deleted.");
+}
+function refreshSelectors(){
+  const itemOpts='<option value="">Select item</option>'+db.items.map(i=>`<option value="${i.id}">${escapeHTML(i.name)} — ${money(i.rate)}</option>`).join("");
+  ["billItem","purchaseItem"].forEach(id=>$(id).innerHTML=itemOpts);
+  const partyOpts='<option value="">Walk-in / General</option>'+db.parties.map(p=>`<option value="${p.id}">${escapeHTML(p.name)} (${escapeHTML(p.type)})</option>`).join("");
+  ["billParty","receiptParty","paymentParty","purchaseParty"].forEach(id=>$(id).innerHTML=partyOpts);
+}
+
+/* BILLING */
+function prepareBill(){
+  $("billNo").value="SH-"+String(db.bills.length+1).padStart(5,"0");
+  $("billDate").value||=today();
+  refreshSelectors();
+  calculateBill();
+}
+$("billItem").addEventListener("change",()=>{
+  const item=db.items.find(i=>i.id===$("billItem").value);
+  if(item){$("billRate").value=item.rate;$("billTax").value=item.tax;}
+  else{$("billRate").value="";$("billTax").value=0;}
+  calculateBill();
+});
+["billQty","billRate"].forEach(id=>$(id).addEventListener("input",calculateBill));
+function calculateBill(){
+  const qty=Math.max(0,Number($("billQty").value)||0);
+  const rate=Math.max(0,Number($("billRate").value)||0);
+  const tax=Math.max(0,Number($("billTax").value)||0);
+  const subtotal=qty*rate,gst=subtotal*tax/100;
+  $("billSubtotal").textContent=money(subtotal);
+  $("billGST").textContent=money(gst);
+  $("billTotal").textContent=money(subtotal+gst);
+}
+$("billForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  const item=db.items.find(i=>i.id===$("billItem").value);
+  if(!item)return notify("Please add and select an item first.");
+  const qty=Number($("billQty").value),rate=Number($("billRate").value);
+  const tax=Number($("billTax").value);
+  if(qty<=0||rate<0)return notify("Enter a valid quantity and rate.");
+  if(item.qty<qty)return notify("Insufficient demo stock. Available: "+item.qty);
+  const subtotal=qty*rate,gst=subtotal*tax/100;
+  const party=db.parties.find(p=>p.id===$("billParty").value);
+  const bill={
+    id:crypto.randomUUID?crypto.randomUUID():String(Date.now()),
+    no:$("billNo").value,date:$("billDate").value,
+    party:party?party.name:"Walk-in Customer",
+    item:item.name,itemId:item.id,qty,rate,tax,gst,
+    subtotal,total:subtotal+gst,payment:$("billPayment").value
+  };
+  item.qty-=qty;
+  db.bills.push(bill);
+  if(saveDB()){
+    lastBill=bill;
+    updateStats();renderItems();renderGeneric("sales");
+    notify("Demo invoice saved.");
+    prepareBill();
+  } else {
+    item.qty+=qty;db.bills.pop();
+  }
+});
+
+/* RECEIPTS AND PAYMENTS */
+function saveMoneyEntry(type,prefix){
+  const party=db.parties.find(p=>p.id===$(prefix+"Party").value);
+  const record={
+    id:crypto.randomUUID?crypto.randomUUID():String(Date.now()),
+    date:$(prefix+"Date").value,party:party?party.name:"General",
+    mode:$(prefix+"Mode").value,amount:Number($(prefix+"Amount").value),
+    note:$(prefix+"Note").value.trim()
+  };
+  if(record.amount<=0)return notify("Enter an amount greater than zero.");
+  db[type].push(record);
+  if(saveDB()){
+    $(prefix+"Form").reset();
+    $(prefix+"Date").value=today();
+    renderMoneyRows(type,prefix+"Rows");updateStats();
+    notify("Entry saved on this device.");
+  } else db[type].pop();
+}
+$("receiptForm").addEventListener("submit",e=>{e.preventDefault();saveMoneyEntry("receipts","receipt");});
+$("paymentForm").addEventListener("submit",e=>{e.preventDefault();saveMoneyEntry("payments","payment");});
+function renderMoneyRows(type,target){
+  const rows=db[type];
+  $(target).innerHTML=rows.length?rows.map(r=>`<tr>
+    <td>${escapeHTML(r.date)}</td><td>${escapeHTML(r.party)}</td>
+    <td>${escapeHTML(r.mode)}</td><td>${money(r.amount)}</td>
+  </tr>`).join(""):'<tr><td colspan="4" class="empty">No entries yet.</td></tr>';
+}
+
+/* PURCHASE */
+$("purchaseItem").addEventListener("change",()=>{
+  const item=db.items.find(i=>i.id===$("purchaseItem").value);
+  if(item)$("purchaseRate").value=item.rate;
+});
+$("purchaseForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  const item=db.items.find(i=>i.id===$("purchaseItem").value);
+  if(!item)return notify("Select an item first.");
+  const qty=Number($("purchaseQty").value),rate=Number($("purchaseRate").value);
+  if(qty<=0||rate<0)return notify("Enter valid purchase quantity and rate.");
+  const p=db.parties.find(x=>x.id===$("purchaseParty").value);
+  const purchase={
+    id:crypto.randomUUID?crypto.randomUUID():String(Date.now()),
+    date:$("purchaseDate").value,no:$("purchaseNo").value.trim(),
+    party:p?p.name:"General Supplier",item:item.name,itemId:item.id,
+    qty,rate,total:qty*rate
+  };
+  item.qty+=qty;db.purchases.push(purchase);
+  if(saveDB()){
+    e.target.reset();$("purchaseDate").value=today();
+    renderPurchases();renderItems();updateStats();
+    notify("Demo purchase saved and stock increased.");
   }else{
-   let product=db.products.find(p=>p.name.toLowerCase()===f.item.trim().toLowerCase());
-   if(product)product.qty+=qty;
-   else db.products.push({id:Date.now()+1,name:f.item,code:"",category:"General",qty,cost:rate,rate,minStock:5});
+    item.qty-=qty;db.purchases.pop();
   }
-  if(paid>0)db.cash.unshift({id:Date.now()+2,date:f.date,type:sales?"Receipt":"Payment",party:f.party,reference:tx.bill,amount:paid});
- }else if(type==="Receipt"||type==="Payment"){
-  const amount=Number(f.amount);
-  if(amount<=0){showToast("Enter an amount greater than zero.");return}
-  db.cash.unshift({id:Date.now(),date:f.date,type,party:f.party,reference:f.reference||"",amount});
-  if(type==="Receipt"){
-   let due=db.transactions.filter(t=>t.type==="Sales"&&t.party.toLowerCase()===f.party.trim().toLowerCase()&&t.paid<t.amount);
-   let remaining=amount;
-   for(const t of due){
-    const applied=Math.min(remaining,t.amount-t.paid);
-    t.paid+=applied;remaining-=applied;
-    t.status=t.paid>=t.amount?"Paid":"Partial";
-    if(remaining<=0)break;
-   }
+});
+function renderPurchases(){
+  $("purchaseRows").innerHTML=db.purchases.length?db.purchases.map(p=>`<tr>
+    <td>${escapeHTML(p.date)}</td><td>${escapeHTML(p.no)}</td>
+    <td>${escapeHTML(p.party)}</td><td>${escapeHTML(p.item)}</td>
+    <td>${p.qty}</td><td>${money(p.total)}</td>
+  </tr>`).join(""):'<tr><td colspan="6" class="empty">No purchases saved.</td></tr>';
+}
+
+/* REPORT SHORTCUTS */
+document.querySelectorAll("[data-report]").forEach(b=>{
+  b.addEventListener("click",()=>showReport(b.dataset.report));
+});
+function showReport(name){
+  if(name==="Wholesale: Bill"||name==="Wholesale"){
+    return openPage("wholesale");
   }
- }else if(type==="Add Product"){
-  if(Number(f.qty)<0||Number(f.rate)<0||Number(f.cost)<0){showToast("Enter valid stock values.");return}
-  db.products.push({id:Date.now(),name:f.name.trim(),code:f.code,category:f.category||"General",qty:Number(f.qty),rate:Number(f.rate),cost:Number(f.cost),minStock:Number(f.minStock||0)});
- }else if(type==="Add Customer"||type==="Add Supplier"){
-  const key=type==="Add Customer"?"customers":"suppliers";
-  db[key].push({id:Date.now(),name:f.name.trim(),phone:f.phone,address:f.address});
- }
- saveData();closeModal();this.reset();renderAll();
- showToast(type+" saved successfully in demo.");
+  if(name==="GSTR 1 (Outward Supply)"||name==="GSTR 3B"){
+    openPage("gst");
+    return;
+  }
+  if(name==="Sale Book"||name==="Party/Item Wise Sale"){
+    openPage("sales");
+    return;
+  }
+  if(name==="Stock Valuation"){openPage("stock");return;}
+  if(name==="Purchase Register"){openPage("purchase");return;}
+  if(name==="Creditors Ledgers"){openPage("ledger");return;}
+  openDialog(name,"<p>This report shortcut is available in the demo interface. Detailed reporting requires additional data and business rules.</p>");
+}
+
+/* GLOBAL SEARCH */
+$("globalSearch").addEventListener("input",e=>{
+  const q=e.target.value.trim().toLowerCase();
+  document.querySelectorAll(".report-link").forEach(b=>{
+    b.classList.toggle("hidden",!b.dataset.report.toLowerCase().includes(q));
+  });
+  if(!q)return;
+  const match=db.items.find(i=>i.name.toLowerCase().includes(q)||(i.code||"").toLowerCase().includes(q));
+  if(match){
+    $("genericTitle").textContent="Search Result";
+    $("genericDesc").textContent="Matching local item";
+    $("genericContent").innerHTML=`<div class="page-card"><h3>${escapeHTML(match.name)}</h3><p>Code: ${escapeHTML(match.code||"-")}</p><p>Rate: ${money(match.rate)}</p><p>Stock: ${match.qty} ${escapeHTML(match.unit||"")}</p><button class="btn" onclick="openPage('items')">Open Item Master</button></div>`;
+  }
 });
-function statusBadge(status){
- let cls=status==="Paid"?"status-paid":status==="Partial"||status==="Pending"?"status-pending":"status-cancel";
- return '<span class="status '+cls+'">'+esc(status)+'</span>';
+
+/* DASHBOARD COUNTS */
+function updateStats(){
+  const todayBills=db.bills.filter(b=>b.date===today());
+  $("statSales").textContent=money(todayBills.reduce((s,b)=>s+b.total,0));
+  $("statBills").textContent=String(db.bills.length);
+  $("statItems").textContent=String(db.items.length);
+  $("statParties").textContent=String(db.parties.length);
 }
-function renderRecent(){
- const arr=db.transactions.slice(0,7);
- $("recentRows").innerHTML=arr.length?arr.map(t=>`<tr>
- <td><b>${esc(t.bill)}</b></td><td>${esc(t.party)}</td><td>${esc(t.type)}</td>
- <td>${esc(t.date)}</td><td><b>${money(t.amount)}</b></td><td>${statusBadge(t.status)}</td></tr>`).join(""):'<tr><td colspan="6" class="empty">No transactions yet. Create your first sales or purchase bill.</td></tr>';
-}
-function renderTables(){
- const salesFilter=($("salesFilter")?.value||"").toLowerCase();
- const productFilter=($("productFilter")?.value||"").toLowerCase();
- const sales=db.transactions.filter(t=>t.type==="Sales"&&JSON.stringify(t).toLowerCase().includes(salesFilter));
- const purchases=db.transactions.filter(t=>t.type==="Purchase");
- $("salesRows").innerHTML=sales.length?sales.map(t=>`<tr><td><b>${esc(t.bill)}</b></td><td>${esc(t.party)}</td><td>${esc(t.type)}</td><td>${esc(t.date)}</td><td>${money(t.amount)}</td><td>${statusBadge(t.status)}</td><td><button class="btn" onclick="viewBill(${t.id})">View</button></td></tr>`).join(""):'<tr><td colspan="7" class="empty">No sales bills found.</td></tr>';
- $("purchaseRows").innerHTML=purchases.length?purchases.map(t=>`<tr><td>${esc(t.bill)}</td><td>${esc(t.party)}</td><td>Purchase</td><td>${esc(t.date)}</td><td>${money(t.amount)}</td><td>${statusBadge(t.status)}</td></tr>`).join(""):'<tr><td colspan="6" class="empty">No purchases recorded.</td></tr>';
- $("productRows").innerHTML=db.products.filter(p=>JSON.stringify(p).toLowerCase().includes(productFilter)).map(p=>`<tr><td>${esc(p.code||"—")}</td><td><b>${esc(p.name)}</b></td><td>${esc(p.category)}</td><td>${p.qty}</td><td>${money(p.rate)}</td><td>${money(p.qty*p.cost)}</td><td><button class="btn" onclick="editStock(${p.id})">Edit</button> <button class="btn" onclick="deleteProduct(${p.id})">×</button></td></tr>`).join("")||'<tr><td colspan="7" class="empty">No products. Add your first product.</td></tr>';
- $("customerRows").innerHTML=db.customers.map(p=>`<tr><td><b>${esc(p.name)}</b></td><td>${esc(p.phone||"—")}</td><td>${esc(p.address||"—")}</td><td><button class="btn" onclick="deleteParty('customers',${p.id})">Delete</button></td></tr>`).join("")||'<tr><td colspan="4" class="empty">No customers added.</td></tr>';
- $("supplierRows").innerHTML=db.suppliers.map(p=>`<tr><td><b>${esc(p.name)}</b></td><td>${esc(p.phone||"—")}</td><td>${esc(p.address||"—")}</td><td><button class="btn" onclick="deleteParty('suppliers',${p.id})">Delete</button></td></tr>`).join("")||'<tr><td colspan="4" class="empty">No suppliers added.</td></tr>';
- $("cashRows").innerHTML=db.cash.map(c=>`<tr><td>${esc(c.date)}</td><td>${esc(c.type)}</td><td>${esc(c.party)}</td><td>${esc(c.reference||"—")}</td><td class="${c.type==="Receipt"?"green":"red"}">${money(c.amount)}</td></tr>`).join("")||'<tr><td colspan="5" class="empty">No cashbook entries.</td></tr>';
- const due=db.transactions.filter(t=>t.type==="Sales"&&t.amount>t.paid);
- $("dueRows").innerHTML=due.map(t=>`<tr><td>${esc(t.bill)}</td><td>${esc(t.party)}</td><td>Sales</td><td>${money(t.amount)}</td><td>${money(t.paid)}</td><td class="red"><b>${money(t.amount-t.paid)}</b></td></tr>`).join("")||'<tr><td colspan="6" class="empty">No outstanding sales bills.</td></tr>';
- $("salesCount").textContent=db.transactions.filter(t=>t.type==="Sales").length;
-}
-function viewBill(id){
- const t=db.transactions.find(x=>x.id===id);if(!t)return;
- alert("SHREE ERP — "+t.type+" Bill\nBill No: "+t.bill+"\nParty: "+t.party+"\nItem: "+t.item+"\nQuantity: "+t.qty+"\nRate: "+money(t.rate)+"\nTotal: "+money(t.amount)+"\nPaid: "+money(t.paid)+"\nDue: "+money(t.amount-t.paid)+"\nDate: "+t.date+"\nStatus: "+t.status);
-}
-function editStock(id){
- const p=db.products.find(x=>x.id===id);if(!p)return;
- const qty=prompt("Update quantity for "+p.name,p.qty);
- if(qty===null)return;
- const n=Number(qty);if(!Number.isFinite(n)||n<0){showToast("Invalid quantity.");return}
- p.qty=n;saveData();renderAll();showToast("Stock updated.");
-}
-function deleteProduct(id){
- if(!confirm("Delete this product from the demo inventory?"))return;
- db.products=db.products.filter(p=>p.id!==id);saveData();renderAll();showToast("Product deleted.");
-}
-function deleteParty(key,id){
- if(!confirm("Delete this party record?"))return;
- db[key]=db[key].filter(p=>p.id!==id);saveData();renderAll();showToast("Record deleted.");
-}
-function renderAll(){
- const sales=db.transactions.filter(t=>t.type==="Sales");
- const purchases=db.transactions.filter(t=>t.type==="Purchase");
- const salesTotal=sum(sales,t=>t.amount);
- const purchaseTotal=sum(purchases,t=>t.amount);
- const stockValue=sum(db.products,p=>p.qty*p.cost);
- const due=sum(sales,t=>t.amount-t.paid);
- const receipts=sum(db.cash.filter(c=>c.type==="Receipt"),c=>c.amount);
- const payments=sum(db.cash.filter(c=>c.type==="Payment"),c=>c.amount);
- $("totalSales").textContent=money(salesTotal);
- $("totalPurchase").textContent=money(purchaseTotal);
- $("stockValue").textContent=money(stockValue);
- $("receivables").textContent=money(due);
- $("stockCount").textContent=db.products.length;
- $("invCount").textContent=db.products.length;
- $("invUnits").textContent=sum(db.products,p=>p.qty).toLocaleString("en-IN");
- $("invValue").textContent=money(stockValue);
- $("lowStock").textContent=db.products.filter(p=>p.qty<=Number(p.minStock||0)).length;
- $("receiptTotal").textContent=money(receipts);
- $("paymentTotal").textContent=money(payments);
- $("cashBalance").textContent=money(receipts-payments);
- $("cashCount").textContent=db.cash.length;
- $("repSales").textContent=money(salesTotal);
- $("repPurchase").textContent=money(purchaseTotal);
- $("repDifference").textContent=money(salesTotal-purchaseTotal);
- $("repBills").textContent=db.transactions.length;
- $("companyNameMini").textContent=db.company.company||"SHREE ERP";
- $("todayDate").textContent=new Date().toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"});
- renderRecent();renderTables();
- $("stockSummary").innerHTML=db.products.length?db.products.slice(0,5).map(p=>{
- const max=Math.max(p.qty,Number(p.minStock)||0,1);
- const pct=Math.min(100,p.qty/max*100);
- return `<div class="stock-line"><div class="stock-info"><span>${esc(p.name)}</span><b>${p.qty} units</b></div><div class="track"><div class="${p.qty<=p.minStock?'low':''}" style="width:${pct}%"></div></div></div>`;
- }).join(""):'<div class="empty">Add products to see stock levels.</div>';
- $("reportSummary").innerHTML=[
- ["Total sales bills",sales.length],["Total purchase bills",purchases.length],
- ["Total customers",db.customers.length],["Total suppliers",db.suppliers.length],
- ["Inventory products",db.products.length],["Outstanding sales",money(due)]
- ].map(([k,v])=>`<div class="action-row"><div class="action-ico">▤</div><div class="action-info"><b>${esc(k)}</b></div><div class="action-amount">${esc(v)}</div></div>`).join("");
- $("settingCompany").value=db.company.company||"";
- $("settingOwner").value=db.company.owner||"";
- $("settingPhone").value=db.company.phone||"";
- $("settingGstin").value=db.company.gstin||"";
- $("settingAddress").value=db.company.address||"";
-}
-$("settingsForm").addEventListener("submit",e=>{
- e.preventDefault();
- const f=new FormData(e.target);
- db.company={company:f.get("company"),owner:f.get("owner"),phone:f.get("phone"),gstin:f.get("gstin"),currency:f.get("currency"),address:f.get("address")};
- saveData();renderAll();showToast("Company settings saved.");
-});
-function searchEverything(q){
- q=q.trim().toLowerCase();if(!q)return;
- const tx=db.transactions.filter(t=>JSON.stringify(t).toLowerCase().includes(q));
- const products=db.products.filter(p=>JSON.stringify(p).toLowerCase().includes(q));
- if(tx.length){showPage(tx[0].type==="Sales"?"sales":"purchase");$("salesFilter").value=q;renderTables();showToast(tx.length+" matching transaction(s) found.");}
- else if(products.length){showPage("inventory");$("productFilter").value=q;renderTables();showToast(products.length+" matching product(s) found.");}
- else{
-  const parties=[...db.customers,...db.suppliers].filter(p=>JSON.stringify(p).toLowerCase().includes(q));
-  if(parties.length){showPage(db.customers.includes(parties[0])?"customers":"suppliers");showToast(parties.length+" matching party record(s).")}
-  else showToast("No matching records found.");
- }
+function printLastBill(){
+  if(!lastBill){
+    if(!db.bills.length)return notify("Save a demo bill first.");
+    lastBill=db.bills[db.bills.length-1];
+  }
+  const b=lastBill;
+  const w=window.open("","_blank","width=700,height=800");
+  if(!w)return notify("Allow pop-ups to print the invoice.");
+  w.document.write(`<!doctype html><html><head><title>Invoice ${escapeHTML(b.no)}</title><style>
+    body{font:14px Arial;padding:28px;color:#222}h1{margin-bottom:5px}
+    table{border-collapse:collapse;width:100%;margin-top:20px}
+    td,th{border:1px solid #bbb;padding:10px;text-align:left}
+    .total{text-align:right;margin-top:22px;font-size:20px;font-weight:bold}
+  </style></head><body><h1>${escapeHTML(db.company.name)}</h1>
+  <p>${escapeHTML(db.company.address)}</p><hr>
+  <h2>DEMO INVOICE</h2><p>Invoice: ${escapeHTML(b.no)} | Date: ${escapeHTML(b.date)}</p>
+  <p>Customer: ${escapeHTML(b.party)}</p>
+  <table><tr><th>Item</th><th>Qty</th><th>Rate</th><th>GST</th><th>Total</th></tr>
+  <tr><td>${escapeHTML(b.item)}</td><td>${b.qty}</td><td>${money(b.rate)}</td>
+  <td>${money(b.gst)}</td><td>${money(b.total)}</td></tr></table>
+  <div class="total">Total: ${money(b.total)}</div>
+  <p>DEMO ONLY — not a statutory tax invoice.</p><script>window.onload=()=>window.print();<\/script>
+  </body></html>`);
+  w.document.close();
 }
 function exportData(){
- const blob=new Blob([JSON.stringify(db,null,2)],{type:"application/json"});
- const url=URL.createObjectURL(blob);
- const a=document.createElement("a");a.href=url;a.download="shree-erp-backup-"+today()+".json";
- document.body.appendChild(a);a.click();a.remove();URL.revokeObjectURL(url);
- showToast("Backup export requested.");
+  const blob=new Blob([JSON.stringify(db,null,2)],{type:"application/json"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url;a.download="shree-erp-demo-backup.json";a.click();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+  notify("Export requested. Keep your backup file safe.");
 }
-function resetData(){
- if(!confirm("Are you sure? This will permanently clear all SHREE ERP demo data saved in this browser."))return;
- db=freshData();saveData();renderAll();showToast("Demo data has been reset.");
+function clearDemoData(){
+  if(!confirm("This will delete all SHREE ERP demo records saved in this browser. Export a backup first. Continue?"))return;
+  const company=db.company;
+  db={company,items:[],parties:[],bills:[],receipts:[],payments:[],purchases:[]};
+  saveDB();lastBill=null;renderItems();renderParties();refreshSelectors();
+  renderPurchases();renderMoneyRows("receipts","receiptRows");
+  renderMoneyRows("payments","paymentRows");updateStats();
+  notify("Local demo records cleared.");
 }
-renderAll();
+
+/* START */
+loadDB();
+fillCompanyForm();
+updateCompany();
+refreshSelectors();
+renderItems();
+renderParties();
+renderPurchases();
+renderMoneyRows("receipts","receiptRows");
+renderMoneyRows("payments","paymentRows");
+updateStats();
+updateDate();
+setInterval(updateDate,1000);
 </script>
 </body>
 </html>
+
 
 
