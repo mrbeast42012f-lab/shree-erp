@@ -319,7 +319,7 @@ ${purchase?`
  <div class="field"><label>Address</label><input id="tAddress" placeholder="Customer / Supplier address"></div><div class="field"><label>Mobile</label><input id="tMobile" inputmode="tel" placeholder="Mobile number"></div>
  </div>
  <div class="bill-item-box"><h3>${purchase?"Purchase Item Details":retail?"Retail Item Details":"Wholesale Item Details"}</h3><div class="bill-grid">
- <div class="field"><label>Product / Barcode *</label><input id="lineSearch" list="itemHints" placeholder="Type or scan barcode" autocomplete="off" oninput="searchBillItem()"><datalist id="itemHints">${db.items.map(i=>`<option value="${esc(i.barcode||i.code||i.name)}">${esc(i.name)}</option>`).join("")}</datalist><input type="hidden" id="lineItem"></div>
+ <div class="field"><label>${purchase ? "Product Name *" : "Product / Barcode *"}</label><input id="lineSearch" list="itemHints" placeholder="Type or scan barcode" autocomplete="off" oninput="searchBillItem()"><datalist id="itemHints">${db.items.map(i=>`<option value="${esc(i.barcode||i.code||i.name)}">${esc(i.name)}</option>`).join("")}</datalist><input type="hidden" id="lineItem"></div>
  <div class="field"><label>Pack / Unit</label><input id="linePack" placeholder="PCS / Strip"></div>
  ${purchase?`<div class="field"><label>Batch No. *</label><input id="lineBatch" placeholder="Enter batch number"></div><div class="field"><label>Expiry Month</label><input id="lineExpiry" type="month"></div>`:""}
  <div class="field"><label>Quantity *</label><input id="lineQty" type="number" min=".01" step=".01" value="1" oninput="calcLinePreview()"></div>
