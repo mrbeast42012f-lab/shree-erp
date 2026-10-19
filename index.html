@@ -421,7 +421,30 @@ function saveTransaction(e,kind){
  }
  const totals=getLineTotals();if(totals.billDiscount>totals.subtotal+totals.gst+.000001)return alert("Bill discount মোট বিলের চেয়ে বেশি হতে পারে না।");
  const party=$("tParty").value||"Cash / Walk-in";
- const x={id:uid(),no,date:$("tDate").value,party,kind,lines:draftLines.map(l=>({...l})),subtotal:totals.subtotal,gstTotal:totals.gst,discount:totals.billDiscount,roundOff:totals.round,total:totals.total,address:$("tAddress")?.value||"",phone:$("tMobile")?.value||"",doctor:$("tDoctor")?.value||"",regNo:$("tReg")?.value||"",note:$("tNote")?.value||"",createdAt:new Date().toISOString()};
+const x={
+  id:uid(),
+  no,
+  date:$("tDate").value,
+
+  // Purchase supplier invoice details
+  invoiceNo: purchase ? ($("tInvoiceNo")?.value.trim() || "") : "",
+  invoiceDate: purchase ? ($("tInvoiceDate")?.value || "") : "",
+
+  party,
+  kind,
+  lines:draftLines.map(l=>({...l})),
+  subtotal:totals.subtotal,
+  gstTotal:totals.gst,
+  discount:totals.billDiscount,
+  roundOff:totals.round,
+  total:totals.total,
+  address:$("tAddress")?.value||"",
+  phone:$("tMobile")?.value||"",
+  doctor:$("tDoctor")?.value||"",
+  regNo:$("tReg")?.value||"",
+  note:$("tNote")?.value||"",
+  createdAt:new Date().toISOString()
+};
  x.item=draftLines.map(l=>l.item).join(", ");x.qty=draftLines.reduce((s,l)=>s+num(l.qty),0);x.itemId=draftLines.length===1?draftLines[0].itemId:"";x.rate=draftLines.length===1?draftLines[0].rate:0;
  if(purchase){
   const prepared=draftLines.map(line=>({line,b:findOrCreateBatch(line)}));
