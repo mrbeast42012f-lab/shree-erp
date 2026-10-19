@@ -569,33 +569,34 @@ function renameCustomer(){
  if(db.parties.some(x=>x.id!==p.id&&x.name.toLowerCase()===newName.toLowerCase()))return alert("এই নামের party আগে থেকেই আছে।");
  const oldName=p.name;p.name=newName;["bills","purchases","receipts","payments"].forEach(k=>db[k].forEach(x=>{if(x.party===oldName)x.party=newName}));save();render();alert("Customer name updated.");
 }
-
-/* SHREE ERP — COMPLETE KEYBOARD NAVIGATION */
+/* SHREE ERP — UNIVERSAL KEYBOARD NAVIGATION */
 (function () {
   "use strict";
 
   const $ = id => document.getElementById(id);
-
+  const ARROWS = ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"];
   const QUICK_SELECTOR =
     ".quickgrid, .quick-actions, .quick-access, .quicklinks";
 
-  function isVisible(el) {
+  function visible(el) {
     return !!el &&
       el.isConnected &&
       el.getClientRects().length > 0 &&
       !el.disabled &&
       el.tabIndex !== -1 &&
-      !el.closest("[hidden], [aria-hidden='true']");
+      !el.closest("[hidden], [aria-hidden='true'], [inert]");
   }
 
-  function isTyping(el) {
+  function typing(el) {
     return el instanceof HTMLElement &&
-      (el.matches("input, textarea, select") || el.isContentEditable);
+      (el.matches("input, textarea") || el.isContentEditable);
   }
 
-  function isEditableText(el) {
+  function textField(el) {
     return el instanceof HTMLElement &&
-      el.matches("input:not([type=checkbox]):not([type=radio]):not([type=button]):not([type=submit]), textarea");
+      el.matches(
+        'input:not([type="hidden"]):not([type="button"]):not([type="submit"]):not([type="reset"]):not([type="checkbox"]):not([type="radio"]):not([type="file"]), textarea'
+      );
   }
 
   function modalOpen() {
@@ -614,114 +615,170 @@ function renameCustomer(){
     }
   }
 
-  function controlsIn(scope) {
+  function getScope(el) {
+    return el.closest(QUICK_SELECTOR) ||
+      el.closest(".modal-bg") ||
+      el.closest("form") ||
+      el.closest("main") ||
+      $("app") ||
+      document.body;
+  }
+
+  function getControls(scope) {
     return [...scope.querySelectorAll(
-      'input:not([type=hidden]):not([type=button]):not([type=submit]):not([type=reset]), select, textarea, button:not(:disabled), a[href], [role="button"], [tabindex="0"]'
+      'input:not([type="hidden"]):not([type="button"]):not([type="submit"]):not([type="reset"]), select, textarea, button:not(:disabled), a[href], [role="button"], [tabindex="0"]'
     )].filter(el =>
-      isVisible(el) &&
+      visible(el) &&
       !el.readOnly &&
       !el.matches("[aria-disabled='true']")
     );
   }
 
-  function focusNext(el, step = 1) {
-    const scope =
-      el.closest(".modal-bg") ||
-      el.closest("form") ||
-      document.querySelector("main") ||
-      $("app") ||
-      document.body;
+  function focusControl(el) {
+    if (!el) return;
+    el.focus();
 
-    const controls = controlsIn(scope);
+    if (
+      el.matches &&
+      el.matches('input[type="text"], input[type="search"], input[type="tel"], input[type="email"]')
+    ) {
+      try { el.select(); } catch (_) {}
+    }
+  }
+
+  function moveSequential(el, step) {
+    const controls = getControls(getScope(el));
     const index = controls.indexOf(el);
     if (index < 0) return false;
 
     const next = controls[index + step];
     if (!next) return false;
 
-    next.focus();
-
-    if (next.matches('input[type="text"], input[type="search"], input[type="tel"], input[type="email"]')) {
-      try { next.select(); } catch (_) {}
-    }
-
+    focusControl(next);
     return true;
   }
 
-  function quickNavigation(e, el) {
-    const area = el.closest(QUICK_SELECTOR);
-    if (!area) return false;
-
+  function moveInGrid(e, el, area) {
     const buttons = [...area.querySelectorAll(
       "button:not(:disabled), a[href], [role='button']"
-    )].filter(isVisible);
+    )].filter(visible);
 
-    if (!buttons.length) return false;
-
-    const currentElement = el.closest(
+    const current = el.closest(
       "button:not(:disabled), a[href], [role='button']"
     );
-    const index = buttons.indexOf(currentElement);
+    const index = buttons.indexOf(current);
 
-    if (e.key === "Enter" && index >= 0) {
-      /* Let the browser activate the focused button normally */
-      return false;
-    }
+    if (!buttons.length || index < 0) return false;
 
-    if (!["ArrowRight", "ArrowLeft", "ArrowDown", "ArrowUp"].includes(e.key)) {
-      return false;
-    }
-
-    /* Do not interrupt text cursor movement */
-    if (isTyping(el)) return false;
-
+    const style = getComputedStyle(area);
     const columns = Math.max(
       1,
-      getComputedStyle(area).gridTemplateColumns
-        .split(" ")
-        .filter(Boolean).length
+      style.gridTemplateColumns.split(" ").filter(Boolean).length
     );
 
-    let next = index < 0 ? 0 : index;
+    let next = index;
 
-    switch (e.key) {
-      case "ArrowRight":
-        next = index < 0 ? 0 : Math.min(index + 1, buttons.length - 1);
-        break;
-      case "ArrowLeft":
-        next = index < 0 ? buttons.length - 1 : Math.max(index - 1, 0);
-        break;
-      case "ArrowDown":
-        next = index < 0 ? 0 : Math.min(index + columns, buttons.length - 1);
-        break;
-      case "ArrowUp":
-        next = index < 0 ? buttons.length - 1 : Math.max(index - columns, 0);
-        break;
-    }
+    if (e.key === "ArrowRight") next = Math.min(index + 1, buttons.length - 1);
+    if (e.key === "ArrowLeft") next = Math.max(index - 1, 0);
+    if (e.key === "ArrowDown") next = Math.min(index + columns, buttons.length - 1);
+    if (e.key === "ArrowUp") next = Math.max(index - columns, 0);
 
     e.preventDefault();
     buttons[next].focus();
     return true;
   }
 
+  function handleArrow(e, el) {
+    if (!ARROWS.includes(e.key)) return false;
+
+    /* Keep native caret movement inside text and multiline fields */
+    if (el.isContentEditable || el.tagName === "TEXTAREA") return false;
+
+    /* Arrow keys inside a select should control its options */
+    if (el.tagName === "SELECT") return false;
+
+    const quickArea = el.closest(QUICK_SELECTOR);
+    if (
+      quickArea &&
+      el.closest("button:not(:disabled), a[href], [role='button']")
+    ) {
+      return moveInGrid(e, el, quickArea);
+    }
+
+    /* Left/right normally move the text cursor.
+       At the edge, they can move between fields. */
+    if (textField(el)) {
+      if (e.key === "ArrowUp") {
+        e.preventDefault();
+        return moveSequential(el, -1);
+      }
+
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        return moveSequential(el, 1);
+      }
+
+      if (
+        e.key === "ArrowLeft" &&
+        typeof el.selectionStart === "number" &&
+        el.selectionStart === 0 &&
+        el.selectionEnd === 0
+      ) {
+        e.preventDefault();
+        return moveSequential(el, -1);
+      }
+
+      if (
+        e.key === "ArrowRight" &&
+        typeof el.selectionEnd === "number" &&
+        el.selectionEnd === el.value.length
+      ) {
+        e.preventDefault();
+        return moveSequential(el, 1);
+      }
+
+      return false;
+    }
+
+    /* Other fields and buttons */
+    if (e.key === "ArrowUp" || e.key === "ArrowLeft") {
+      e.preventDefault();
+      return moveSequential(el, -1);
+    }
+
+    if (e.key === "ArrowDown" || e.key === "ArrowRight") {
+      e.preventDefault();
+      return moveSequential(el, 1);
+    }
+
+    return false;
+  }
+
   document.addEventListener("keydown", function (e) {
     const el = e.target;
     if (!(el instanceof HTMLElement)) return;
 
-    /* ESC — close modal or return */
+    /* Keep browser and operating-system shortcuts intact */
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+
+    /* ESC */
     if (e.key === "Escape") {
-      if (modalOpen() ||
-          (typeof view !== "undefined" && view !== "dashboard")) {
+      if (
+        modalOpen() ||
+        (typeof view !== "undefined" && view !== "dashboard")
+      ) {
         e.preventDefault();
         closeOrBack();
       }
       return;
     }
 
-    /* ERP function keys */
+    /* F1 — Doctor */
     if (e.key === "F1") {
-      if (typeof view !== "undefined" &&
-          ["retail", "wholesale"].includes(view)) {
+      if (
+        typeof view !== "undefined" &&
+        ["retail", "wholesale"].includes(view)
+      ) {
         const doctor = $("tDoctor");
         if (doctor) {
           e.preventDefault();
@@ -731,6 +788,7 @@ function renameCustomer(){
       return;
     }
 
+    /* F2 — Party picker */
     if (e.key === "F2") {
       if (typeof openPartyPicker === "function") {
         e.preventDefault();
@@ -739,6 +797,7 @@ function renameCustomer(){
       return;
     }
 
+    /* F3 — Rename customer */
     if (e.key === "F3") {
       if (typeof renameCustomer === "function") {
         e.preventDefault();
@@ -747,6 +806,7 @@ function renameCustomer(){
       return;
     }
 
+    /* F4 — Retail billing */
     if (e.key === "F4") {
       if (typeof go === "function") {
         e.preventDefault();
@@ -755,29 +815,28 @@ function renameCustomer(){
       return;
     }
 
-    /* Preserve browser and OS shortcuts */
-    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    /* Arrow navigation for fields, buttons, and menus */
+    if (handleArrow(e, el)) return;
 
-    /* Quick Access arrow navigation */
-    if (quickNavigation(e, el)) return;
-
-    /* Do not override native button/link activation */
-    if (el.matches("button, a[href], [role='button']")) return;
-
-    /* ENTER — next field, never submit accidentally */
+    /* ENTER — move through ordinary form fields */
     if (e.key === "Enter" && !e.shiftKey) {
-      if (!isTyping(el) || el.tagName === "TEXTAREA") return;
-      if (el.readOnly || ["checkbox", "radio", "file"].includes(el.type)) return;
+      if (el.tagName === "TEXTAREA" || el.isContentEditable) return;
 
-      /* Let native select options be chosen */
-      if (el.tagName === "SELECT") {
-        e.preventDefault();
-        focusNext(el, 1);
-        return;
-      }
+      /* Native button Enter must still click the button */
+      if (el.matches("button, a[href], [role='button']")) return;
 
-      /* Resolve matching item in the existing item lookup */
-      if (el.id === "lineSearch" && typeof db !== "undefined" && db.items) {
+      /* Let checkboxes, radios, and file inputs keep native behavior */
+      if (["checkbox", "radio", "file"].includes(el.type)) return;
+
+      /* Let Enter select the currently highlighted dropdown option */
+      if (el.tagName === "SELECT") return;
+
+      /* Existing item lookup */
+      if (
+        el.id === "lineSearch" &&
+        typeof db !== "undefined" &&
+        db.items
+      ) {
         const value = el.value.trim().toLowerCase();
         const item = db.items.find(i =>
           [i.name, i.code, i.barcode, i.id].some(v =>
@@ -787,45 +846,35 @@ function renameCustomer(){
 
         if (item) {
           e.preventDefault();
+
           const hidden = $("lineItem");
           if (hidden) hidden.value = item.id;
+
           if (typeof fillLineRate === "function") fillLineRate();
-          focusNext(el, 1);
+
+          moveSequential(el, 1);
           return;
         }
       }
 
-      e.preventDefault();
+      if (textField(el) || el.tagName === "INPUT") {
+        if (el.readOnly) return;
 
-      if (!focusNext(el, 1)) {
-        /* Focus submit instead of submitting unexpectedly */
-        const form = el.closest("form");
-        const submit = form && form.querySelector(
-          'button[type="submit"]:not(:disabled), input[type="submit"]:not(:disabled)'
-        );
-        if (submit) submit.focus();
+        e.preventDefault();
+
+        if (!moveSequential(el, 1)) {
+          const form = el.closest("form");
+          const submit = form && form.querySelector(
+            'button[type="submit"]:not(:disabled), input[type="submit"]:not(:disabled)'
+          );
+
+          if (submit) submit.focus();
+        }
       }
       return;
     }
 
-    /* LEFT ARROW — previous field at the start of text */
-    if (e.key === "ArrowLeft" && isTyping(el)) {
-      if (el.tagName === "SELECT" ||
-          ["date", "month", "checkbox", "radio"].includes(el.type)) {
-        e.preventDefault();
-        focusNext(el, -1);
-        return;
-      }
-
-      if (isEditableText(el) &&
-          typeof el.selectionStart === "number" &&
-          el.selectionStart === 0 &&
-          el.selectionEnd === 0) {
-        if (focusNext(el, -1)) e.preventDefault();
-      }
-    }
-
-    /* TAB / SHIFT+TAB stay native */
+    /* TAB and Shift+TAB remain native */
   }, false);
 
   /* Visible keyboard focus */
@@ -837,52 +886,18 @@ function renameCustomer(){
         outline: 2px solid #8150d8 !important;
         outline-offset: 2px !important;
       }
-      button:focus-visible, a:focus-visible {
+
+      button:focus-visible,
+      a:focus-visible,
+      input:focus-visible,
+      select:focus-visible,
+      textarea:focus-visible,
+      [role="button"]:focus-visible {
         box-shadow: 0 0 0 2px rgba(129,80,216,.25);
       }
     `;
     document.head.appendChild(style);
   }
- 
-/* SHREE ERP — QUICK BUTTON ARROW FIX */
-document.addEventListener("keydown", function (e) {
-  if (!["ArrowRight", "ArrowLeft", "ArrowDown", "ArrowUp"].includes(e.key)) {
-    return;
-  }
-const el = e.target;
-  if (!(el instanceof HTMLElement)) return;
-
-  /* Only navigate when focus is on a button */
-  const currentButton = el.closest(
-    ".quickgrid button, .quick-actions button, .quick-access button, .quicklinks button"
-  );
-  if (!currentButton) return;
-
-  const area = currentButton.closest(
-    ".quickgrid, .quick-actions, .quick-access, .quicklinks"
-  );
-
-  const buttons = [...area.querySelectorAll("button:not(:disabled)")]
-    .filter(b => b.getClientRects().length > 0);
-
-  const index = buttons.indexOf(currentButton);
-  if (index < 0 || !buttons.length) return;
-
-  const columns = Math.max(
-    1,
-    getComputedStyle(area).gridTemplateColumns.split(" ").filter(Boolean).length
-  );
-
-  let next = index;
-
-  if (e.key === "ArrowRight") next = Math.min(index + 1, buttons.length - 1);
-  if (e.key === "ArrowLeft") next = Math.max(index - 1, 0);
-  if (e.key === "ArrowDown") next = Math.min(index + columns, buttons.length - 1);
-  if (e.key === "ArrowUp") next = Math.max(index - columns, 0);
-
-  e.preventDefault();
-  buttons[next].focus();
-}, true);
 })();
 </script>
 </body>
