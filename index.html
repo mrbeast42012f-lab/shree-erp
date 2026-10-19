@@ -725,16 +725,13 @@ function renameCustomer(){
       buttons[next].focus();
       return;
     }
-
-    /* ENTER: next field; buttons activate normally */
+ /* ENTER: next field; buttons activate normally */
     if (e.key === "Enter" && !e.shiftKey) {
       if (el.matches("button, a[href], [role=button]")) return;
       if (!isTyping(el) || el.tagName === "TEXTAREA") return;
       if (el.readOnly || el.type === "checkbox" || el.type === "radio") return;
-
-      e.preventDefault();
-
-      if (!moveFocus(el, 1)) {
+ e.preventDefault();
+if (!moveFocus(el, 1)) {
         const form = el.closest("form");
         if (form) {
           const submit = form.querySelector(
@@ -745,8 +742,7 @@ function renameCustomer(){
       }
       return;
     }
-
-    /* LEFT ARROW: previous field at start of input */
+/* LEFT ARROW: previous field at start of input */
     if (e.key === "ArrowLeft" && isTyping(el)) {
       if (el.tagName === "SELECT" ||
           ["date", "month", "checkbox", "radio"].includes(el.type)) {
