@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="bn">
 <head>
@@ -59,6 +58,7 @@ tbody tr:nth-child(even){background:#f0f5fb}tbody tr:hover{background:#fff1c9}
 .modal{box-shadow:0 10px 40px #0005;max-width:100%;overflow:auto;max-height:90vh}
 @media(max-width:1250px){.workspace{grid-template-columns:175px minmax(0,1fr)}.right-panel{display:none}.bill-grid{grid-template-columns:repeat(3,minmax(110px,1fr))}}
 @media(max-width:850px){.workspace{grid-template-columns:minmax(0,1fr)}.left-panel{display:none}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.formgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.quickgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.bill-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:480px){.bill-grid,.formgrid{grid-template-columns:minmax(0,1fr)}.titlebar{align-items:flex-start;flex-direction:column}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.banner{padding:12px}.banner h2{font-size:19px}}
 @media print{body{background:white}.titlebar,.menubar,.toolbar,.left-panel,.right-panel,.statusline,.view-head .btn,.form-actions,.no-print{display:none!important}.workspace{display:block;padding:0}.app{border:0}.card{break-inside:avoid}}
 </style>
 </head>
@@ -163,7 +163,7 @@ function normalizeDB(s){
  d.batches=d.batches.filter(Boolean).map(x=>({...x,id:String(x.id||uid()),itemId:String(x.itemId||""),batch:String(x.batch||"NO BATCH"),expiry:String(x.expiry||""),qty:cleanQty(x.qty),rate:cleanQty(x.rate),mrp:cleanQty(x.mrp)}));
  if(!d.batches.length)d.items.forEach(i=>{if(i.qty>0)d.batches.push({id:uid(),itemId:i.id,batch:"OPENING",expiry:"",qty:i.qty,rate:cleanQty(i.purchaseRate),mrp:cleanQty(i.mrp||i.rate),opening:true})});
  d.items.forEach(i=>{
-  let bs=d.batches.filter(b=>b.itemId===i.id),sum=bs.reduce((s,b)=>s+cleanQty(b.qty),0);
+  let sum=d.batches.filter(b=>b.itemId===i.id).reduce((s,b)=>s+cleanQty(b.qty),0);
   if(i.qty>sum+0.000001)d.batches.push({id:uid(),itemId:i.id,batch:"OPENING ADJUSTMENT",expiry:"",qty:i.qty-sum,rate:cleanQty(i.purchaseRate),mrp:cleanQty(i.mrp||i.rate),opening:true});
   i.qty=d.batches.filter(b=>b.itemId===i.id).reduce((s,b)=>s+cleanQty(b.qty),0);
  });
@@ -211,6 +211,7 @@ function dashboard(){
  <div class="notice">Keyboard: F2 Party · F3 Rename Party · F4 Retail Billing · Esc Dashboard · Enter Next Field</div>`;
 }
 
+/* ITEM MASTER */
 function itemsPage(){
  let q=($("itemSearch")?.value||"").toLowerCase();
  let list=db.items.filter(x=>[x.name,x.code,x.barcode,x.company,x.type].some(v=>String(v||"").toLowerCase().includes(q)));
@@ -227,21 +228,39 @@ function itemsPage(){
  <div class="card"><div class="view-head"><h3>Item List (${list.length})</h3><input id="itemSearch" class="searchbox" style="max-width:260px" placeholder="Search item / code / barcode" value="${esc(q)}" oninput="refreshItems()"></div>${table(["Code","Barcode","Item","Type","Company","Unit","Rate","Stock","Action"],rows)}</div>`;
 }
 function refreshItems(){let v=$("itemSearch").value,p=$("itemSearch").selectionStart;render();$("itemSearch").value=v;$("itemSearch").focus();try{$("itemSearch").setSelectionRange(p,p)}catch(e){}}
+
+/* Stock edit is planned before changing saved data. */
 function saveItem(e){
- e.preventDefault();let id=$("itemId").value||uid(),old=db.items.find(x=>x.id===id),qty=cleanQty($("iQty").value);
+ e.preventDefault();
+ let id=$("itemId").value||uid(),old=db.items.find(x=>x.id===id),qty=cleanQty($("iQty").value);
  let x={...(old||{}),id,code:$("iCode").value.trim(),barcode:$("iBarcode").value.trim(),name:$("iName").value.trim(),type:$("iType").value,company:$("iCompany").value.trim(),unit:$("iUnit").value.trim()||"PCS",rate:cleanQty($("iRate").value),qty,purchaseRate:cleanQty($("iPurchaseRate").value),mrp:cleanQty($("iMrp").value)};
  if(!x.name)return alert("Item name লিখো।");
  if(x.barcode&&db.items.some(a=>a.id!==id&&String(a.barcode||"")===x.barcode))return alert("Barcode ইতিমধ্যে ব্যবহৃত হয়েছে।");
  if(old){
-  db.items=db.items.map(a=>a.id===id?x:a);let diff=qty-cleanQty(old.qty);
-  if(diff>0){let b=db.batches.find(z=>z.itemId===id&&z.opening);if(!b){b={id:uid(),itemId:id,batch:"OPENING ADJUSTMENT",expiry:"",qty:0,rate:x.purchaseRate,mrp:x.mrp,opening:true};db.batches.push(b)}b.qty=cleanQty(b.qty)+diff}
-  if(diff<0){let left=-diff;for(let b of db.batches.filter(z=>z.itemId===id).sort((a,b)=>Number(!!b.opening)-Number(!!a.opening))){let take=Math.min(left,cleanQty(b.qty));b.qty-=take;left-=take;if(left<=0)break}if(left>0)return alert("Stock adjustment সম্ভব হয়নি।")}
- }else{db.items.push(x);if(qty>0)db.batches.push({id:uid(),itemId:id,batch:"OPENING",expiry:"",qty,rate:x.purchaseRate,mrp:x.mrp,opening:true})}
+  let diff=qty-cleanQty(old.qty),plan=[],left=Math.max(0,-diff);
+  if(left>0){
+   let batches=db.batches.filter(z=>z.itemId===id).slice().sort((a,b)=>Number(!!b.opening)-Number(!!a.opening));
+   for(let b of batches){let take=Math.min(left,cleanQty(b.qty));if(take>0)plan.push({id:b.id,take});left-=take;if(left<=0)break}
+   if(left>0.000001)return alert("Stock adjustment সম্ভব হয়নি। বর্তমান Batch stock পরীক্ষা করো।");
+  }
+  if(diff>0){
+   let b=db.batches.find(z=>z.itemId===id&&z.opening);
+   if(!b){b={id:uid(),itemId:id,batch:"OPENING ADJUSTMENT",expiry:"",qty:0,rate:x.purchaseRate,mrp:x.mrp,opening:true};db.batches.push(b)}
+   b.qty=cleanQty(b.qty)+diff;
+  }else if(diff<0){
+   plan.forEach(p=>{let b=db.batches.find(z=>z.id===p.id);if(b)b.qty=cleanQty(b.qty-p.take)});
+  }
+  db.items=db.items.map(a=>a.id===id?x:a);
+ }else{
+  db.items.push(x);
+  if(qty>0)db.batches.push({id:uid(),itemId:id,batch:"OPENING",expiry:"",qty,rate:x.purchaseRate,mrp:x.mrp,opening:true});
+ }
  reconcileItem(id);save();render();alert("Item saved.");
 }
 function editItem(id){let x=db.items.find(a=>a.id===id);if(!x)return;render();$("itemId").value=x.id;$("iCode").value=x.code||"";$("iBarcode").value=x.barcode||"";$("iName").value=x.name||"";$("iType").value=x.type||"Others";$("iCompany").value=x.company||"";$("iUnit").value=x.unit||"PCS";$("iRate").value=x.rate||0;$("iQty").value=x.qty||0;$("iPurchaseRate").value=x.purchaseRate||0;$("iMrp").value=x.mrp||x.rate||0;$("iName").focus()}
 function resetItemForm(){render()}
 
+/* PARTY MASTER */
 function partiesPage(){
  let rows=db.parties.map(x=>`<tr><td>${esc(x.name)}</td><td>${esc(x.type||"Customer")}</td><td>${esc(x.phone||"")}</td><td>${esc(x.address||"")}</td><td>${esc(x.gstin||"")}</td><td>${esc(x.dlNo||"")}</td><td>${money(x.balance)}</td><td><button class="btn" onclick="editParty('${esc(x.id)}')">Edit</button> <button class="btn" onclick="openLedger('${esc(x.id)}')">Ledger</button> <button class="btn danger" onclick="deleteRecord('parties','${esc(x.id)}')">Del</button></td></tr>`).join("");
  return `${head("Party Master","Customer / Supplier Account")}<div class="card"><h3>Add / Edit Party</h3><form onsubmit="saveParty(event)"><input type="hidden" id="pId"><div class="formgrid">
@@ -278,10 +297,9 @@ function transactionPage(kind){
  <div class="field"><label>Batch</label><input id="lineBatch" list="batchHints" onchange="selectBillBatch()" oninput="selectBillBatch()"><datalist id="batchHints"></datalist></div>
  <div class="field"><label>Expiry Month</label><input id="lineExpiry" type="month"></div>
  <div class="field"><label>Qty</label><input id="lineQty" type="number" min=".01" step=".01" value="1" oninput="calcLinePreview()"></div>
- ${!retail?`<div class="field"><label>Free Qty</label><input id="lineFree" type="number" min="0" step=".01" value="0" oninput="calcLinePreview()">`:""}
+ ${!retail?`<div class="field"><label>Free Qty</label><input id="lineFree" type="number" min="0" step=".01" value="0" oninput="calcLinePreview()"></div>`:""}
  <div class="field"><label>Rate ₹</label><input id="lineRate" type="number" min="0" step=".01" value="0" oninput="calcLinePreview()"></div>
- ${retail?`<div class="field"><label>MRP ₹</label><input id="lineMrp" type="number" min="0" step=".01" value="0" oninput="calcLinePreview()">`:`<div class="field"><label>${purchase?"Purchase Discount %":"Distributor Discount %"}</label><input id="lineDist" type="number" min="0" max="100" step=".01" value="0" oninput="calcLinePreview()">`}
- </div>
+ ${retail?`<div class="field"><label>MRP ₹</label><input id="lineMrp" type="number" min="0" step=".01" value="0" oninput="calcLinePreview()">`:`<div class="field"><label>${purchase?"Purchase Discount %":"Distributor Discount %"}</label><input id="lineDist" type="number" min="0" max="100" step=".01" value="0" oninput="calcLinePreview()"></div>`}
  <div class="field"><label>Line Discount ₹</label><input id="lineDiscount" type="number" min="0" step=".01" value="0" oninput="calcLinePreview()"></div>
  <div class="field"><label>GST %</label><input id="lineGst" type="number" min="0" max="100" step=".01" value="0" oninput="calcLinePreview()"></div>
  <div class="field"><label>Available Stock</label><input id="lineStock" readonly value="—"></div>
@@ -293,11 +311,16 @@ function transactionPage(kind){
  <div class="form-actions"><button class="btn primary" type="submit">Save Voucher</button><button class="btn" type="button" onclick="go('${kind}')">Clear / New Bill</button><button class="btn" type="button" onclick="backup()">Backup</button></div>
  </form></div><div class="card"><h3>Voucher Register (${db[key].length})</h3>${table(["Date","Voucher","Party","Total","Action"],records)}</div>`;
 }
+
+/* Exact matches first; partial matches only if the result is unambiguous. */
 function searchBillItem(){
- let raw=$("lineSearch")?.value.trim().toLowerCase();if(!raw)return;
- let i=db.items.find(x=>[x.name,x.code,x.barcode,x.id].some(y=>String(y||"").toLowerCase()===raw));
- if(!i){$("lineItem").value="";return}
- $("lineItem").value=i.id;fillLineRate();
+ let el=$("lineSearch"),raw=el?.value.trim().toLowerCase();if(!raw)return;
+ let fields=i=>[i.name,i.code,i.barcode,i.id].map(v=>String(v||"").toLowerCase()).filter(Boolean);
+ let exact=db.items.filter(i=>fields(i).some(v=>v===raw));
+ let matches=exact.length?exact:db.items.filter(i=>fields(i).some(v=>v.startsWith(raw)));
+ if(!matches.length)matches=db.items.filter(i=>fields(i).some(v=>v.includes(raw)));
+ if(matches.length!==1){$("lineItem").value="";return}
+ $("lineItem").value=matches[0].id;fillLineRate();
 }
 function currentItem(){return db.items.find(i=>i.id===$("lineItem")?.value)}
 function itemBatches(id){return db.batches.filter(b=>b.itemId===id&&cleanQty(b.qty)>0).sort((a,b)=>String(a.expiry||"9999-12").localeCompare(String(b.expiry||"9999-12")))}
@@ -382,10 +405,13 @@ function saveTransaction(e,kind){
   for(let [id,q] of Object.entries(required)){let b=db.batches.find(x=>x.id===id);if(!b||cleanQty(b.qty)+.000001<q)return alert("Batch stock পর্যাপ্ত নেই।");if(b.expiry&&daysToExpiry(b.expiry)<0)return alert("Expired batch বিক্রি করা যাবে না।")}
  }
  let t=getLineTotals();if(t.billDiscount>t.subtotal+t.gst+.000001)return alert("Bill discount মোট বিলের চেয়ে বেশি।");
+
+ /* Purchase voucher lines get their real batch IDs before being saved. */
+ if(purchase)draftLines.forEach(l=>{let b=findOrCreateBatch(l);l.batchId=b.id;l.batch=normalizedBatchName(l.batch);});
  let x={id:uid(),no,date:$("tDate").value,party:$("tParty").value||"Cash / Walk-in",kind,lines:draftLines.map(l=>({...l})),subtotal:t.subtotal,gstTotal:t.gst,discount:t.billDiscount,roundOff:t.round,total:t.total,address:$("tAddress")?.value||"",phone:$("tMobile")?.value||"",doctor:$("tDoctor")?.value||"",regNo:$("tReg")?.value||"",note:$("tNote")?.value||"",createdAt:new Date().toISOString()};
  x.item=draftLines.map(l=>l.item).join(", ");x.qty=draftLines.reduce((s,l)=>s+l.qty,0);x.itemId=draftLines.length===1?draftLines[0].itemId:"";x.rate=draftLines.length===1?draftLines[0].rate:0;
  if(purchase){
-  draftLines.forEach(l=>{let b=findOrCreateBatch(l);b.qty=cleanQty(b.qty)+l.qty+l.free;b.rate=cleanQty(l.rate);b.mrp=cleanQty(l.mrp||b.mrp)});
+  draftLines.forEach(l=>{let b=db.batches.find(z=>z.id===l.batchId);if(b){b.qty=cleanQty(b.qty)+l.qty+l.free;b.rate=cleanQty(l.rate);b.mrp=cleanQty(l.mrp||b.mrp)}});
  }else{
   let req={};draftLines.forEach(l=>req[l.batchId]=(req[l.batchId]||0)+l.qty+(kind==="retail"?0:l.free));
   Object.entries(req).forEach(([id,q])=>{let b=db.batches.find(x=>x.id===id);b.qty=cleanQty(b.qty-q)});
@@ -393,6 +419,8 @@ function saveTransaction(e,kind){
  reconcileAll();db[key].push(x);save();let printCopy={...x,company:{...db.company}};draftLines=[];render();
  if(confirm("Voucher saved. Invoice print করবে?"))printObject(printCopy);
 }
+
+/* RECEIPT / PAYMENT */
 function accountPage(kind){
  let receipt=kind==="receipt",key=receipt?"receipts":"payments";
  let rows=db[key].slice().reverse().map(x=>`<tr><td>${esc(x.date)}</td><td>${esc(x.no)}</td><td>${esc(x.party)}</td><td>${esc(x.mode)}</td><td>${money(x.amount)}</td><td><button class="btn" onclick="printVoucher('${key}','${esc(x.id)}')">Print</button> <button class="btn danger" onclick="deleteRecord('${key}','${esc(x.id)}')">Del</button></td></tr>`).join("");
@@ -444,7 +472,13 @@ function reportsPage(kind){
 function recordLines(x){if(Array.isArray(x.lines))return x.lines;if(x.itemId)return [{itemId:x.itemId,batchId:"",batch:"",expiry:"",qty:num(x.qty),free:0,rate:num(x.rate)}];return []}
 function resolveLineBatch(l){return db.batches.find(b=>l.batchId&&b.id===l.batchId)||db.batches.find(b=>b.itemId===l.itemId&&normalizedBatchName(b.batch).toLowerCase()===normalizedBatchName(l.batch).toLowerCase()&&String(b.expiry||"")===String(l.expiry||""))}
 function deleteRecord(key,id){
- let x=db[key]?.find(r=>r.id===id);if(!x)return;if(!confirm("এই record delete করবে?"))return;
+ let x=db[key]?.find(r=>r.id===id);if(!x)return;
+ if(key==="parties"){
+  let name=x.name;
+  let used=["bills","purchases","receipts","payments"].some(k=>db[k].some(r=>r.party===name));
+  if(used)return alert("এই Party-এর transaction history আছে। History নষ্ট না করতে Party delete করা হয়নি।");
+ }
+ if(!confirm("এই record delete করবে?"))return;
  if(key==="bills"||key==="purchases"){
   let purchase=key==="purchases",lines=recordLines(x);
   if(purchase){for(let l of lines){let b=resolveLineBatch(l),q=num(l.qty)+num(l.free);if(!b||b.qty+0.000001<q)return alert("Purchase-এর stock ইতিমধ্যে বিক্রি/ব্যবহৃত হয়েছে অথবা batch পাওয়া যাচ্ছে না। নিরাপদে delete করা হয়নি।")}}
@@ -524,7 +558,7 @@ function renameCustomer(){
  let old=p.name;p.name=next;["bills","purchases","receipts","payments"].forEach(k=>db[k].forEach(x=>{if(x.party===old)x.party=next}));save();render();alert("Party name updated.");
 }
 
-/* KEYBOARD: Enter moves to next visible form control. */
+/* KEYBOARD */
 document.addEventListener("keydown",e=>{
  if(e.key==="Escape"){
   if($("modalRoot").innerHTML){closeModal();e.preventDefault();return}
@@ -551,6 +585,3 @@ render();updateStatus();
 </script>
 </body>
 </html>
-
-
-
