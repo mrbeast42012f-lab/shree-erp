@@ -571,40 +571,185 @@ function renameCustomer(){
  const oldName=p.name;p.name=newName;["bills","purchases","receipts","payments"].forEach(k=>db[k].forEach(x=>{if(x.party===oldName)x.party=newName}));save();render();alert("Customer name updated.");
 }
 
-/* KEYBOARD: Esc back, Enter next field, Left Arrow previous field */
-document.addEventListener("keydown",e=>{
- if(e.key==="Escape"){if($("modalRoot").innerHTML){closeModal();e.preventDefault();return}if(view!=="dashboard"){goBack();e.preventDefault()}return}
- if(e.key==="F2"){e.preventDefault();openPartyPicker();return}
- if(e.key==="F3"){e.preventDefault();renameCustomer();return}
- if(e.key==="F4"){e.preventDefault();go("retail");return}
- if(e.key==="F1"&&["retail","wholesale"].includes(view)){e.preventDefault();if($("tDoctor"))$("tDoctor").focus();else alert("Doctor field Retail Billing-এ পাওয়া যাবে।");return}
- const target=e.target;
- if(e.key==="ArrowLeft"&&!e.ctrlKey&&!e.altKey&&!e.metaKey){
-  if(target.matches("input,select,textarea")&&!target.readOnly&&!target.disabled){
-   const textTypes=["text","search","tel","url","email","password","number"];
-   if(target.tagName==="SELECT"||!textTypes.includes(target.type)){movePrevious(target,e);return}
-   if(typeof target.selectionStart==="number"&&target.selectionStart===0&&target.selectionEnd===0){movePrevious(target,e);return}
-  }
- }
- if(e.key==="Enter"&&!e.ctrlKey&&!e.altKey&&!e.shiftKey){
-  if(target.closest(".modal-bg"))return;
-  if(!target.matches("input,select,textarea")||target.matches("[type=submit],[type=button],[readonly]")||target.tagName==="TEXTAREA")return;
-  if(target.id==="lineSearch"){
-   const val=target.value.trim().toLowerCase(),i=db.items.find(i=>[i.name,i.code,i.barcode,i.id].some(v=>String(v||"").toLowerCase()===val));
-   if(i){e.preventDefault();$("lineItem").value=i.id;fillLineRate();$("linePack").focus();return}
-  }
-  const form=target.closest("form");if(!form)return;
-  const fields=[...form.querySelectorAll("input:not([type=hidden]):not([type=button]):not([type=submit]):not([readonly]),select,textarea")].filter(el=>!el.disabled&&el.offsetParent!==null);
-  const idx=fields.indexOf(target);
-  if(idx>=0){e.preventDefault();if(idx<fields.length-1)fields[idx+1].focus();else if(form.requestSubmit)form.requestSubmit();else form.dispatchEvent(new Event("submit",{cancelable:true,bubbles:true}))}
- }
+<script>
+/* UNIVERSAL KEYBOARD NAVIGATION */
+document.addEventListener("keydown", function(e) {
+    const target = e.target;
+    const modalRoot = document.getElementById("modalRoot");
+    const modalOpen = modalRoot && modalRoot.innerHTML.trim() !== "";
+
+    /* ESC: Close popup first, otherwise go back */
+    if (e.key === "Escape") {
+        if (modalOpen) {
+            closeModal();
+        } else if (view !== "dashboard") {
+            goBack();
+        }
+        e.preventDefault();
+        return;
+    }
+
+    /* F2: Customer / Party picker */
+    if (e.key === "F2") {
+        e.preventDefault();
+        openPartyPicker();
+        return;
+    }
+
+    /* F3: Rename customer */
+    if (e.key === "F3") {
+        e.preventDefault();
+        renameCustomer();
+        return;
+    }
+
+    /* F4: Retail bill */
+    if (e.key === "F4") {
+        e.preventDefault();
+        go("retail");
+        return;
+    }
+
+    /* F1: Doctor field */
+    if (e.key === "F1") {
+        if (["retail", "wholesale"].includes(view)) {
+            const doctor = document.getElementById("tDoctor");
+            if (doctor) {
+                e.preventDefault();
+                doctor.focus();
+                doctor.select();
+            }
+        }
+        return;
+    }
+
+    /* Do not interfere with browser shortcuts */
+    if (e.ctrlKey || e.altKey || e.metaKey) return;
+
+    /* Collect visible, usable fields */
+    function getFields(container) {
+        return [...container.querySelectorAll(
+            'input:not([type="hidden"]):not([type="button"]):not([type="submit"]):not([type="reset"]):not([readonly]), select:not([disabled]), textarea:not([readonly])'
+        )].filter(el =>
+            !el.disabled &&
+            !el.readOnly &&
+            el.getAttribute("type") !== "file" &&
+            el.offsetParent !== null
+        );
+    }
+
+    function focusField(el, end = false) {
+        if (!el) return;
+        el.focus();
+
+        if (
+            end &&
+            typeof el.setSelectionRange === "function" &&
+            ["text", "search", "tel", "url", "email", "password"].includes(el.type)
+        ) {
+            try {
+                const n = el.value.length;
+                el.setSelectionRange(n, n);
+            } catch (_) {}
+        }
+    }
+
+    function moveField(direction) {
+        const container = target.closest(".modal-body") ||
+                          target.closest("form") ||
+                          document.getElementById("main");
+
+        if (!container) return;
+
+        const fields = getFields(container);
+        const index = fields.indexOf(target);
+
+        if (index < 0) return;
+
+        const next = fields[index + direction];
+
+        if (next) {
+            e.preventDefault();
+            focusField(next, direction < 0);
+        }
+    }
+
+    /* LEFT ARROW: Previous field when cursor is at start */
+    if (e.key === "ArrowLeft" && target.matches("input, select, textarea")) {
+        if (target.tagName === "SELECT" || target.tagName === "TEXTAREA") {
+            moveField(-1);
+            return;
+        }
+
+        if (typeof target.selectionStart === "number" &&
+            target.selectionStart === 0 &&
+            target.selectionEnd === 0) {
+            moveField(-1);
+        }
+        return;
+    }
+
+    /* ENTER: Next field */
+    if (e.key !== "Enter" || e.shiftKey) return;
+
+    if (target.tagName === "TEXTAREA") return;
+
+    /* Let buttons work normally */
+    if (target.matches("button, [type='submit'], [type='button']")) return;
+
+    if (!target.matches("input, select")) return;
+
+    /* Resolve product name / barcode before moving on */
+    if (target.id === "lineSearch") {
+        const value = target.value.trim().toLowerCase();
+        const item = db.items.find(i =>
+            [i.name, i.code, i.barcode, i.id].some(
+                v => String(v || "").toLowerCase() === value
+            )
+        );
+
+        if (item) {
+            e.preventDefault();
+            document.getElementById("lineItem").value = item.id;
+            fillLineRate();
+            focusField(document.getElementById("linePack"));
+            return;
+        }
+    }
+
+    const container = target.closest(".modal-body") ||
+                      target.closest("form") ||
+                      document.getElementById("main");
+
+    if (!container) return;
+
+    const fields = getFields(container);
+    const index = fields.indexOf(target);
+
+    if (index < 0) return;
+
+    e.preventDefault();
+
+    if (index < fields.length - 1) {
+        focusField(fields[index + 1]);
+        return;
+    }
+
+    /* Submit only when the last field belongs to a form */
+    const form = target.closest("form");
+
+    if (form) {
+        const submitButton = form.querySelector(
+            'button[type="submit"], button:not([type])'
+        );
+
+        if (submitButton) {
+            submitButton.click();
+        } else if (typeof form.requestSubmit === "function") {
+            form.requestSubmit();
+        }
+    }
 });
-function movePrevious(target,e){
- const form=target.closest("form");if(!form)return;
- const fields=[...form.querySelectorAll("input:not([type=hidden]):not([type=button]):not([type=submit]):not([readonly]),select,textarea")].filter(el=>!el.disabled&&el.offsetParent!==null);
- const idx=fields.indexOf(target);if(idx>0){e.preventDefault();fields[idx-1].focus();if(fields[idx-1].setSelectionRange&&["text","search","tel","url","email","password"].includes(fields[idx-1].type)){const n=fields[idx-1].value.length;try{fields[idx-1].setSelectionRange(n,n)}catch(err){}}}
-}
-render();updateStatus();
 </script>
 </body>
 </html>
