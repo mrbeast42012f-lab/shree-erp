@@ -569,83 +569,168 @@ function renameCustomer(){
  if(db.parties.some(x=>x.id!==p.id&&x.name.toLowerCase()===newName.toLowerCase()))return alert("এই নামের party আগে থেকেই আছে।");
  const oldName=p.name;p.name=newName;["bills","purchases","receipts","payments"].forEach(k=>db[k].forEach(x=>{if(x.party===oldName)x.party=newName}));save();render();alert("Customer name updated.");
 }
-/* SHREE ERP — UNIVERSAL NAVIGATION */
+
+/* SHREE ERP — COMPLETE KEYBOARD NAVIGATION */
 (function () {
   "use strict";
+
   const $ = id => document.getElementById(id);
+
+  const QUICK_SELECTOR =
+    ".quickgrid, .quick-actions, .quick-access, .quicklinks";
+
   function isVisible(el) {
     return !!el &&
       el.isConnected &&
       el.getClientRects().length > 0 &&
       !el.disabled &&
-      el.tabIndex !== -1;
+      el.tabIndex !== -1 &&
+      !el.closest("[hidden], [aria-hidden='true']");
   }
+
   function isTyping(el) {
     return el instanceof HTMLElement &&
       (el.matches("input, textarea, select") || el.isContentEditable);
   }
-  function getScope(el) {
-    return el.closest(".modal-bg") ||
-      el.closest("form") ||
-      el.closest(".quickgrid") ||
-      el.closest(".quick-actions") ||
-      document.querySelector("main") ||
-      document.getElementById("app") ||
-      document.body;
+
+  function isEditableText(el) {
+    return el instanceof HTMLElement &&
+      el.matches("input:not([type=checkbox]):not([type=radio]):not([type=button]):not([type=submit]), textarea");
   }
-  function getControls(scope) {
-    return [...scope.querySelectorAll(
-      'input:not([type=hidden]):not([type=button]):not([type=submit]), select, textarea, button:not(:disabled), a[href], [role=button], [tabindex="0"]'
-    )].filter(el =>
-      isVisible(el) &&
-      !el.readOnly &&
-      !el.matches("[aria-hidden=true]")
-    );
+
+  function modalOpen() {
+    const root = $("modalRoot");
+    return !!root && !!root.innerHTML.trim();
   }
-  function moveFocus(el, step) {
-    const scope = getScope(el);
-    const controls = getControls(scope);
-    const index = controls.indexOf(el);
-    if (index < 0) return false;
-    const next = controls[index + step];
-    if (!next) return false;
-    next.focus();
-    if (next.matches('input[type="text"], input[type="search"], input[type="tel"]')) {
-      try { next.select(); } catch (_) {}
-    }
-    return true;
-  }
+
   function closeOrBack() {
-    const modal = $("modalRoot");
-    if (modal && modal.innerHTML.trim()) {
+    if (modalOpen()) {
       if (typeof closeModal === "function") closeModal();
       return;
     }
+
     if (typeof view !== "undefined" && view !== "dashboard") {
       if (typeof goBack === "function") goBack();
     }
   }
+
+  function controlsIn(scope) {
+    return [...scope.querySelectorAll(
+      'input:not([type=hidden]):not([type=button]):not([type=submit]):not([type=reset]), select, textarea, button:not(:disabled), a[href], [role="button"], [tabindex="0"]'
+    )].filter(el =>
+      isVisible(el) &&
+      !el.readOnly &&
+      !el.matches("[aria-disabled='true']")
+    );
+  }
+
+  function focusNext(el, step = 1) {
+    const scope =
+      el.closest(".modal-bg") ||
+      el.closest("form") ||
+      document.querySelector("main") ||
+      $("app") ||
+      document.body;
+
+    const controls = controlsIn(scope);
+    const index = controls.indexOf(el);
+    if (index < 0) return false;
+
+    const next = controls[index + step];
+    if (!next) return false;
+
+    next.focus();
+
+    if (next.matches('input[type="text"], input[type="search"], input[type="tel"], input[type="email"]')) {
+      try { next.select(); } catch (_) {}
+    }
+
+    return true;
+  }
+
+  function quickNavigation(e, el) {
+    const area = el.closest(QUICK_SELECTOR);
+    if (!area) return false;
+
+    const buttons = [...area.querySelectorAll(
+      "button:not(:disabled), a[href], [role='button']"
+    )].filter(isVisible);
+
+    if (!buttons.length) return false;
+
+    const currentElement = el.closest(
+      "button:not(:disabled), a[href], [role='button']"
+    );
+    const index = buttons.indexOf(currentElement);
+
+    if (e.key === "Enter" && index >= 0) {
+      /* Let the browser activate the focused button normally */
+      return false;
+    }
+
+    if (!["ArrowRight", "ArrowLeft", "ArrowDown", "ArrowUp"].includes(e.key)) {
+      return false;
+    }
+
+    /* Do not interrupt text cursor movement */
+    if (isTyping(el)) return false;
+
+    const columns = Math.max(
+      1,
+      getComputedStyle(area).gridTemplateColumns
+        .split(" ")
+        .filter(Boolean).length
+    );
+
+    let next = index < 0 ? 0 : index;
+
+    switch (e.key) {
+      case "ArrowRight":
+        next = index < 0 ? 0 : Math.min(index + 1, buttons.length - 1);
+        break;
+      case "ArrowLeft":
+        next = index < 0 ? buttons.length - 1 : Math.max(index - 1, 0);
+        break;
+      case "ArrowDown":
+        next = index < 0 ? 0 : Math.min(index + columns, buttons.length - 1);
+        break;
+      case "ArrowUp":
+        next = index < 0 ? buttons.length - 1 : Math.max(index - columns, 0);
+        break;
+    }
+
+    e.preventDefault();
+    buttons[next].focus();
+    return true;
+  }
+
   document.addEventListener("keydown", function (e) {
     const el = e.target;
     if (!(el instanceof HTMLElement)) return;
-    /* ESC: close modal / go back */
+
+    /* ESC — close modal or return */
     if (e.key === "Escape") {
-      e.preventDefault();
-      closeOrBack();
-      return;
-    }
-    /* Function keys */
-    if (e.key === "F1" &&
-        ["retail", "wholesale"].includes(
-          typeof view !== "undefined" ? view : ""
-        )) {
-      const doctor = $("tDoctor");
-      if (doctor) {
+      if (modalOpen() ||
+          (typeof view !== "undefined" && view !== "dashboard")) {
         e.preventDefault();
-        doctor.focus();
+        closeOrBack();
       }
       return;
     }
+
+    /* ERP function keys */
+    if (e.key === "F1") {
+      if (typeof view !== "undefined" &&
+          ["retail", "wholesale"].includes(view)) {
+        const doctor = $("tDoctor");
+        if (doctor) {
+          e.preventDefault();
+          doctor.focus();
+        }
+      }
+      return;
+    }
+
     if (e.key === "F2") {
       if (typeof openPartyPicker === "function") {
         e.preventDefault();
@@ -653,6 +738,7 @@ function renameCustomer(){
       }
       return;
     }
+
     if (e.key === "F3") {
       if (typeof renameCustomer === "function") {
         e.preventDefault();
@@ -660,6 +746,7 @@ function renameCustomer(){
       }
       return;
     }
+
     if (e.key === "F4") {
       if (typeof go === "function") {
         e.preventDefault();
@@ -667,49 +754,95 @@ function renameCustomer(){
       }
       return;
     }
-    /* Keep browser shortcuts intact */
-    if (e.ctrlKey || e.metaKey || e.altKey) return;
-    const quick = el.closest(
-      ".quickgrid, .quick-actions, .quick-access, .quicklinks"
-    );
-    
-/* Quick Access: arrow navigation */
-if (
-  ["ArrowRight", "ArrowLeft", "ArrowDown", "ArrowUp"].includes(e.key) &&
-  !isTyping(el)
-) {
-  const quick = el.closest(
-    ".quickgrid, .quick-actions, .quick-access, .quicklinks"
-  );
-  if (quick) {
-    const buttons = [...quick.querySelectorAll(
-      "button:not(:disabled), a[href], [role=button]"
-    )].filter(b => b.getClientRects().length > 0);
-    if (buttons.length) {
-      const focused = el.closest("button, a[href], [role=button]");
-      const current = buttons.indexOf(focused);
 
-      const cols = Math.max(
-        1,
-        getComputedStyle(quick).gridTemplateColumns
-          .split(" ").filter(Boolean).length
-      );
-      let next = current < 0 ? 0 : current;
-if (e.key === "ArrowRight")
-        next = Math.min(next + 1, buttons.length - 1);
-      if (e.key === "ArrowLeft")
-        next = Math.max(next - 1, 0);
-      if (e.key === "ArrowDown")
-        next = Math.min(next + cols, buttons.length - 1);
-      if (e.key === "ArrowUp")
-        next = Math.max(next - cols, 0);
+    /* Preserve browser and OS shortcuts */
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+
+    /* Quick Access arrow navigation */
+    if (quickNavigation(e, el)) return;
+
+    /* Do not override native button/link activation */
+    if (el.matches("button, a[href], [role='button']")) return;
+
+    /* ENTER — next field, never submit accidentally */
+    if (e.key === "Enter" && !e.shiftKey) {
+      if (!isTyping(el) || el.tagName === "TEXTAREA") return;
+      if (el.readOnly || ["checkbox", "radio", "file"].includes(el.type)) return;
+
+      /* Let native select options be chosen */
+      if (el.tagName === "SELECT") {
+        e.preventDefault();
+        focusNext(el, 1);
+        return;
+      }
+
+      /* Resolve matching item in the existing item lookup */
+      if (el.id === "lineSearch" && typeof db !== "undefined" && db.items) {
+        const value = el.value.trim().toLowerCase();
+        const item = db.items.find(i =>
+          [i.name, i.code, i.barcode, i.id].some(v =>
+            String(v || "").toLowerCase() === value
+          )
+        );
+
+        if (item) {
+          e.preventDefault();
+          const hidden = $("lineItem");
+          if (hidden) hidden.value = item.id;
+          if (typeof fillLineRate === "function") fillLineRate();
+          focusNext(el, 1);
+          return;
+        }
+      }
 
       e.preventDefault();
-      buttons[next].focus();
+
+      if (!focusNext(el, 1)) {
+        /* Focus submit instead of submitting unexpectedly */
+        const form = el.closest("form");
+        const submit = form && form.querySelector(
+          'button[type="submit"]:not(:disabled), input[type="submit"]:not(:disabled)'
+        );
+        if (submit) submit.focus();
+      }
       return;
     }
+
+    /* LEFT ARROW — previous field at the start of text */
+    if (e.key === "ArrowLeft" && isTyping(el)) {
+      if (el.tagName === "SELECT" ||
+          ["date", "month", "checkbox", "radio"].includes(el.type)) {
+        e.preventDefault();
+        focusNext(el, -1);
+        return;
+      }
+
+      if (isEditableText(el) &&
+          typeof el.selectionStart === "number" &&
+          el.selectionStart === 0 &&
+          el.selectionEnd === 0) {
+        if (focusNext(el, -1)) e.preventDefault();
+      }
+    }
+
+    /* TAB / SHIFT+TAB stay native */
+  }, false);
+
+  /* Visible keyboard focus */
+  if (!$("shreeNavigationStyle")) {
+    const style = document.createElement("style");
+    style.id = "shreeNavigationStyle";
+    style.textContent = `
+      :focus-visible {
+        outline: 2px solid #8150d8 !important;
+        outline-offset: 2px !important;
+      }
+      button:focus-visible, a:focus-visible {
+        box-shadow: 0 0 0 2px rgba(129,80,216,.25);
+      }
+    `;
+    document.head.appendChild(style);
   }
-}
 })();
 </script>
 </body>
