@@ -843,6 +843,46 @@ function renameCustomer(){
     `;
     document.head.appendChild(style);
   }
+ 
+/* SHREE ERP — QUICK BUTTON ARROW FIX */
+document.addEventListener("keydown", function (e) {
+  if (!["ArrowRight", "ArrowLeft", "ArrowDown", "ArrowUp"].includes(e.key)) {
+    return;
+  }
+const el = e.target;
+  if (!(el instanceof HTMLElement)) return;
+
+  /* Only navigate when focus is on a button */
+  const currentButton = el.closest(
+    ".quickgrid button, .quick-actions button, .quick-access button, .quicklinks button"
+  );
+  if (!currentButton) return;
+
+  const area = currentButton.closest(
+    ".quickgrid, .quick-actions, .quick-access, .quicklinks"
+  );
+
+  const buttons = [...area.querySelectorAll("button:not(:disabled)")]
+    .filter(b => b.getClientRects().length > 0);
+
+  const index = buttons.indexOf(currentButton);
+  if (index < 0 || !buttons.length) return;
+
+  const columns = Math.max(
+    1,
+    getComputedStyle(area).gridTemplateColumns.split(" ").filter(Boolean).length
+  );
+
+  let next = index;
+
+  if (e.key === "ArrowRight") next = Math.min(index + 1, buttons.length - 1);
+  if (e.key === "ArrowLeft") next = Math.max(index - 1, 0);
+  if (e.key === "ArrowDown") next = Math.min(index + columns, buttons.length - 1);
+  if (e.key === "ArrowUp") next = Math.max(index - columns, 0);
+
+  e.preventDefault();
+  buttons[next].focus();
+}, true);
 })();
 </script>
 </body>
