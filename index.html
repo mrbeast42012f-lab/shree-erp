@@ -672,76 +672,44 @@ function renameCustomer(){
     const quick = el.closest(
       ".quickgrid, .quick-actions, .quick-access, .quicklinks"
     );
-    /* Quick Access: arrows select buttons */
-    if (quick && !isTyping(el) &&
-        ["ArrowRight", "ArrowLeft", "ArrowDown", "ArrowUp"].includes(e.key)) {
-      const buttons = [...quick.querySelectorAll(
-        "button:not(:disabled), a[href], [role=button]"
-      )].filter(isVisible);
-      if (!buttons.length) return;
-      const current = buttons.indexOf(el.closest(
-        "button, a[href], [role=button]"
-      ));
-const cols = Math.max(
+    
+/* Quick Access: arrow navigation */
+if (
+  ["ArrowRight", "ArrowLeft", "ArrowDown", "ArrowUp"].includes(e.key) &&
+  !isTyping(el)
+) {
+  const quick = el.closest(
+    ".quickgrid, .quick-actions, .quick-access, .quicklinks"
+  );
+  if (quick) {
+    const buttons = [...quick.querySelectorAll(
+      "button:not(:disabled), a[href], [role=button]"
+    )].filter(b => b.getClientRects().length > 0);
+    if (buttons.length) {
+      const focused = el.closest("button, a[href], [role=button]");
+      const current = buttons.indexOf(focused);
+
+      const cols = Math.max(
         1,
         getComputedStyle(quick).gridTemplateColumns
-          .split(" ").filter(Boolean).length      );
+          .split(" ").filter(Boolean).length
+      );
       let next = current < 0 ? 0 : current;
-      if (e.key === "ArrowRight") next = Math.min(next + 1, buttons.length - 1);
-      if (e.key === "ArrowLeft") next = Math.max(next - 1, 0);
-      if (e.key === "ArrowDown") next = Math.min(next + cols, buttons.length - 1);
-      if (e.key === "ArrowUp") next = Math.max(next - cols, 0);
+if (e.key === "ArrowRight")
+        next = Math.min(next + 1, buttons.length - 1);
+      if (e.key === "ArrowLeft")
+        next = Math.max(next - 1, 0);
+      if (e.key === "ArrowDown")
+        next = Math.min(next + cols, buttons.length - 1);
+      if (e.key === "ArrowUp")
+        next = Math.max(next - cols, 0);
+
       e.preventDefault();
       buttons[next].focus();
       return;
     }
- /* ENTER: next field; buttons activate normally */
-    if (e.key === "Enter" && !e.shiftKey) {
-      if (el.matches("button, a[href], [role=button]")) return;
-      if (!isTyping(el) || el.tagName === "TEXTAREA") return;
-      if (el.readOnly || el.type === "checkbox" || el.type === "radio") return;
- e.preventDefault();
-if (!moveFocus(el, 1)) {
-        const form = el.closest("form");
-        if (form) {
-          const submit = form.querySelector(
-            'button[type=submit]:not(:disabled), input[type=submit]:not(:disabled)'
-          );
-          if (submit) submit.focus();
-        }
-      }
-      return;
-    }
-/* LEFT ARROW: previous field at start of input */
-    if (e.key === "ArrowLeft" && isTyping(el)) {
-      if (el.tagName === "SELECT" ||
-          ["date", "month", "checkbox", "radio"].includes(el.type)) {
-        e.preventDefault();
-        moveFocus(el, -1);
-        return;
-      }
-  if (typeof el.selectionStart === "number" &&
-          el.selectionStart === 0 &&
-          el.selectionEnd === 0) {
-        if (moveFocus(el, -1)) e.preventDefault();
-      }
-      return;
-    }
- /* Tab and Shift+Tab remain native */
-  }, false);
-
-  /* Visible focus ring */
-  if (!$("shreeNavigationStyle")) {
-    const style = document.createElement("style");
-    style.id = "shreeNavigationStyle";
-    style.textContent = `
-      :focus-visible {
-        outline: 2px solid #8150d8 !important;
-        outline-offset: 2px !important;
-      }
-    `;
-   document.head.appendChild(style);
   }
+}
 })();
 </script>
 </body>
