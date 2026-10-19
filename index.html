@@ -293,170 +293,567 @@ function settingsPage(){return `${head("Settings & Data Tools","Local browser se
 function nextVoucherNo(kind){
  const key=kind==="purchase"?"purchases":"bills";
  const prefix=kind==="purchase"?"PUR":kind==="retail"?"RS":"WS";
- const nums=db[key].map(x=>{const m=String(x.no||"").match(new RegExp("^"+prefix+"-(\\\\d+)$","i"));return m?Number(m[1]):0});
+ const nums=db[key].map(x=>{
+  const m=String(x.no||"").match(new RegExp("^"+prefix+"-(\\d+)$","i"));
+  return m?Number(m[1]):0;
+ });
  return prefix+"-"+String(Math.max(0,...nums)+1).padStart(6,"0");
 }
+
 function transactionPage(kind){
  const purchase=kind==="purchase",retail=kind==="retail",key=purchase?"purchases":"bills";
  const title=purchase?"Purchase Entry":retail?"Retail Sale Entry":"Wholesale Sale Entry";
  const allowed=purchase?["Supplier","Both"]:["Customer","Both"];
- const records=db[key].slice().reverse().map(x=>`<tr><td>${esc(x.date||"")}</td><td>${esc(x.no||"")}</td><td>${esc(x.kind||"Purchase")}</td><td>${esc(x.party||"")}</td><td>${money(x.total)}</td><td><button class="btn" onclick="printVoucher('${key}','${esc(x.id)}')">Print</button> <button class="btn danger" onclick="deleteRecord('${key}','${esc(x.id)}')">Del</button></td></tr>`).join("");
- const partyOptions=db.parties.filter(p=>allowed.includes(p.type)).map(p=>`<option value="${esc(p.name)}">${esc(p.name)}</option>`).join("");
- return `${head(title,purchase?"Supplier invoice / Stock entry":retail?"Retail billing · F2 Customer · F1 Doctor · F4 Retail":"Wholesale billing · Free quantity · Distributor discount")}
- <div class="bill-type"><b>${retail?"RETAIL SALE":purchase?"PURCHASE ENTRY":"WHOLESALE SALE"}</b> — ${retail?"MRP, Doctor, Registration and GST":purchase?"Supplier stock-in, batch, expiry and MRP entry":"Distributor discount and free quantity"}.
- <span class="muted">${purchase?"Purchase-এ batch, expiry ও MRP নির্ধারণ হবে।":"Sales-এ stock থেকে earliest-expiry batch স্বয়ংক্রিয়ভাবে নেওয়া হবে।"}</span></div>
- <div class="card"><form id="transactionForm" onsubmit="saveTransaction(event,'${kind}')"><h3>Voucher Details</h3><div class="formgrid">
 
-<div class="field"><label>Voucher / Bill No.</label><input id="tNo" readonly value="${nextVoucherNo(kind)}"></div>
-<div class="field"><label>Bill Date *</label><input id="tDate" type="date" value="${today()}" required></div>
-${purchase?`
-<div class="field"><label>Purchase Invoice No.</label><input id="tInvoiceNo" placeholder="Supplier invoice number"></div>
-<div class="field"><label>Purchase Invoice Date</label><input id="tInvoiceDate" type="date" value="${today()}"></div>
-`:""}
-<div class="field"><label>${purchase?"Supplier":"Customer / Patient"} (F2)</label><select id="tParty" onchange="showPartyInfo()"><option value="">Cash / Walk-in</option>${partyOptions}</select></div>
-<select id="tParty" onchange="showPartyInfo()"><option value="">Cash / Walk-in</option>${partyOptions}</select></div>
+ const records=db[key].slice().reverse().map(x=>
+  `<tr><td>${esc(x.date||"")}</td><td>${esc(x.no||"")}</td><td>${esc(x.kind||"Purchase")}</td><td>${esc(x.party||"")}</td><td>${money(x.total)}</td><td><button class="btn" onclick="printVoucher('${key}','${esc(x.id)}')">Print</button> <button class="btn danger" onclick="deleteRecord('${key}','${esc(x.id)}')">Del</button></td></tr>`
+ ).join("");
+
+ const partyOptions=db.parties.filter(p=>allowed.includes(p.type))
+  .map(p=>`<option value="${esc(p.name)}">${esc(p.name)}</option>`).join("");
+
+ return `${head(title,purchase?"Supplier invoice / Stock entry":retail?"Retail billing · F2 Customer · F1 Doctor · F4 Retail":"Wholesale billing · Free quantity · Distributor discount")}
+
+ <div class="bill-type"><b>${retail?"RETAIL SALE":purchase?"PURCHASE ENTRY":"WHOLESALE SALE"}</b> — ${retail?"MRP, Doctor, Registration and GST":purchase?"Supplier stock-in, batch, expiry and MRP entry":"Distributor discount and free quantity"}.
+ <span class="muted">${purchase?"Purchase-এ নতুন Product তৈরি, batch, expiry ও MRP নির্ধারণ করা যাবে।":"Sales-এ stock থেকে earliest-expiry batch স্বয়ংক্রিয়ভাবে নেওয়া হবে।"}</span></div>
+
+ <div class="card">
+ <form id="transactionForm" onsubmit="saveTransaction(event,'${kind}')">
+ <h3>Voucher Details</h3>
+ <div class="formgrid">
+
+ <div class="field"><label>Voucher / Bill No.</label><input id="tNo" readonly value="${nextVoucherNo(kind)}"></div>
+ <div class="field"><label>Bill Date *</label><input id="tDate" type="date" value="${today()}" required></div>
+
+ ${purchase?`
+ <div class="field"><label>Purchase Invoice No.</label><input id="tInvoiceNo" placeholder="Supplier invoice number"></div>
+ <div class="field"><label>Purchase Invoice Date</label><input id="tInvoiceDate" type="date" value="${today()}"></div>
+ `:""}
+
+ <div class="field"><label>${purchase?"Supplier":"Customer / Patient"} (F2)</label><select id="tParty" onchange="showPartyInfo()"><option value="">Cash / Walk-in</option>${partyOptions}</select></div>
+
  ${retail?`<div class="field"><label>Doctor (F1)</label><input id="tDoctor" placeholder="Doctor name"></div><div class="field"><label>Reg. No.</label><input id="tReg" placeholder="Registration number"></div>`:""}
- <div class="field"><label>Address</label><input id="tAddress" placeholder="Customer / Supplier address"></div><div class="field"><label>Mobile</label><input id="tMobile" inputmode="tel" placeholder="Mobile number"></div>
+
+ <div class="field"><label>Address</label><input id="tAddress" placeholder="Customer / Supplier address"></div>
+ <div class="field"><label>Mobile</label><input id="tMobile" inputmode="tel" placeholder="Mobile number"></div>
+
  </div>
- <div class="bill-item-box"><h3>${purchase?"Purchase Item Details":retail?"Retail Item Details":"Wholesale Item Details"}</h3><div class="bill-grid">
- <div class="field"><label>${purchase ? "Product Name *" : "Product / Barcode *"}</label><input id="lineSearch" list="itemHints" placeholder="Type or scan barcode" autocomplete="off" oninput="searchBillItem()"><datalist id="itemHints">${db.items.map(i=>`<option value="${esc(i.barcode||i.code||i.name)}">${esc(i.name)}</option>`).join("")}</datalist><input type="hidden" id="lineItem"></div>
- <div class="field"><label>Pack / Unit</label><input id="linePack" placeholder="PCS / Strip"></div>
+
+ <div class="bill-item-box">
+ <h3>${purchase?"Purchase Item Details":retail?"Retail Item Details":"Wholesale Item Details"}</h3>
+ <div class="bill-grid">
+
+ <div class="field">
+ <label>${purchase?"Product Name *":"Product / Barcode *"}</label>
+ <input id="lineSearch" list="itemHints" placeholder="${purchase?"Existing বা নতুন Product Name":"Type or scan barcode"}" autocomplete="off" oninput="searchBillItem('${kind}')">
+ <datalist id="itemHints">${db.items.map(i=>`<option value="${esc(purchase?i.name:(i.barcode||i.code||i.name))}"></option>`).join("")}</datalist>
+ <input type="hidden" id="lineItem">
+ </div>
+
+ ${purchase?`<div class="field"><label>Barcode</label><input id="lineBarcode" placeholder="Optional barcode"></div>`:""}
+
+ <div class="field"><label>Pack / Unit</label><input id="linePack" placeholder="PCS / Strip" value="${purchase?"PCS":""}"></div>
+
  ${purchase?`<div class="field"><label>Batch No. *</label><input id="lineBatch" placeholder="Enter batch number"></div><div class="field"><label>Expiry Month</label><input id="lineExpiry" type="month"></div>`:""}
+
  <div class="field"><label>Quantity *</label><input id="lineQty" type="number" min=".01" step=".01" value="1" oninput="calcLinePreview()"></div>
+
  ${!retail?`<div class="field"><label>Free Qty</label><input id="lineFree" type="number" min="0" step=".01" value="0" oninput="calcLinePreview()"></div>`:""}
- <div class="field"><label>Rate (₹)</label><input id="lineRate" type="number" min="0" step=".01" value="0" oninput="calcLinePreview()"></div>
- ${purchase?`<div class="field"><label>MRP (₹)</label><input id="lineMrp" type="number" min="0" step=".01" value="0"> </div>`:retail?``:`<div class="field"><label>Distributor Discount (%)</label><input id="lineDist" type="number" min="0" max="100" step=".01" value="0" oninput="calcLinePreview()"></div>`}
+
+ <div class="field"><label>${purchase?"Purchase Rate (₹)":"Rate (₹)"}</label><input id="lineRate" type="number" min="0" step=".01" value="0" oninput="calcLinePreview()"></div>
+
+ ${purchase?`<div class="field"><label>MRP (₹)</label><input id="lineMrp" type="number" min="0" step=".01" value="0"></div>`:retail?``:`<div class="field"><label>Distributor Discount (%)</label><input id="lineDist" type="number" min="0" max="100" step=".01" value="0" oninput="calcLinePreview()"></div>`}
+
  ${purchase?`<div class="field"><label>Purchase Discount (%)</label><input id="lineDist" type="number" min="0" max="100" step=".01" value="0" oninput="calcLinePreview()"></div>`:""}
+
  <div class="field"><label>Line Discount (₹)</label><input id="lineDiscount" type="number" min="0" step=".01" value="0" oninput="calcLinePreview()"></div>
  <div class="field"><label>GST (%)</label><input id="lineGst" type="number" min="0" max="100" step=".01" value="0" oninput="calcLinePreview()"></div>
- <div class="field"><label>Available Stock</label><input id="lineStock" readonly value="—"></div><div class="field"><label>Line Amount</label><input id="linePreview" readonly value="₹0.00"></div>
- </div><div class="form-actions"><button class="btn primary" type="button" onclick="addBillLine('${kind}')">＋ Add Item to Bill</button><button class="btn" type="button" onclick="clearLineForm()">Clear Item</button></div></div>
+ <div class="field"><label>Available Stock</label><input id="lineStock" readonly value="—"></div>
+ <div class="field"><label>Line Amount</label><input id="linePreview" readonly value="₹0.00"></div>
+
+ </div>
+
+ <div class="form-actions">
+ <button class="btn primary" type="button" onclick="addBillLine('${kind}')">＋ Add Item to Bill</button>
+ <button class="btn" type="button" onclick="clearLineForm()">Clear Item</button>
+ </div>
+ </div>
+
  <div class="card"><h3>Bill Items</h3><div id="draftLineTable">${renderDraftLines()}</div></div>
- <div class="formgrid"><div class="field"><label>Bill Discount (₹)</label><input id="tBillDiscount" type="number" min="0" step=".01" value="0" oninput="updateBillTotal()"></div><div class="field"><label>Round Off (₹)</label><input id="tRound" type="number" step=".01" value="0" oninput="updateBillTotal()"></div><div class="field"><label>Challan / Notes</label><input id="tNote" placeholder="Challan number or notes"></div></div>
- <div class="total-box" style="margin-top:10px;line-height:1.9"><div>Taxable Subtotal: <span id="tSubtotal">${money(0)}</span></div><div>GST Total: <span id="tGstTotal">${money(0)}</span></div><div>Bill Discount: <span id="tDiscountShow">${money(0)}</span></div><div>Round Off: <span id="tRoundShow">${money(0)}</span></div><div style="font-size:18px">Net Total: <span id="tTotal">${money(0)}</span></div></div>
- <div class="form-actions"><button class="btn primary" type="submit">Save Voucher</button><button class="btn" type="button" onclick="go('${kind}')">Clear / New Bill</button><button class="btn" type="button" onclick="backup()">Backup</button></div></form></div>
+
+ <div class="formgrid">
+ <div class="field"><label>Bill Discount (₹)</label><input id="tBillDiscount" type="number" min="0" step=".01" value="0" oninput="updateBillTotal()"></div>
+ <div class="field"><label>Round Off (₹)</label><input id="tRound" type="number" step=".01" value="0" oninput="updateBillTotal()"></div>
+ <div class="field"><label>Challan / Notes</label><input id="tNote" placeholder="Challan number or notes"></div>
+ </div>
+
+ <div class="total-box" style="margin-top:10px;line-height:1.9">
+ <div>Taxable Subtotal: <span id="tSubtotal">${money(0)}</span></div>
+ <div>GST Total: <span id="tGstTotal">${money(0)}</span></div>
+ <div>Bill Discount: <span id="tDiscountShow">${money(0)}</span></div>
+ <div>Round Off: <span id="tRoundShow">${money(0)}</span></div>
+ <div style="font-size:18px">Net Total: <span id="tTotal">${money(0)}</span></div>
+ </div>
+
+ <div class="form-actions">
+ <button class="btn primary" type="submit">Save Voucher</button>
+ <button class="btn" type="button" onclick="go('${kind}')">Clear / New Bill</button>
+ <button class="btn" type="button" onclick="backup()">Backup</button>
+ </div>
+ </form>
+ </div>
+
  <div class="card"><h3>Voucher Register (${db[key].length})</h3>${table(["Date","Voucher No.","Type","Party","Total","Action"],records)}</div>`;
 }
-function searchBillItem(){
+
+function searchBillItem(kind){
  const val=($("lineSearch")?.value||"").trim().toLowerCase();
- const item=db.items.find(i=>[i.name,i.code,i.barcode,i.id].some(v=>String(v||"").toLowerCase()===val));
- if(item){$("lineItem").value=item.id;fillLineRate()}else{$("lineItem").value="";if($("lineStock"))$("lineStock").value="—"}
+
+ const item=db.items.find(i=>
+  [i.name,i.code,i.barcode,i.id].some(v=>
+   String(v||"").trim().toLowerCase()===val
+  )
+ );
+
+ if(item){
+  $("lineItem").value=item.id;
+  fillLineRate();
+ }else{
+  $("lineItem").value="";
+  if($("lineStock"))$("lineStock").value="—";
+
+  // Purchase-এ নতুন Product Name লেখা যাবে।
+  if(kind==="purchase" && $("linePack") && !$("linePack").value){
+   $("linePack").value="PCS";
+  }
+ }
 }
-function currentItem(){return db.items.find(i=>i.id===($("lineItem")?.value||""))}
-function itemBatches(id){return db.batches.filter(b=>b.itemId===id&&cleanQty(b.qty)>0).sort((a,b)=>String(a.expiry||"9999-12").localeCompare(String(b.expiry||"9999-12")))}
+
+function currentItem(){
+ return db.items.find(i=>i.id===($("lineItem")?.value||""));
+}
+
+function itemBatches(id){
+ return db.batches.filter(b=>b.itemId===id&&cleanQty(b.qty)>0)
+  .sort((a,b)=>String(a.expiry||"9999-12").localeCompare(String(b.expiry||"9999-12")));
+}
+
 function fillLineRate(){
- const i=currentItem();if(!i)return;
- $("lineSearch").value=i.barcode||i.code||i.name;$("linePack").value=i.unit||"PCS";
- $("lineRate").value=view==="purchase"?(i.purchaseRate||i.rate||0):(i.rate||0);
- const batches=itemBatches(i.id);
- if(view==="purchase"){
+ const i=currentItem();
+ if(!i)return;
+
+ const purchase=!!$("lineBatch");
+
+ $("lineSearch").value=purchase?i.name:(i.barcode||i.code||i.name);
+ $("linePack").value=i.unit||"PCS";
+ $("lineRate").value=purchase?(i.purchaseRate||i.rate||0):(i.rate||0);
+
+ if(purchase){
+  if($("lineBarcode"))$("lineBarcode").value=i.barcode||"";
   $("lineStock").value=cleanQty(i.qty);
   if($("lineMrp"))$("lineMrp").value=i.mrp||i.rate||0;
  }else{
+  const batches=itemBatches(i.id);
   $("lineStock").value=batches.reduce((s,b)=>s+cleanQty(b.qty),0);
  }
+
  calcLinePreview();
 }
+
 function calcLinePreview(){
  if(!$("lineQty"))return;
- const qty=cleanQty($("lineQty").value),rate=cleanQty($("lineRate").value),dist=Math.max(0,Math.min(100,num($("lineDist")?.value))),discount=cleanQty($("lineDiscount").value),gst=Math.max(0,Math.min(100,num($("lineGst").value)));
- const base=Math.max(0,qty*rate*(1-dist/100)-discount),tax=base*gst/100;$("linePreview").value=money(base+tax);
+
+ const qty=cleanQty($("lineQty").value);
+ const rate=cleanQty($("lineRate").value);
+ const dist=Math.max(0,Math.min(100,num($("lineDist")?.value)));
+ const discount=cleanQty($("lineDiscount").value);
+ const gst=Math.max(0,Math.min(100,num($("lineGst").value)));
+
+ const base=Math.max(0,qty*rate*(1-dist/100)-discount);
+ const tax=base*gst/100;
+
+ $("linePreview").value=money(base+tax);
 }
+
 function clearLineForm(){
- ["lineItem","lineSearch","linePack","lineBatch","lineExpiry","lineQty","lineFree","lineRate","lineMrp","lineDist","lineDiscount","lineGst"].forEach(id=>{const el=$(id);if(el)el.value=id==="lineQty"?"1":["lineFree","lineRate","lineMrp","lineDist","lineDiscount","lineGst"].includes(id)?"0":""});
- if($("lineStock"))$("lineStock").value="—";if($("linePreview"))$("linePreview").value=money(0);$("lineSearch")?.focus();
+ ["lineItem","lineSearch","lineBarcode","linePack","lineBatch","lineExpiry","lineQty","lineFree","lineRate","lineMrp","lineDist","lineDiscount","lineGst"].forEach(id=>{
+  const el=$(id);
+  if(el){
+   el.value=id==="lineQty"?"1":
+    ["lineFree","lineRate","lineMrp","lineDist","lineDiscount","lineGst"].includes(id)?"0":"";
+  }
+ });
+
+ if($("linePack")&&$("lineBatch"))$("linePack").value="PCS";
+ if($("lineStock"))$("lineStock").value="—";
+ if($("linePreview"))$("linePreview").value=money(0);
+
+ $("lineSearch")?.focus();
 }
+
 function addBillLine(kind){
- const item=currentItem();if(!item)return alert("পণ্যের নাম বা barcode লিখে তালিকা থেকে সঠিক পণ্য নির্বাচন করো।");
- const qty=num($("lineQty").value),rate=num($("lineRate").value),free=num($("lineFree")?.value),dist=num($("lineDist")?.value),discount=num($("lineDiscount").value),gst=num($("lineGst").value);
+ let item=currentItem();
+ let pendingProduct=null;
+
+ const productName=($("lineSearch")?.value||"").trim();
+ const barcode=($("lineBarcode")?.value||"").trim();
+ const qty=num($("lineQty").value);
+ const rate=num($("lineRate").value);
+ const free=num($("lineFree")?.value);
+ const dist=num($("lineDist")?.value);
+ const discount=num($("lineDiscount").value);
+ const gst=num($("lineGst").value);
+
  if(qty<=0)return alert("Quantity অবশ্যই 0-এর বেশি হতে হবে।");
- if(rate<0||free<0||discount<0||dist<0||dist>100||gst<0||gst>100)return alert("Quantity, Rate, Discount বা GST পরীক্ষা করো।");
- let batch=null,batchName="",expiry="",mrp=0,batchId="";
- if(kind==="purchase"){
-  batchName=$("lineBatch").value.trim();expiry=$("lineExpiry").value;mrp=num($("lineMrp").value);
-  if(!batchName)return alert("Purchase-এর Batch No. লিখো।");
- }else{
-  const batches=itemBatches(item.id);
-  if(!batches.length)return alert("এই পণ্যের stock নেই। আগে Purchase Entry-তে stock যোগ করো।");
-  batch=batches.find(b=>cleanQty(b.qty)>=qty+free);
-  if(!batch)return alert("কোনও একক batch-এ পর্যাপ্ত stock নেই। Quantity কমাও অথবা আগে stock যাচাই করো।");
-  if(batch.expiry&&daysToExpiry(batch.expiry)<0)return alert("এই batch expired। অন্য batch-এর stock ব্যবহার করো।");
-  const already=draftLines.filter(l=>l.itemId===item.id&&l.batchId===batch.id).reduce((s,l)=>s+l.qty+num(l.free),0);
-  if(cleanQty(batch.qty)<already+qty+free)return alert("এই batch-এর stock পর্যাপ্ত নয়। Available: "+cleanQty(batch.qty));
-  batchName=batch.batch;expiry=batch.expiry||"";mrp=num(batch.mrp)||num(item.mrp)||num(item.rate);batchId=batch.id;
+ if(rate<0||free<0||discount<0||dist<0||dist>100||gst<0||gst>100){
+  return alert("Quantity, Rate, Discount বা GST পরীক্ষা করো।");
  }
- const base=Math.max(0,qty*rate*(1-dist/100)-discount),tax=base*gst/100;
- draftLines.push({id:uid(),itemId:item.id,item:item.name,pack:$("linePack").value.trim()||item.unit||"PCS",batchId,batch:batchName,expiry,qty,free:kind==="retail"?0:free,rate,dist,discount,gst,tax,mrp,amount:base+tax});
- renderDraftLinesIntoPage();clearLineForm();updateBillTotal();
+
+ let batch=null,batchName="",expiry="",mrp=0,batchId="";
+
+ if(kind==="purchase"){
+  if(!productName)return alert("Product Name লিখো।");
+
+  batchName=$("lineBatch").value.trim();
+  expiry=$("lineExpiry").value;
+  mrp=num($("lineMrp").value);
+
+  if(!batchName)return alert("Purchase-এর Batch No. লিখো。");
+
+  // Name/Barcode দিয়ে existing item খুঁজবে।
+  if(!item){
+   item=db.items.find(i=>
+    String(i.name||"").trim().toLowerCase()===productName.toLowerCase() ||
+    (barcode&&String(i.barcode||"").trim().toLowerCase()===barcode.toLowerCase())
+   );
+  }
+
+  // আগে একই draft-এ নতুন product যোগ করা থাকলে duplicate বানাবে না।
+  if(!item){
+   const draftMatch=draftLines.find(l=>
+    l.newItem && (
+     String(l.newItem.name||"").trim().toLowerCase()===productName.toLowerCase() ||
+     (barcode&&String(l.newItem.barcode||"").trim().toLowerCase()===barcode.toLowerCase())
+    )
+   );
+
+   if(draftMatch){
+    pendingProduct={...draftMatch.newItem};
+    item={...pendingProduct};
+   }else{
+    const id=uid();
+
+    pendingProduct={
+     id,
+     name:productName,
+     code:barcode,
+     barcode,
+     unit:($("linePack").value||"PCS").trim()||"PCS",
+     purchaseRate:rate,
+     rate:mrp||rate,
+     mrp,
+     qty:0,
+     category:"General",
+     gst,
+     createdAt:new Date().toISOString()
+    };
+
+    item={...pendingProduct};
+   }
+  }
+
+  if(!pendingProduct){
+   $("lineSearch").value=item.name;
+   $("linePack").value=$("linePack").value.trim()||item.unit||"PCS";
+  }
+
+ }else{
+  if(!item){
+   return alert("পণ্যের নাম বা barcode লিখে তালিকা থেকে সঠিক পণ্য নির্বাচন করো।");
+  }
+
+  const batches=itemBatches(item.id);
+
+  if(!batches.length)return alert("এই পণ্যের stock নেই। আগে Purchase Entry-তে stock যোগ করো।");
+
+  batch=batches.find(b=>cleanQty(b.qty)>=qty+free);
+
+  if(!batch)return alert("কোনও একক batch-এ পর্যাপ্ত stock নেই। Quantity কমাও অথবা আগে stock যাচাই করো।");
+
+  if(batch.expiry&&daysToExpiry(batch.expiry)<0){
+   return alert("এই batch expired। অন্য batch-এর stock ব্যবহার করো।");
+  }
+
+  const already=draftLines
+   .filter(l=>l.itemId===item.id&&l.batchId===batch.id)
+   .reduce((s,l)=>s+l.qty+num(l.free),0);
+
+  if(cleanQty(batch.qty)<already+qty+free){
+   return alert("এই batch-এর stock পর্যাপ্ত নয়। Available: "+cleanQty(batch.qty));
+  }
+
+  batchName=batch.batch;
+  expiry=batch.expiry||"";
+  mrp=num(batch.mrp)||num(item.mrp)||num(item.rate);
+  batchId=batch.id;
+ }
+
+ const base=Math.max(0,qty*rate*(1-dist/100)-discount);
+ const tax=base*gst/100;
+
+ const line={
+  id:uid(),
+  itemId:item.id,
+  item:item.name,
+  pack:$("linePack").value.trim()||item.unit||"PCS",
+  batchId,
+  batch:batchName,
+  expiry,
+  qty,
+  free:kind==="retail"?0:free,
+  rate,
+  dist,
+  discount,
+  gst,
+  tax,
+  mrp,
+  amount:base+tax
+ };
+
+ if(pendingProduct)line.newItem={...pendingProduct};
+
+ draftLines.push(line);
+ renderDraftLinesIntoPage();
+ clearLineForm();
+ updateBillTotal();
 }
+
 function renderDraftLines(){
  if(!draftLines.length)return `<div class="empty">এখনও কোনো পণ্য যোগ করা হয়নি। উপরের ফর্ম থেকে পণ্য যোগ করো।</div>`;
- const rows=draftLines.map((x,n)=>`<tr><td>${n+1}</td><td>${esc(x.item)}</td><td>${esc(x.pack||"")}</td><td>${esc(x.batch||"—")}</td><td>${esc(x.expiry||"—")}</td><td>${x.qty}</td><td>${x.free||0}</td><td>${money(x.rate)}</td><td>${x.dist||0}%</td><td>${x.gst||0}%</td><td>${money(x.amount)}</td><td><button class="btn danger small" type="button" onclick="removeBillLine('${x.id}')">Remove</button></td></tr>`).join("");
+
+ const rows=draftLines.map((x,n)=>
+  `<tr><td>${n+1}</td><td>${esc(x.item)}</td><td>${esc(x.pack||"")}</td><td>${esc(x.batch||"—")}</td><td>${esc(x.expiry||"—")}</td><td>${x.qty}</td><td>${x.free||0}</td><td>${money(x.rate)}</td><td>${x.dist||0}%</td><td>${x.gst||0}%</td><td>${money(x.amount)}</td><td><button class="btn danger small" type="button" onclick="removeBillLine('${x.id}')">Remove</button></td></tr>`
+ ).join("");
+
  return table(["#","Product","Pack","Batch (internal)","Expiry (internal)","Qty","Free","Rate","Dist %","GST","Amount","Action"],rows);
 }
-function renderDraftLinesIntoPage(){if($("draftLineTable"))$("draftLineTable").innerHTML=renderDraftLines()}
-function removeBillLine(id){draftLines=draftLines.filter(x=>x.id!==id);renderDraftLinesIntoPage();updateBillTotal()}
-function getLineTotals(){
- const subtotal=draftLines.reduce((s,x)=>s+Math.max(0,num(x.qty)*num(x.rate)*(1-num(x.dist)/100)-num(x.discount)),0),gst=draftLines.reduce((s,x)=>s+num(x.tax),0),billDiscount=cleanQty($("tBillDiscount")?.value),round=num($("tRound")?.value);
- return {subtotal,gst,billDiscount,round,total:Math.max(0,subtotal+gst-billDiscount+round)};
+
+function renderDraftLinesIntoPage(){
+ if($("draftLineTable"))$("draftLineTable").innerHTML=renderDraftLines();
 }
-function updateBillTotal(){if(!$("tTotal"))return;const t=getLineTotals();$("tSubtotal").textContent=money(t.subtotal);$("tGstTotal").textContent=money(t.gst);$("tDiscountShow").textContent=money(t.billDiscount);$("tRoundShow").textContent=money(t.round);$("tTotal").textContent=money(t.total)}
-function showPartyInfo(){const name=$("tParty")?.value||"",p=db.parties.find(x=>x.name===name);if($("tAddress"))$("tAddress").value=p?.address||"";if($("tMobile"))$("tMobile").value=p?.phone||""}
-function normalizedBatchName(v){return String(v||"").trim()||"NO BATCH"}
+
+function removeBillLine(id){
+ draftLines=draftLines.filter(x=>x.id!==id);
+ renderDraftLinesIntoPage();
+ updateBillTotal();
+}
+
+function getLineTotals(){
+ const subtotal=draftLines.reduce((s,x)=>s+Math.max(0,num(x.qty)*num(x.rate)*(1-num(x.dist)/100)-num(x.discount)),0);
+ const gst=draftLines.reduce((s,x)=>s+num(x.tax),0);
+ const billDiscount=cleanQty($("tBillDiscount")?.value);
+ const round=num($("tRound")?.value);
+
+ return {
+  subtotal,
+  gst,
+  billDiscount,
+  round,
+  total:Math.max(0,subtotal+gst-billDiscount+round)
+ };
+}
+
+function updateBillTotal(){
+ if(!$("tTotal"))return;
+
+ const t=getLineTotals();
+
+ $("tSubtotal").textContent=money(t.subtotal);
+ $("tGstTotal").textContent=money(t.gst);
+ $("tDiscountShow").textContent=money(t.billDiscount);
+ $("tRoundShow").textContent=money(t.round);
+ $("tTotal").textContent=money(t.total);
+}
+
+function showPartyInfo(){
+ const name=$("tParty")?.value||"";
+ const p=db.parties.find(x=>x.name===name);
+
+ if($("tAddress"))$("tAddress").value=p?.address||"";
+ if($("tMobile"))$("tMobile").value=p?.phone||"";
+}
+
+function normalizedBatchName(v){
+ return String(v||"").trim()||"NO BATCH";
+}
+
 function findOrCreateBatch(line){
- const name=normalizedBatchName(line.batch),expiry=String(line.expiry||"");
- let b=db.batches.find(x=>x.itemId===line.itemId&&normalizedBatchName(x.batch).toLowerCase()===name.toLowerCase()&&String(x.expiry||"")===expiry);
- if(!b){b={id:uid(),itemId:line.itemId,batch:name,expiry,qty:0,rate:cleanQty(line.rate),mrp:cleanQty(line.mrp)};db.batches.push(b)}
+ const name=normalizedBatchName(line.batch);
+ const expiry=String(line.expiry||"");
+
+ let b=db.batches.find(x=>
+  x.itemId===line.itemId &&
+  normalizedBatchName(x.batch).toLowerCase()===name.toLowerCase() &&
+  String(x.expiry||"")===expiry
+ );
+
+ if(!b){
+  b={
+   id:uid(),
+   itemId:line.itemId,
+   batch:name,
+   expiry,
+   qty:0,
+   rate:cleanQty(line.rate),
+   mrp:cleanQty(line.mrp)
+  };
+
+  db.batches.push(b);
+ }
+
  return b;
 }
+
 function saveTransaction(e,kind){
- e.preventDefault();if(!draftLines.length)return alert("Bill save করার আগে অন্তত একটি পণ্য যোগ করো।");
- const purchase=kind==="purchase",key=purchase?"purchases":"bills",no=$("tNo").value.trim();
- if(!no)return alert("Voucher number তৈরি হয়নি। আবার নতুন voucher খুলুন।");
- if(db[key].some(x=>String(x.no||"").toLowerCase()===no.toLowerCase()))return alert("এই voucher number আগে থেকেই আছে। নতুন voucher খুলুন।");
- for(const line of draftLines)if(!db.items.some(i=>i.id===line.itemId))return alert("একটি পণ্য আর পাওয়া যাচ্ছে না। Bill পরীক্ষা করো।");
- if(!purchase){
-  const required={};for(const l of draftLines){if(!l.batchId)return alert("একটি sales line-এ batch নির্দিষ্ট নেই। Item আবার নির্বাচন করো।");required[l.batchId]=(required[l.batchId]||0)+num(l.qty)+num(l.free)}
-  for(const [id,qty] of Object.entries(required)){const b=db.batches.find(x=>x.id===id);if(!b||cleanQty(b.qty)+.000001<qty)return alert("একটি batch-এর stock পর্যাপ্ত নেই। Bill পরীক্ষা করো।");if(b.expiry&&daysToExpiry(b.expiry)<0)return alert("Expired batch বিক্রি করা যাবে না।")}
+ e.preventDefault();
+
+ if(!draftLines.length)return alert("Bill save করার আগে অন্তত একটি পণ্য যোগ করো।");
+
+ const purchase=kind==="purchase";
+ const key=purchase?"purchases":"bills";
+ const no=$("tNo").value.trim();
+
+ if(!no)return alert("Voucher number তৈরি হয়নি। আবার নতুন voucher খুলুন。");
+
+ if(db[key].some(x=>String(x.no||"").toLowerCase()===no.toLowerCase())){
+  return alert("এই voucher number আগে থেকেই আছে। নতুন voucher খুলুন।");
  }
- const totals=getLineTotals();if(totals.billDiscount>totals.subtotal+totals.gst+.000001)return alert("Bill discount মোট বিলের চেয়ে বেশি হতে পারে না।");
+
+ // Existing item অথবা draft-এ তৈরি নতুন item—দুটিই গ্রহণযোগ্য।
+ for(const line of draftLines){
+  if(!db.items.some(i=>i.id===line.itemId)&&!line.newItem){
+   return alert("একটি পণ্য আর পাওয়া যাচ্ছে না। Bill পরীক্ষা করো।");
+  }
+ }
+
+ if(!purchase){
+  const required={};
+
+  for(const l of draftLines){
+   if(!l.batchId)return alert("একটি sales line-এ batch নির্দিষ্ট নেই। Item আবার নির্বাচন করো।");
+   required[l.batchId]=(required[l.batchId]||0)+num(l.qty)+num(l.free);
+  }
+
+  for(const [id,qty] of Object.entries(required)){
+   const b=db.batches.find(x=>x.id===id);
+
+   if(!b||cleanQty(b.qty)+.000001<qty){
+    return alert("একটি batch-এর stock পর্যাপ্ত নেই। Bill পরীক্ষা করো।");
+   }
+
+   if(b.expiry&&daysToExpiry(b.expiry)<0){
+    return alert("Expired batch বিক্রি করা যাবে না।");
+   }
+  }
+ }
+
+ const totals=getLineTotals();
+
+ if(totals.billDiscount>totals.subtotal+totals.gst+.000001){
+  return alert("Bill discount মোট বিলের চেয়ে বেশি হতে পারে না।");
+ }
+
  const party=$("tParty").value||"Cash / Walk-in";
-const x={
+
+ const x={
   id:uid(),
   no,
   date:$("tDate").value,
 
-  // Purchase supplier invoice details
-  invoiceNo: purchase ? ($("tInvoiceNo")?.value.trim() || "") : "",
-  invoiceDate: purchase ? ($("tInvoiceDate")?.value || "") : "",
+  invoiceNo:purchase?($("tInvoiceNo")?.value.trim()||""):"",
+  invoiceDate:purchase?($("tInvoiceDate")?.value||""):"",
 
   party,
   kind,
-  lines:draftLines.map(l=>({...l})),
+
+  // Internal draft metadata স্থায়ী Voucher-এ রাখা হবে না।
+  lines:draftLines.map(l=>{
+   const copy={...l};
+   delete copy.newItem;
+   return copy;
+  }),
+
   subtotal:totals.subtotal,
   gstTotal:totals.gst,
   discount:totals.billDiscount,
   roundOff:totals.round,
   total:totals.total,
+
   address:$("tAddress")?.value||"",
   phone:$("tMobile")?.value||"",
   doctor:$("tDoctor")?.value||"",
   regNo:$("tReg")?.value||"",
   note:$("tNote")?.value||"",
   createdAt:new Date().toISOString()
-};
- x.item=draftLines.map(l=>l.item).join(", ");x.qty=draftLines.reduce((s,l)=>s+num(l.qty),0);x.itemId=draftLines.length===1?draftLines[0].itemId:"";x.rate=draftLines.length===1?draftLines[0].rate:0;
- if(purchase){
-  const prepared=draftLines.map(line=>({line,b:findOrCreateBatch(line)}));
-  prepared.forEach(({line,b})=>{b.qty=cleanQty(b.qty)+num(line.qty)+num(line.free);b.rate=cleanQty(line.rate);b.mrp=cleanQty(line.mrp||b.mrp||0)});
- }else{
-  const required={};draftLines.forEach(l=>required[l.batchId]=(required[l.batchId]||0)+num(l.qty)+num(l.free));
-  for(const [id,qty] of Object.entries(required)){const b=db.batches.find(z=>z.id===id);b.qty=cleanQty(b.qty-qty)}
- }
- reconcileAll();db[key].push(x);save();const copy={...x,company:{...db.company}};draftLines=[];render();
- if(confirm("Voucher saved. Invoice print করতে চাও?"))printObject(copy);
-}
+ };
 
+ x.item=draftLines.map(l=>l.item).join(", ");
+ x.qty=draftLines.reduce((s,l)=>s+num(l.qty),0);
+ x.itemId=draftLines.length===1?draftLines[0].itemId:"";
+ x.rate=draftLines.length===1?draftLines[0].rate:0;
+
+ if(purchase){
+  // নতুন Item Master-এ একবারই যোগ হবে।
+  const pendingItems=new Map();
+
+  for(const line of draftLines){
+   if(line.newItem&&!db.items.some(i=>i.id===line.itemId)){
+    pendingItems.set(line.itemId,line.newItem);
+   }
+  }
+
+  for(const item of pendingItems.values()){
+   db.items.push({...item});
+  }
+
+  // Stock কেবল এই batch update-এই বাড়বে।
+  const prepared=draftLines.map(line=>({
+   line,
+   b:findOrCreateBatch(line)
+  }));
+
+  prepared.forEach(({line,b})=>{
+   b.qty=cleanQty(b.qty)+num(line.qty)+num(line.free);
+   b.rate=cleanQty(line.rate);
+   b.mrp=cleanQty(line.mrp||b.mrp||0);
+  });
+
+ }else{
+  const required={};
+
+  draftLines.forEach(l=>{
+   required[l.batchId]=(required[l.batchId]||0)+num(l.qty)+num(l.free);
+  });
+
+  for(const [id,qty] of Object.entries(required)){
+   const b=db.batches.find(z=>z.id===id);
+   b.qty=cleanQty(b.qty-qty);
+  }
+ }
+
+ reconcileAll();
+ db[key].push(x);
+ save();
+
+ const copy={...x,company:{...db.company}};
+
+ draftLines=[];
+ render();
+
+ if(confirm("Voucher saved. Invoice print করতে চাও?")){
+  printObject(copy);
+ }
+}
 /* RECEIPT / PAYMENT */
 function accountPage(kind){
  const receipt=kind==="receipt",key=receipt?"receipts":"payments";
