@@ -306,9 +306,15 @@ function transactionPage(kind){
  <div class="bill-type"><b>${retail?"RETAIL SALE":purchase?"PURCHASE ENTRY":"WHOLESALE SALE"}</b> — ${retail?"MRP, Doctor, Registration and GST":purchase?"Supplier stock-in, batch, expiry and MRP entry":"Distributor discount and free quantity"}.
  <span class="muted">${purchase?"Purchase-এ batch, expiry ও MRP নির্ধারণ হবে।":"Sales-এ stock থেকে earliest-expiry batch স্বয়ংক্রিয়ভাবে নেওয়া হবে।"}</span></div>
  <div class="card"><form id="transactionForm" onsubmit="saveTransaction(event,'${kind}')"><h3>Voucher Details</h3><div class="formgrid">
- <div class="field"><label>Voucher / Bill No.</label><input id="tNo" readonly value="${nextVoucherNo(kind)}"></div>
- <div class="field"><label>Bill Date *</label><input id="tDate" type="date" value="${today()}" required></div>
- <div class="field"><label>${purchase?"Supplier":"Customer / Patient"} (F2)</label><select id="tParty" onchange="showPartyInfo()"><option value="">Cash / Walk-in</option>${partyOptions}</select></div>
+
+<div class="field"><label>Voucher / Bill No.</label><input id="tNo" readonly value="${nextVoucherNo(kind)}"></div>
+<div class="field"><label>Bill Date *</label><input id="tDate" type="date" value="${today()}" required></div>
+${purchase?`
+<div class="field"><label>Purchase Invoice No.</label><input id="tInvoiceNo" placeholder="Supplier invoice number"></div>
+<div class="field"><label>Purchase Invoice Date</label><input id="tInvoiceDate" type="date" value="${today()}"></div>
+`:""}
+<div class="field"><label>${purchase?"Supplier":"Customer / Patient"} (F2)</label><select id="tParty" onchange="showPartyInfo()"><option value="">Cash / Walk-in</option>${partyOptions}</select></div>
+<select id="tParty" onchange="showPartyInfo()"><option value="">Cash / Walk-in</option>${partyOptions}</select></div>
  ${retail?`<div class="field"><label>Doctor (F1)</label><input id="tDoctor" placeholder="Doctor name"></div><div class="field"><label>Reg. No.</label><input id="tReg" placeholder="Registration number"></div>`:""}
  <div class="field"><label>Address</label><input id="tAddress" placeholder="Customer / Supplier address"></div><div class="field"><label>Mobile</label><input id="tMobile" inputmode="tel" placeholder="Mobile number"></div>
  </div>
