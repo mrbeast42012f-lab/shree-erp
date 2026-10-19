@@ -572,9 +572,7 @@ function renameCustomer(){
 /* SHREE ERP — UNIVERSAL NAVIGATION */
 (function () {
   "use strict";
-
   const $ = id => document.getElementById(id);
-
   function isVisible(el) {
     return !!el &&
       el.isConnected &&
@@ -582,12 +580,10 @@ function renameCustomer(){
       !el.disabled &&
       el.tabIndex !== -1;
   }
-
   function isTyping(el) {
     return el instanceof HTMLElement &&
       (el.matches("input, textarea, select") || el.isContentEditable);
   }
-
   function getScope(el) {
     return el.closest(".modal-bg") ||
       el.closest("form") ||
@@ -597,7 +593,6 @@ function renameCustomer(){
       document.getElementById("app") ||
       document.body;
   }
-
   function getControls(scope) {
     return [...scope.querySelectorAll(
       'input:not([type=hidden]):not([type=button]):not([type=submit]), select, textarea, button:not(:disabled), a[href], [role=button], [tabindex="0"]'
@@ -607,50 +602,38 @@ function renameCustomer(){
       !el.matches("[aria-hidden=true]")
     );
   }
-
   function moveFocus(el, step) {
     const scope = getScope(el);
     const controls = getControls(scope);
     const index = controls.indexOf(el);
-
     if (index < 0) return false;
-
     const next = controls[index + step];
     if (!next) return false;
-
     next.focus();
-
     if (next.matches('input[type="text"], input[type="search"], input[type="tel"]')) {
       try { next.select(); } catch (_) {}
     }
-
     return true;
   }
-
   function closeOrBack() {
     const modal = $("modalRoot");
-
     if (modal && modal.innerHTML.trim()) {
       if (typeof closeModal === "function") closeModal();
       return;
     }
-
     if (typeof view !== "undefined" && view !== "dashboard") {
       if (typeof goBack === "function") goBack();
     }
   }
-
   document.addEventListener("keydown", function (e) {
     const el = e.target;
     if (!(el instanceof HTMLElement)) return;
-
     /* ESC: close modal / go back */
     if (e.key === "Escape") {
       e.preventDefault();
       closeOrBack();
       return;
     }
-
     /* Function keys */
     if (e.key === "F1" &&
         ["retail", "wholesale"].includes(
@@ -663,7 +646,6 @@ function renameCustomer(){
       }
       return;
     }
-
     if (e.key === "F2") {
       if (typeof openPartyPicker === "function") {
         e.preventDefault();
@@ -671,7 +653,6 @@ function renameCustomer(){
       }
       return;
     }
-
     if (e.key === "F3") {
       if (typeof renameCustomer === "function") {
         e.preventDefault();
@@ -679,7 +660,6 @@ function renameCustomer(){
       }
       return;
     }
-
     if (e.key === "F4") {
       if (typeof go === "function") {
         e.preventDefault();
@@ -687,40 +667,30 @@ function renameCustomer(){
       }
       return;
     }
-
     /* Keep browser shortcuts intact */
     if (e.ctrlKey || e.metaKey || e.altKey) return;
-
     const quick = el.closest(
       ".quickgrid, .quick-actions, .quick-access, .quicklinks"
     );
-
     /* Quick Access: arrows select buttons */
     if (quick && !isTyping(el) &&
         ["ArrowRight", "ArrowLeft", "ArrowDown", "ArrowUp"].includes(e.key)) {
       const buttons = [...quick.querySelectorAll(
         "button:not(:disabled), a[href], [role=button]"
       )].filter(isVisible);
-
       if (!buttons.length) return;
-
       const current = buttons.indexOf(el.closest(
         "button, a[href], [role=button]"
       ));
-
-      const cols = Math.max(
+const cols = Math.max(
         1,
         getComputedStyle(quick).gridTemplateColumns
-          .split(" ").filter(Boolean).length
-      );
-
+          .split(" ").filter(Boolean).length      );
       let next = current < 0 ? 0 : current;
-
       if (e.key === "ArrowRight") next = Math.min(next + 1, buttons.length - 1);
       if (e.key === "ArrowLeft") next = Math.max(next - 1, 0);
       if (e.key === "ArrowDown") next = Math.min(next + cols, buttons.length - 1);
       if (e.key === "ArrowUp") next = Math.max(next - cols, 0);
-
       e.preventDefault();
       buttons[next].focus();
       return;
@@ -750,16 +720,14 @@ if (!moveFocus(el, 1)) {
         moveFocus(el, -1);
         return;
       }
-
-      if (typeof el.selectionStart === "number" &&
+  if (typeof el.selectionStart === "number" &&
           el.selectionStart === 0 &&
           el.selectionEnd === 0) {
         if (moveFocus(el, -1)) e.preventDefault();
       }
       return;
     }
-
-    /* Tab and Shift+Tab remain native */
+ /* Tab and Shift+Tab remain native */
   }, false);
 
   /* Visible focus ring */
@@ -772,11 +740,9 @@ if (!moveFocus(el, 1)) {
         outline-offset: 2px !important;
       }
     `;
-    document.head.appendChild(style);
+   document.head.appendChild(style);
   }
 })();
 </script>
 </body>
 </html>
-
-
