@@ -569,41 +569,244 @@ function renameCustomer(){
  if(db.parties.some(x=>x.id!==p.id&&x.name.toLowerCase()===newName.toLowerCase()))return alert("এই নামের party আগে থেকেই আছে।");
  const oldName=p.name;p.name=newName;["bills","purchases","receipts","payments"].forEach(k=>db[k].forEach(x=>{if(x.party===oldName)x.party=newName}));save();render();alert("Customer name updated.");
 }
+/* SHREE ERP — UNIVERSAL KEYBOARD CONTROL */
+(function () {
+  "use strict";
 
-/* KEYBOARD: Esc back, Enter next field, Left Arrow previous field */
-document.addEventListener("keydown",e=>{
- if(e.key==="Escape"){if($("modalRoot").innerHTML){closeModal();e.preventDefault();return}if(view!=="dashboard"){goBack();e.preventDefault()}return}
- if(e.key==="F2"){e.preventDefault();openPartyPicker();return}
- if(e.key==="F3"){e.preventDefault();renameCustomer();return}
- if(e.key==="F4"){e.preventDefault();go("retail");return}
- if(e.key==="F1"&&["retail","wholesale"].includes(view)){e.preventDefault();if($("tDoctor"))$("tDoctor").focus();else alert("Doctor field Retail Billing-এ পাওয়া যাবে।");return}
- const target=e.target;
- if(e.key==="ArrowLeft"&&!e.ctrlKey&&!e.altKey&&!e.metaKey){
-  if(target.matches("input,select,textarea")&&!target.readOnly&&!target.disabled){
-   const textTypes=["text","search","tel","url","email","password","number"];
-   if(target.tagName==="SELECT"||!textTypes.includes(target.type)){movePrevious(target,e);return}
-   if(typeof target.selectionStart==="number"&&target.selectionStart===0&&target.selectionEnd===0){movePrevious(target,e);return}
+  function visible(el) {
+    return !!el &&
+      el.isConnected &&
+      el.getClientRects().length > 0 &&
+      !el.disabled &&
+      el.tabIndex !== -1;
   }
- }
- if(e.key==="Enter"&&!e.ctrlKey&&!e.altKey&&!e.shiftKey){
-  if(target.closest(".modal-bg"))return;
-  if(!target.matches("input,select,textarea")||target.matches("[type=submit],[type=button],[readonly]")||target.tagName==="TEXTAREA")return;
-  if(target.id==="lineSearch"){
-   const val=target.value.trim().toLowerCase(),i=db.items.find(i=>[i.name,i.code,i.barcode,i.id].some(v=>String(v||"").toLowerCase()===val));
-   if(i){e.preventDefault();$("lineItem").value=i.id;fillLineRate();$("linePack").focus();return}
+
+  function modalOpen() {
+    const root = document.getElementById("modalRoot");
+    return !!root && !!root.innerHTML.trim();
   }
-  const form=target.closest("form");if(!form)return;
-  const fields=[...form.querySelectorAll("input:not([type=hidden]):not([type=button]):not([type=submit]):not([readonly]),select,textarea")].filter(el=>!el.disabled&&el.offsetParent!==null);
-  const idx=fields.indexOf(target);
-  if(idx>=0){e.preventDefault();if(idx<fields.length-1)fields[idx+1].focus();else if(form.requestSubmit)form.requestSubmit();else form.dispatchEvent(new Event("submit",{cancelable:true,bubbles:true}))}
- }
-});
-function movePrevious(target,e){
- const form=target.closest("form");if(!form)return;
- const fields=[...form.querySelectorAll("input:not([type=hidden]):not([type=button]):not([type=submit]):not([readonly]),select,textarea")].filter(el=>!el.disabled&&el.offsetParent!==null);
- const idx=fields.indexOf(target);if(idx>0){e.preventDefault();fields[idx-1].focus();if(fields[idx-1].setSelectionRange&&["text","search","tel","url","email","password"].includes(fields[idx-1].type)){const n=fields[idx-1].value.length;try{fields[idx-1].setSelectionRange(n,n)}catch(err){}}}
-}
-render();updateStatus();
+
+  function fieldsIn(scope) {
+    return [...scope.querySelectorAll(
+      'input:not([type="hidden"]):not([type="button"]):not([type="submit"]):not([type="reset"]), select, textarea, button, [tabindex]:not([tabindex="-1"])'
+    )].filter(el => visible(el) && !el.readOnly);
+  }
+
+  function focusNext(el, backwards = false) {
+    const form = el.closest("form");
+    const scope = form || document.querySelector("main") ||
+      document.getElementById("app") || document.body;
+
+    const fields = fieldsIn(scope);
+    const index = fields.indexOf(el);
+
+    if (index < 0) return false;
+
+    const next = fields[index + (backwards ? -1 : 1)];
+
+    if (next) {
+      next.focus();
+      if (next.select && next.tagName === "INPUT" &&
+          ["text", "search", "tel", "email"].includes(next.type)) {
+        try { next.select(); } catch (_) {}
+      }
+      return true;
+    }
+
+    return false;
+  }
+
+  function editable(el) {
+    return el instanceof HTMLElement &&
+      (el.matches("input, textarea, select") ||
+       el.isContentEditable);
+  }
+
+  function saveCurrentForm(el) {
+    const form = el.closest("form");
+    if (!form) return false;
+
+    const submit = form.querySelector(
+      'button[type="submit"], input[type="submit"]'
+    );
+
+    if (submit && !submit.disabled) {
+      form.requestSubmit(submit);
+      return true;
+    }
+
+    return false;
+  }
+
+  document.addEventListener("keydown", function (e) {
+    const el = e.target;
+    const typing = editable(el);
+    const modal = modalOpen();
+
+    /* ESC: close modal first, otherwise navigate back */
+    if (e.key === "Escape") {
+      if (modal) {
+        e.preventDefault();
+        if (typeof closeModal === "function") closeModal();
+        return;
+      }
+
+      if (typeof view !== "undefined" && view !== "dashboard") {
+        e.preventDefault();
+        if (typeof goBack === "function") goBack();
+      }
+      return;
+    }
+
+    /* F1: Doctor field */
+    if (e.key === "F1") {
+      if (typeof view !== "undefined" &&
+          ["retail", "wholesale"].includes(view)) {
+        const doctor = document.getElementById("tDoctor");
+        if (doctor) {
+          e.preventDefault();
+          doctor.focus();
+        }
+      }
+      return;
+    }
+
+    /* F2: Party picker */
+    if (e.key === "F2") {
+      e.preventDefault();
+      if (typeof openPartyPicker === "function") openPartyPicker();
+      return;
+    }
+
+    /* F3: Rename customer */
+    if (e.key === "F3") {
+      e.preventDefault();
+      if (typeof renameCustomer === "function") renameCustomer();
+      return;
+    }
+
+    /* F4: Retail billing */
+    if (e.key === "F4") {
+      e.preventDefault();
+      if (typeof go === "function") go("retail");
+      return;
+    }
+
+    /* Ctrl+S: save the current form */
+    if ((e.ctrlKey || e.metaKey) &&
+        e.key.toLowerCase() === "s") {
+      const form = el.closest("form");
+      if (form) {
+        e.preventDefault();
+        saveCurrentForm(el);
+      }
+      return;
+    }
+
+    /* Do not hijack normal browser/editor shortcuts */
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+
+    /* Enter: next field; never submit accidentally */
+    if (e.key === "Enter" && !e.shiftKey) {
+      if (modal) {
+        if (el.matches("input:not([type=button]), select")) {
+          e.preventDefault();
+          focusNext(el);
+        }
+        return;
+      }
+
+      if (el.matches("button, a, [role=button]")) return;
+      if (!typing || el.tagName === "TEXTAREA") return;
+      if (el.type === "checkbox" || el.type === "radio") return;
+      if (el.readOnly) return;
+
+      /* Product lookup: resolve item before moving onward */
+      if (el.id === "lineSearch") {
+        const value = el.value.trim().toLowerCase();
+        const item = typeof db !== "undefined" &&
+          db.items.find(i =>
+            [i.name, i.code, i.barcode, i.id].some(v =>
+              String(v || "").toLowerCase() === value
+            )
+          );
+
+        if (item) {
+          e.preventDefault();
+          const hidden = document.getElementById("lineItem");
+          if (hidden) hidden.value = item.id;
+          if (typeof fillLineRate === "function") fillLineRate();
+          focusNext(el);
+          return;
+        }
+      }
+
+      e.preventDefault();
+
+      if (!focusNext(el)) {
+        const form = el.closest("form");
+        if (form && form.checkValidity()) {
+          saveCurrentForm(el);
+        }
+      }
+      return;
+    }
+
+    /* Left Arrow: previous field only at start of text input */
+    if (e.key === "ArrowLeft" && typing && !e.shiftKey) {
+      if (el.tagName === "SELECT" || el.type === "date" ||
+          el.type === "month" || el.type === "checkbox" ||
+          el.type === "radio") {
+        e.preventDefault();
+        focusNext(el, true);
+        return;
+      }
+
+      if (typeof el.selectionStart === "number" &&
+          el.selectionStart === 0 && el.selectionEnd === 0) {
+        if (focusNext(el, true)) e.preventDefault();
+      }
+      return;
+    }
+
+    /* Arrow navigation between controls, without disrupting text editing */
+    if (!typing && ["ArrowDown", "ArrowRight"].includes(e.key)) {
+      if (el.matches("button, a, [role=button]")) {
+        e.preventDefault();
+        focusNext(el);
+      }
+      return;
+    }
+
+    if (!typing && ["ArrowUp", "ArrowLeft"].includes(e.key)) {
+      if (el.matches("button, a, [role=button]")) {
+        e.preventDefault();
+        focusNext(el, true);
+      }
+      return;
+    }
+
+    /* Space toggles checkboxes using their native behavior */
+    /* Home / End / PageUp / PageDown remain native for lists and tables */
+  });
+
+  /* Visible keyboard focus */
+  if (!document.getElementById("shreeKeyboardFocusStyle")) {
+    const style = document.createElement("style");
+    style.id = "shreeKeyboardFocusStyle";
+    style.textContent = `
+      :focus-visible {
+        outline: 2px solid #8150d8 !important;
+        outline-offset: 2px !important;
+      }
+      button:focus-visible,
+      a:focus-visible {
+        box-shadow: 0 0 0 2px rgba(129,80,216,.25);
+      }
+    `;
+    document.head.appendChild(style);
+  }
+})();
 </script>
 </body>
 </html>
