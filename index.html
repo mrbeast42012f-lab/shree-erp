@@ -570,55 +570,56 @@ function renameCustomer(){
  const oldName=p.name;p.name=newName;["bills","purchases","receipts","payments"].forEach(k=>db[k].forEach(x=>{if(x.party===oldName)x.party=newName}));save();render();alert("Customer name updated.");
 }
 
+
 /* SHREE ERP — QUICK ACCESS NAVIGATION */
 document.addEventListener("keydown", function (e) {
   const el = e.target;
   if (!(el instanceof Element)) return;
-  const area = el.closest(
-    ".quickgrid, .quick-actions, .quick-access, .quicklinks"
-  );
+
+  const area = el.closest(".quickgrid");
   if (!area) return;
-  const buttons = Array.from(area.querySelectorAll(
-    'button:not(:disabled), a[href], [role="button"]'
-  )).filter(b => b.getClientRects().length > 0);
+
+  const buttons = [...area.querySelectorAll(
+    "button:not(:disabled)"
+  )].filter(b => b.getClientRects().length > 0);
+
   if (!buttons.length) return;
-  const active = buttons.indexOf(el.closest(
-    'button:not(:disabled), a[href], [role="button"]'
-  ));
-  if (e.key === "Enter") {
-    if (active >= 0) {
-      e.preventDefault();
-      e.stopImmediatePropagation();
-      buttons[active].click();
-    }
+
+  const current = buttons.indexOf(el.closest("button"));
+
+  if (e.key === "Enter" && current >= 0) {
+    e.preventDefault();
+    buttons[current].click();
     return;
   }
+
   const cols = Math.max(
     1,
     getComputedStyle(area).gridTemplateColumns
       .split(" ").filter(Boolean).length
   );
+
   let next;
- switch (e.key) {
+  switch (e.key) {
     case "ArrowRight":
-      next = active < 0 ? 0 : Math.min(active + 1, buttons.length - 1);
+      next = current < 0 ? 0 : Math.min(current + 1, buttons.length - 1);
       break;
     case "ArrowLeft":
-      next = active < 0 ? buttons.length - 1 : Math.max(active - 1, 0);
+      next = current < 0 ? buttons.length - 1 : Math.max(current - 1, 0);
       break;
     case "ArrowDown":
-      next = active < 0 ? 0 : Math.min(active + cols, buttons.length - 1);
+      next = current < 0 ? 0 : Math.min(current + cols, buttons.length - 1);
       break;
     case "ArrowUp":
-      next = active < 0 ? buttons.length - 1 : Math.max(active - cols, 0);
+      next = current < 0 ? buttons.length - 1 : Math.max(current - cols, 0);
       break;
     default:
       return;
   }
-e.preventDefault();
-  e.stopImmediatePropagation();
+
+  e.preventDefault();
   buttons[next].focus();
-}, true);
+});
 </script>
 </body>
 </html>
