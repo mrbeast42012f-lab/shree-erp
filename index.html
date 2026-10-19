@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="bn">
 <head>
@@ -571,384 +570,40 @@ function renameCustomer(){
  const oldName=p.name;p.name=newName;["bills","purchases","receipts","payments"].forEach(k=>db[k].forEach(x=>{if(x.party===oldName)x.party=newName}));save();render();alert("Customer name updated.");
 }
 
-<script>
-/* UNIVERSAL SHREE ERP KEYBOARD CONTROLS */
-function getKeyboardFields(container) {
-  if (!container) return [];
-  return [...container.querySelectorAll(
-    'input:not([type="hidden"]):not([type="button"]):not([type="submit"]):not([readonly]), select, textarea'
-  )].filter(el =>
-    !el.disabled &&
-    el.offsetParent !== null &&
-    !el.closest(".hidden")
-  );
-}
-
-function focusField(field) {
-  if (!field) return false;
-  field.focus();
-  if (typeof field.select === "function" &&
-      ["search", "number"].includes(field.type)) {
-    try { field.select(); } catch (_) {}
+/* KEYBOARD: Esc back, Enter next field, Left Arrow previous field */
+document.addEventListener("keydown",e=>{
+ if(e.key==="Escape"){if($("modalRoot").innerHTML){closeModal();e.preventDefault();return}if(view!=="dashboard"){goBack();e.preventDefault()}return}
+ if(e.key==="F2"){e.preventDefault();openPartyPicker();return}
+ if(e.key==="F3"){e.preventDefault();renameCustomer();return}
+ if(e.key==="F4"){e.preventDefault();go("retail");return}
+ if(e.key==="F1"&&["retail","wholesale"].includes(view)){e.preventDefault();if($("tDoctor"))$("tDoctor").focus();else alert("Doctor field Retail Billing-এ পাওয়া যাবে।");return}
+ const target=e.target;
+ if(e.key==="ArrowLeft"&&!e.ctrlKey&&!e.altKey&&!e.metaKey){
+  if(target.matches("input,select,textarea")&&!target.readOnly&&!target.disabled){
+   const textTypes=["text","search","tel","url","email","password","number"];
+   if(target.tagName==="SELECT"||!textTypes.includes(target.type)){movePrevious(target,e);return}
+   if(typeof target.selectionStart==="number"&&target.selectionStart===0&&target.selectionEnd===0){movePrevious(target,e);return}
   }
-  return true;
-}
-
-function moveField(target, direction, e) {
-  const container = target.closest("form") ||
-                    target.closest(".modal-body") ||
-                    $("main");
-  const fields = getKeyboardFields(container);
-  const index = fields.indexOf(target);
-
-  if (index < 0) return false;
-
-  const next = fields[index + direction];
-  if (!next) {
-    if (direction > 0) {
-      const submit = container.querySelector(
-        'button[type="submit"], button.primary'
-      );
-      if (submit && submit.offsetParent !== null) {
-        e.preventDefault();
-        submit.focus();
-        return true;
-      }
-    }
-    return false;
+ }
+ if(e.key==="Enter"&&!e.ctrlKey&&!e.altKey&&!e.shiftKey){
+  if(target.closest(".modal-bg"))return;
+  if(!target.matches("input,select,textarea")||target.matches("[type=submit],[type=button],[readonly]")||target.tagName==="TEXTAREA")return;
+  if(target.id==="lineSearch"){
+   const val=target.value.trim().toLowerCase(),i=db.items.find(i=>[i.name,i.code,i.barcode,i.id].some(v=>String(v||"").toLowerCase()===val));
+   if(i){e.preventDefault();$("lineItem").value=i.id;fillLineRate();$("linePack").focus();return}
   }
-
-  e.preventDefault();
-  next.focus();
-  return true;
-}
-
-function submitActiveForm() {
-  const active = document.activeElement;
-  const form = active?.closest("form");
-
-  if (!form) {
-    $("statusText").textContent = "Save: আগে একটি ফর্ম নির্বাচন করো";
-    return;
-  }
-
-  if (typeof form.requestSubmit === "function") {
-    form.requestSubmit();
-  } else {
-    form.dispatchEvent(
-      new Event("submit", { bubbles: true, cancelable: true })
-    );
-  }
-}
-
-function focusCurrentSearch() {
-  const modal = $("modalRoot").querySelector(".modal-bg");
-  if (modal) {
-    const modalInput = modal.querySelector(
-      'input:not([type="hidden"]), select'
-    );
-    if (modalInput) {
-      modalInput.focus();
-      return;
-    }
-  }
-
-  const searches = {
-    items: "itemSearch",
-    expiry: "expirySearch",
-    retail: "lineSearch",
-    wholesale: "lineSearch",
-    purchase: "lineSearch"
-  };
-
-  const id = searches[view];
-  const input = id ? $(id) : null;
-
-  if (input && input.offsetParent !== null) {
-    input.focus();
-    if (typeof input.select === "function") {
-      try { input.select(); } catch (_) {}
-    }
-    return;
-  }
-
-  const firstSearch = $("main").querySelector(
-    'input[type="search"], input.searchbox'
-  );
-
-  if (firstSearch) {
-    firstSearch.focus();
-    if (typeof firstSearch.select === "function") {
-      try { firstSearch.select(); } catch (_) {}
-    }
-  } else {
-    $("statusText").textContent =
-      "এই স্ক্রিনে Search field নেই";
-  }
-}
-
-function navigateFocusable(target, direction, e) {
-  const group = target.closest(
-    ".menubar, .toolbar, .quickgrid, .row-actions, .right-box, .left-panel"
-  );
-
-  if (!group) return false;
-
-  const buttons = [...group.querySelectorAll(
-    "button:not(:disabled), a[href], input:not(:disabled), select:not(:disabled)"
-  )].filter(el => el.offsetParent !== null);
-
-  const index = buttons.indexOf(target);
-  if (index < 0) return false;
-
-  const next = buttons[index + direction];
-  if (!next) return false;
-
-  e.preventDefault();
-  next.focus();
-  return true;
-}
-
-document.addEventListener("keydown", function(e) {
-  const target = e.target;
-  const modalOpen = !!$("modalRoot").querySelector(".modal-bg");
-
-  /* Function keys */
-  if (e.key === "F1") {
-    if (["retail", "wholesale"].includes(view)) {
-      e.preventDefault();
-      if ($("tDoctor")) {
-        $("tDoctor").focus();
-      } else {
-        alert("Doctor field Retail Billing-এ পাওয়া যাবে।");
-      }
-    }
-    return;
-  }
-
-  if (e.key === "F2") {
-    e.preventDefault();
-    openPartyPicker();
-    return;
-  }
-
-  if (e.key === "F3") {
-    e.preventDefault();
-    renameCustomer();
-    return;
-  }
-
-  if (e.key === "F4") {
-    e.preventDefault();
-    go("retail");
-    return;
-  }
-
-  if (e.key === "F5") {
-    e.preventDefault();
-    render();
-    $("statusText").textContent = "Screen refreshed";
-    return;
-  }
-
-  if (e.key === "F6") {
-    e.preventDefault();
-    const first = getKeyboardFields($("main"))[0];
-    if (first) first.focus();
-    else {
-      const firstButton = $("main").querySelector("button");
-      if (firstButton) firstButton.focus();
-    }
-    return;
-  }
-
-  const functionViews = {
-    F7: "items",
-    F8: "parties",
-    F9: "stock",
-    F10: "reports",
-    F11: "company",
-    F12: "settings"
-  };
-
-  if (functionViews[e.key]) {
-    e.preventDefault();
-    go(functionViews[e.key]);
-    return;
-  }
-
-  /* Ctrl shortcuts */
-  if ((e.ctrlKey || e.metaKey) &&
-      e.key.toLowerCase() === "s") {
-    e.preventDefault();
-    submitActiveForm();
-    return;
-  }
-
-  if ((e.ctrlKey || e.metaKey) &&
-      e.key.toLowerCase() === "f") {
-    e.preventDefault();
-    focusCurrentSearch();
-    return;
-  }
-
-  /* Ctrl + Enter = explicit form submission */
-  if (e.key === "Enter" && e.ctrlKey) {
-    e.preventDefault();
-    submitActiveForm();
-    return;
-  }
-
-  /* Escape: close modal or go back */
-  if (e.key === "Escape") {
-    if (modalOpen) {
-      e.preventDefault();
-      closeModal();
-      return;
-    }
-
-    if (view !== "dashboard") {
-      e.preventDefault();
-      goBack();
-    }
-    return;
-  }
-
-  /* Arrow navigation inside menus and button groups */
-  if (target.matches("button, a[href]") &&
-      !e.ctrlKey && !e.altKey && !e.metaKey) {
-    if (["ArrowDown", "ArrowRight"].includes(e.key)) {
-      if (navigateFocusable(target, 1, e)) return;
-    }
-
-    if (["ArrowUp", "ArrowLeft"].includes(e.key)) {
-      if (navigateFocusable(target, -1, e)) return;
-    }
-  }
-
-  /* Input navigation */
-  if (e.key === "ArrowLeft" &&
-      !e.ctrlKey && !e.altKey && !e.metaKey &&
-      target.matches("input, select, textarea") &&
-      !target.disabled && !target.readOnly) {
-
-    if (target.tagName === "SELECT" ||
-        !["text", "search", "tel", "url", "email", "password", "number"]
-          .includes(target.type)) {
-      moveField(target, -1, e);
-      return;
-    }
-
-    if (typeof target.selectionStart === "number" &&
-        target.selectionStart === 0 &&
-        target.selectionEnd === 0) {
-      moveField(target, -1, e);
-      return;
-    }
-  }
-
-  if (e.key === "ArrowRight" &&
-      !e.ctrlKey && !e.altKey && !e.metaKey &&
-      target.matches("input, select, textarea") &&
-      !target.disabled && !target.readOnly &&
-      target.tagName !== "SELECT" &&
-      typeof target.selectionStart === "number" &&
-      target.selectionStart === target.value.length &&
-      target.selectionEnd === target.value.length) {
-    /* At the end of a text input, move forward only when a form field exists. */
-    const container = target.closest("form") ||
-                      target.closest(".modal-body") ||
-                      $("main");
-    const fields = getKeyboardFields(container);
-    const index = fields.indexOf(target);
-
-    if (index >= 0 && index < fields.length - 1) {
-      moveField(target, 1, e);
-      return;
-    }
-  }
-
-  /* Enter: select a product or move to the next field */
-  if (e.key === "Enter" &&
-      !e.ctrlKey && !e.altKey && !e.shiftKey) {
-
-    /* Party picker: Enter selects the highlighted party */
-    if (target.id === "pickerParty") {
-      e.preventDefault();
-      chooseParty();
-      return;
-    }
-
-    /* Product search: resolve item before moving forward */
-    if (target.id === "lineSearch") {
-      const val = target.value.trim().toLowerCase();
-
-      const item = db.items.find(i =>
-        [i.name, i.code, i.barcode, i.id].some(
-          v => String(v || "").toLowerCase() === val
-        )
-      );
-
-      if (item) {
-        e.preventDefault();
-        $("lineItem").value = item.id;
-        fillLineRate();
-
-        if ($("linePack")) $("linePack").focus();
-        return;
-      }
-    }
-
-    /* Let buttons, checkboxes and ordinary non-form controls work natively */
-    if (!target.matches("input, select, textarea")) return;
-
-    if (target.matches(
-      '[type="submit"], [type="button"], [type="checkbox"], [readonly]'
-    ) || target.tagName === "TEXTAREA") {
-      return;
-    }
-
-    if (modalOpen) {
-      const modalContainer = target.closest(".modal-body");
-      if (modalContainer) {
-        e.preventDefault();
-        if (moveField(target, 1, e)) return;
-
-        const primary = modalContainer.querySelector(
-          "button.primary"
-        );
-        if (primary) primary.focus();
-        return;
-      }
-    }
-
-    const form = target.closest("form");
-    if (!form) return;
-
-    e.preventDefault();
-
-    /* Enter moves to the next field; it never auto-saves the form. */
-    if (moveField(target, 1, e)) return;
-
-    /* At the last field, focus the Save button instead of submitting. */
-    const submit = form.querySelector(
-      'button[type="submit"], input[type="submit"]'
-    );
-
-    if (submit && !submit.disabled) {
-      submit.focus();
-    }
-    return;
-  }
+  const form=target.closest("form");if(!form)return;
+  const fields=[...form.querySelectorAll("input:not([type=hidden]):not([type=button]):not([type=submit]):not([readonly]),select,textarea")].filter(el=>!el.disabled&&el.offsetParent!==null);
+  const idx=fields.indexOf(target);
+  if(idx>=0){e.preventDefault();if(idx<fields.length-1)fields[idx+1].focus();else if(form.requestSubmit)form.requestSubmit();else form.dispatchEvent(new Event("submit",{cancelable:true,bubbles:true}))}
+ }
 });
-
-/* Previous field helper retained for compatibility */
-function movePrevious(target, e) {
-  return moveField(target, -1, e);
+function movePrevious(target,e){
+ const form=target.closest("form");if(!form)return;
+ const fields=[...form.querySelectorAll("input:not([type=hidden]):not([type=button]):not([type=submit]):not([readonly]),select,textarea")].filter(el=>!el.disabled&&el.offsetParent!==null);
+ const idx=fields.indexOf(target);if(idx>0){e.preventDefault();fields[idx-1].focus();if(fields[idx-1].setSelectionRange&&["text","search","tel","url","email","password"].includes(fields[idx-1].type)){const n=fields[idx-1].value.length;try{fields[idx-1].setSelectionRange(n,n)}catch(err){}}}
 }
-
-render();
-updateStatus();
+render();updateStatus();
 </script>
 </body>
 </html>
