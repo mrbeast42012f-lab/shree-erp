@@ -807,6 +807,7 @@ function renameCustomer(){
     document.head.appendChild(style);
   }
  
+  
   /* QUICK ACCESS: Arrow navigation + Enter activation */
   document.addEventListener("keydown", function (e) {
     const el = e.target;
@@ -846,7 +847,8 @@ function renameCustomer(){
     else return;
 
     e.preventDefault();
-    buttons[next].focus
+    buttons[next].focus();
+  });
 })();
 </script>
 </body>
