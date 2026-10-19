@@ -574,22 +574,17 @@ function renameCustomer(){
 document.addEventListener("keydown", function (e) {
   const el = e.target;
   if (!(el instanceof Element)) return;
-
   const area = el.closest(
     ".quickgrid, .quick-actions, .quick-access, .quicklinks"
   );
   if (!area) return;
-
   const buttons = Array.from(area.querySelectorAll(
     'button:not(:disabled), a[href], [role="button"]'
   )).filter(b => b.getClientRects().length > 0);
-
   if (!buttons.length) return;
-
   const active = buttons.indexOf(el.closest(
     'button:not(:disabled), a[href], [role="button"]'
   ));
-
   if (e.key === "Enter") {
     if (active >= 0) {
       e.preventDefault();
@@ -598,16 +593,13 @@ document.addEventListener("keydown", function (e) {
     }
     return;
   }
-
   const cols = Math.max(
     1,
     getComputedStyle(area).gridTemplateColumns
       .split(" ").filter(Boolean).length
   );
-
   let next;
-
-  switch (e.key) {
+ switch (e.key) {
     case "ArrowRight":
       next = active < 0 ? 0 : Math.min(active + 1, buttons.length - 1);
       break;
@@ -623,12 +615,10 @@ document.addEventListener("keydown", function (e) {
     default:
       return;
   }
-
-  e.preventDefault();
+e.preventDefault();
   e.stopImmediatePropagation();
   buttons[next].focus();
 }, true);
-
 })();
 </script>
 </body>
