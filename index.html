@@ -25,13 +25,12 @@ button:focus,input:focus,select:focus,textarea:focus{outline:2px solid #2469c8;o
 .menubar button{border:0;border-right:1px solid #c1cedd;background:transparent;padding:9px 10px;color:#17385f}
 .menubar button:hover,.menubar button.active{background:white;font-weight:bold}
 .toolbar{padding:7px;background:#edf2f8;border-bottom:1px solid #a9b8ca}
-.workspace{display:grid;grid-template-columns:205px minmax(650px,1fr) 205px;gap:8px;padding:8px;min-height:70vh;align-items:start}
+.workspace{display:grid;grid-template-columns:205px minmax(0,1fr) 205px;gap:8px;padding:8px;min-height:70vh;align-items:start}
 .panel{border:1px solid #9eafc5;background:#f7f9fc;min-width:0}
 .panel-title{padding:8px;background:linear-gradient(#edf4fc,#cbd9e9);border-bottom:1px solid #9eafc5;font-weight:bold;color:#193f6d}
 .side-link{display:block;width:100%;text-align:left;padding:9px 10px;border:0;border-bottom:1px solid #e0e6ed;background:#f8faff;color:#203d60}
 .side-link:hover,.side-link.active{background:#d9e8f9;color:#123e76;font-weight:bold}
-.center{min-width:0}
-.statusline{background:#e4ebf4;border-top:1px solid #9eafc5;padding:7px 10px;display:flex;justify-content:space-between;gap:6px;flex-wrap:wrap}
+.center{min-width:0}.statusline{background:#e4ebf4;border-top:1px solid #9eafc5;padding:7px 10px;display:flex;justify-content:space-between;gap:6px;flex-wrap:wrap}
 .view-head{padding:10px;background:#e3ebf6;border:1px solid #9eafc5;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
 h2{font-size:16px;margin:0;color:#183e70}h3{font-size:13px;margin:0 0 10px;color:#183e70}
 .banner{padding:18px;background:linear-gradient(115deg,#173b69,#3979b8);color:white;border:1px solid #12345c;margin-bottom:8px}
@@ -42,8 +41,7 @@ h2{font-size:16px;margin:0;color:#183e70}h3{font-size:13px;margin:0 0 10px;color
 .card{background:white;border:1px solid #a6b7ca;padding:12px;margin-bottom:8px}
 .quickgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}.quickgrid button{min-height:39px}
 .formgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
-.field{display:flex;flex-direction:column;gap:4px;min-width:0}
-.field label{font-weight:bold;color:#304a68}
+.field{display:flex;flex-direction:column;gap:4px;min-width:0}.field label{font-weight:bold;color:#304a68}
 .field input,.field select,.field textarea,.searchbox{width:100%;padding:7px;border:1px solid #9eafc5;background:white;border-radius:0;min-width:0}
 .field input,.field select{min-height:30px}.field textarea{min-height:65px;resize:vertical}
 .table-wrap{overflow:auto;border:1px solid #a5b4c6;background:white;max-width:100%}
@@ -56,11 +54,9 @@ tbody tr:nth-child(even){background:#f0f5fb}tbody tr:hover{background:#fff1c9}
 .muted{color:#6a7c91}.total-box{background:#edf3fa;border:1px solid #a5b4c6;padding:10px;text-align:right;font-weight:bold}
 .hidden{display:none!important}.bill-grid{display:grid;grid-template-columns:repeat(6,minmax(110px,1fr));gap:8px}
 .bill-item-box{border:1px solid #9eafc5;background:#f3f6fa;padding:12px;margin:10px 0}
-.hotkey{display:inline-block;background:white;border:1px solid #a6b7ca;padding:3px 6px;margin:2px;font-weight:bold}
-.bill-type{padding:8px;background:#eaf1fa;border:1px solid #9eafc5;margin-bottom:8px}
 .warning{color:#a11;font-weight:bold}.success{color:#17602b;font-weight:bold}
 .modal-bg{position:fixed;inset:0;background:#0008;z-index:999;display:flex;align-items:center;justify-content:center;padding:12px}
-.modal{box-shadow:0 10px 40px #0005;max-width:100%}
+.modal{box-shadow:0 10px 40px #0005;max-width:100%;overflow:auto;max-height:90vh}
 @media(max-width:1250px){.workspace{grid-template-columns:175px minmax(0,1fr)}.right-panel{display:none}.bill-grid{grid-template-columns:repeat(3,minmax(110px,1fr))}}
 @media(max-width:850px){.workspace{grid-template-columns:minmax(0,1fr)}.left-panel{display:none}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.formgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.quickgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.bill-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media print{body{background:white}.titlebar,.menubar,.toolbar,.left-panel,.right-panel,.statusline,.view-head .btn,.form-actions,.no-print{display:none!important}.workspace{display:block;padding:0}.app{border:0}.card{break-inside:avoid}}
@@ -220,7 +216,7 @@ function itemsPage(){
  let list=db.items.filter(x=>[x.name,x.code,x.barcode,x.company,x.type].some(v=>String(v||"").toLowerCase().includes(q)));
  let rows=list.map(x=>`<tr><td>${esc(x.code||"")}</td><td>${esc(x.barcode||"")}</td><td>${esc(x.name)}</td><td>${esc(x.type||"Others")}</td><td>${esc(x.company||"")}</td><td>${esc(x.unit||"PCS")}</td><td>${money(x.rate)}</td><td>${cleanQty(x.qty)}</td><td><button class="btn" onclick="editItem('${esc(x.id)}')">Edit</button> <button class="btn danger" onclick="deleteRecord('items','${esc(x.id)}')">Del</button></td></tr>`).join("");
  return `${head("Item Master","Product / Inventory / Barcode Master")}
- <div class="card"><h3 id="itemFormTitle">Add / Edit Item</h3><form onsubmit="saveItem(event)"><input type="hidden" id="itemId">
+ <div class="card"><h3>Add / Edit Item</h3><form onsubmit="saveItem(event)"><input type="hidden" id="itemId">
  <div class="formgrid">
  <div class="field"><label>Item Code</label><input id="iCode"></div><div class="field"><label>Barcode</label><input id="iBarcode"></div><div class="field"><label>Item Name *</label><input id="iName" required></div>
  <div class="field"><label>Type</label><select id="iType"><option>Others</option><option>Medicine</option><option>Syrup</option><option>Tablet</option><option>Capsule</option><option>Food</option><option>General</option></select></div>
@@ -259,7 +255,7 @@ function companyPage(){return `${head("Company Information","Business Profile")}
 function saveCompany(e){e.preventDefault();db.company={...db.company,name:$("cName").value.trim(),phone:$("cPhone").value.trim(),gstin:$("cGstin").value.trim(),address:$("cAddress").value.trim()};save();render();alert("Company saved")}
 function settingsPage(){return `${head("Settings & Data Tools","Browser storage / Backup")}<div class="card"><h3>Backup & Restore</h3><p>নিয়মিত JSON backup রাখো।</p><div class="form-actions"><button class="btn primary" onclick="backup()">Export JSON Backup</button><button class="btn" onclick="$('restoreFile').click()">Import Backup</button></div></div><div class="card"><h3>Data Status</h3><p>Storage key: <b>${KEY}</b></p><p>Items ${db.items.length} · Parties ${db.parties.length} · Sales ${db.bills.length} · Purchases ${db.purchases.length} · Batches ${db.batches.length}</p></div><div class="card"><h3>Keyboard Shortcuts</h3><p>F2 Party · F3 Rename Party · F4 Retail · Esc Home · Enter Next Field</p></div><div class="card"><h3>Danger Zone</h3><button class="btn danger" onclick="clearData()">Clear All ERP Data</button></div>`}
 
-/* BILLING */
+/* TRANSACTIONS */
 function transactionPage(kind){
  const purchase=kind==="purchase",retail=kind==="retail",key=purchase?"purchases":"bills";
  const title=purchase?"Purchase Entry":retail?"Retail Sale Entry":"Wholesale Sale Entry";
@@ -321,7 +317,7 @@ function selectBillBatch(){
  let typed=$("lineBatch").value.trim();
  let b=itemBatches(i.id).find(x=>String(x.batch).toLowerCase()===typed.toLowerCase());
  if(b){$("lineExpiry").value=b.expiry||"";$("lineStock").value=cleanQty(b.qty)}
- else{$("lineStock").value=view==="purchase"?0:0}
+ else{$("lineStock").value=0}
  calcLinePreview();
 }
 function calcLinePreview(){
@@ -503,13 +499,13 @@ function printObject(x){
 function openPartyPicker(){
  if(!["retail","wholesale","purchase"].includes(view)){go("parties");return}
  let allowed=view==="purchase"?["Supplier","Both"]:["Customer","Both"];
- $("modalRoot").innerHTML=`<div class="modal-bg" onclick="if(event.target===this)closeModal()"><div class="modal" style="background:#edf2f8;border:1px solid #58708e;width:min(560px,100%);max-height:90vh;overflow:auto"><div class="modal-head" style="padding:10px;background:#183e70;color:white">F2 · Select / Add Party <button class="btn" onclick="closeModal()">✕</button></div><div style="padding:15px"><div class="field"><label>Party</label><select id="pickerParty"><option value="">Cash / Walk-in</option>${db.parties.filter(p=>allowed.includes(p.type)).map(p=>`<option value="${esc(p.name)}">${esc(p.name)} · ${esc(p.phone||"")}</option>`).join("")}</select></div><div class="form-actions"><button class="btn primary" onclick="chooseParty()">Select Party</button><button class="btn" onclick="showQuickParty()">＋ New Party</button></div></div></div></div>`;
+ $("modalRoot").innerHTML=`<div class="modal-bg" onclick="if(event.target===this)closeModal()"><div class="modal" style="background:#edf2f8;border:1px solid #58708e;width:min(560px,100%);max-height:90vh;overflow:auto"><div style="padding:10px;background:#183e70;color:white">F2 · Select / Add Party <button class="btn" onclick="closeModal()">✕</button></div><div style="padding:15px"><div class="field"><label>Party</label><select id="pickerParty"><option value="">Cash / Walk-in</option>${db.parties.filter(p=>allowed.includes(p.type)).map(p=>`<option value="${esc(p.name)}">${esc(p.name)} · ${esc(p.phone||"")}</option>`).join("")}</select></div><div class="form-actions"><button class="btn primary" onclick="chooseParty()">Select Party</button><button class="btn" onclick="showQuickParty()">＋ New Party</button></div></div></div></div>`;
  $("pickerParty").focus();
 }
 function closeModal(){$("modalRoot").innerHTML=""}
 function chooseParty(){if($("tParty")){$("tParty").value=$("pickerParty").value;showPartyInfo()}closeModal()}
 function showQuickParty(){
- $("modalRoot").innerHTML=`<div class="modal-bg"><div class="modal" style="background:#edf2f8;width:min(560px,100%);max-height:90vh;overflow:auto"><div class="modal-head" style="padding:10px;background:#183e70;color:white">New Customer / Party <button class="btn" onclick="closeModal()">✕</button></div><div style="padding:15px"><div class="field"><label>Name *</label><input id="qName"></div><div class="field"><label>Mobile</label><input id="qPhone"></div><div class="field"><label>Address</label><input id="qAddress"></div><div class="field"><label>GSTIN</label><input id="qGstin"></div><div class="field"><label>DL No.</label><input id="qDl"></div><div class="form-actions"><button class="btn primary" onclick="saveQuickParty()">Save & Select</button><button class="btn" onclick="openPartyPicker()">Back</button></div></div></div></div>`;
+ $("modalRoot").innerHTML=`<div class="modal-bg"><div class="modal" style="background:#edf2f8;width:min(560px,100%);max-height:90vh;overflow:auto"><div style="padding:10px;background:#183e70;color:white">New Customer / Party <button class="btn" onclick="closeModal()">✕</button></div><div style="padding:15px"><div class="field"><label>Name *</label><input id="qName"></div><div class="field"><label>Mobile</label><input id="qPhone"></div><div class="field"><label>Address</label><input id="qAddress"></div><div class="field"><label>GSTIN</label><input id="qGstin"></div><div class="field"><label>DL No.</label><input id="qDl"></div><div class="form-actions"><button class="btn primary" onclick="saveQuickParty()">Save & Select</button><button class="btn" onclick="openPartyPicker()">Back</button></div></div></div></div>`;
  $("qName").focus();
 }
 function saveQuickParty(){
@@ -528,15 +524,22 @@ function renameCustomer(){
  let old=p.name;p.name=next;["bills","purchases","receipts","payments"].forEach(k=>db[k].forEach(x=>{if(x.party===old)x.party=next}));save();render();alert("Party name updated.");
 }
 
-/* KEYBOARD */
+/* KEYBOARD: Enter moves to next visible form control. */
 document.addEventListener("keydown",e=>{
- if(e.key==="Escape"){if($("modalRoot").innerHTML){closeModal();e.preventDefault();return}if(view!=="dashboard"){go("dashboard");e.preventDefault()}return}
+ if(e.key==="Escape"){
+  if($("modalRoot").innerHTML){closeModal();e.preventDefault();return}
+  if(view!=="dashboard"){go("dashboard");e.preventDefault()}
+  return;
+ }
  if(e.key==="F2"){e.preventDefault();openPartyPicker();return}
  if(e.key==="F3"){e.preventDefault();renameCustomer();return}
  if(e.key==="F4"){e.preventDefault();go("retail");return}
- if(e.key==="F1"&&["retail","wholesale"].includes(view)){e.preventDefault();if($("tDoctor"))$("tDoctor").focus();else alert("Doctor field Retail Billing-এ আছে।");return}
+ if(e.key==="F1"&&["retail","wholesale"].includes(view)){
+  e.preventDefault();if($("tDoctor"))$("tDoctor").focus();else alert("Doctor field Retail Billing-এ আছে।");return;
+ }
  if(e.key==="Enter"&&!e.ctrlKey&&!e.altKey&&!e.shiftKey){
-  let t=e.target;if(t.closest(".modal-bg"))return;
+  let t=e.target;
+  if(t.closest(".modal-bg"))return;
   if(!t.matches("input,select,textarea")||t.matches("[type=submit],[type=button],[readonly]")||t.tagName==="TEXTAREA")return;
   let f=t.closest("form");if(!f)return;
   if(t.id==="lineSearch"){searchBillItem();if(currentItem()){e.preventDefault();fillLineRate();$("linePack").focus();return}}
@@ -548,5 +551,6 @@ render();updateStatus();
 </script>
 </body>
 </html>
+
 
 
