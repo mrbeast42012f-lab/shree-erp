@@ -1,537 +1,764 @@
-<!DOCTYPE html> 
-<html lang="bn">  
-<head>  
-<meta charset="UTF-8">  
-<meta name="viewport" content="width=device-width,initial-scale=1">  
-<meta name="theme-color" content="#183e70">  
-<title>SHREE ERP — Business Management</title>  
-<style>  
-:root{--navy:#183e70;--blue:#245a96;--light:#eaf1fa;--line:#9eafc5;--bg:#cbd5e2}  
-*{box-sizing:border-box}  
-body{margin:0;background:var(--bg);font:12px Tahoma,Arial,sans-serif;color:#172b45}  
-button,input,select,textarea{font:inherit}  
-button{cursor:pointer}  
-button:focus,input:focus,select:focus,textarea:focus{outline:2px solid #2469c8;outline-offset:1px}  
-.app{width:100%;max-width:1920px;margin:auto;background:#e9eef5;min-height:100vh;border:1px solid #526b89}  
-.titlebar{background:linear-gradient(#426da3,#183e70);color:#fff;padding:9px 12px;display:flex;align-items:center;justify-content:space-between;gap:8px}  
-.brand{font-weight:bold;font-size:18px;letter-spacing:.6px}.brand small{display:block;font-size:10px;font-weight:normal;margin-top:3px}  
-.title-actions,.toolbar,.form-actions{display:flex;gap:5px;flex-wrap:wrap}  
-.btn{border:1px solid #8b9db3;background:linear-gradient(#fff,#dbe5f1);padding:6px 10px;color:#16395f;border-radius:2px;font-weight:bold}  
-.btn:hover{background:linear-gradient(#fff3cc,#f7d77c)}  
-.btn.primary{background:linear-gradient(#467db8,#1d4c80);color:white;border-color:#173c67}  
-.btn.danger{color:#a00000}.btn.small{padding:4px 7px}  
-.menubar{display:flex;flex-wrap:wrap;background:#dce6f2;border-bottom:1px solid #8098b6}  
-.menubar button{border:0;border-right:1px solid #c1cedd;background:transparent;padding:9px 10px;color:#17385f}  
-.menubar button:hover,.menubar button.active{background:white;font-weight:bold}  
-.toolbar{padding:7px;background:#edf2f8;border-bottom:1px solid #a9b8ca}  
-.workspace{display:grid;grid-template-columns:205px minmax(0,1fr) 205px;gap:8px;padding:8px;min-height:70vh;align-items:start}  
-.panel{border:1px solid #9eafc5;background:#f7f9fc;min-width:0}  
-.panel-title{padding:8px;background:linear-gradient(#edf4fc,#cbd9e9);border-bottom:1px solid #9eafc5;font-weight:bold;color:#193f6d}  
-.side-link{display:block;width:100%;text-align:left;padding:9px 10px;border:0;border-bottom:1px solid #e0e6ed;background:#f8faff;color:#203d60}  
-.side-link:hover,.side-link.active{background:#d9e8f9;color:#123e76;font-weight:bold}  
-.center{min-width:0}.statusline{background:#e4ebf4;border-top:1px solid #9eafc5;padding:7px 10px;display:flex;justify-content:space-between;gap:6px;flex-wrap:wrap}  
-.view-head{padding:10px;background:#e3ebf6;border:1px solid #9eafc5;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}  
-h2{font-size:16px;margin:0;color:#183e70}h3{font-size:13px;margin:0 0 10px;color:#183e70}  
-.banner{padding:18px;background:linear-gradient(115deg,#173b69,#3979b8);color:white;border:1px solid #12345c;margin-bottom:8px}  
-.banner h2{color:white;font-size:22px;margin-bottom:7px}.banner p{margin:0;line-height:1.6}  
-.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin-bottom:8px}  
-.stat{border:1px solid #a6b7ca;background:white;padding:12px 9px}.stat .label{color:#586b82;margin-bottom:7px}  
-.stat strong{font-size:19px;color:#1c4779}.stat:nth-child(2){background:#eef7e9}.stat:nth-child(3){background:#fff5dc}.stat:nth-child(4){background:#e8f2ff}  
-.card{background:white;border:1px solid #a6b7ca;padding:12px;margin-bottom:8px}  
-.quickgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}.quickgrid button{min-height:39px}  
-.formgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}  
-.field{display:flex;flex-direction:column;gap:4px;min-width:0}.field label{font-weight:bold;color:#304a68}  
-.field input,.field select,.field textarea,.searchbox{width:100%;padding:7px;border:1px solid #9eafc5;background:white;border-radius:0;min-width:0}  
-.field input,.field select{min-height:30px}.field textarea{min-height:65px;resize:vertical}  
-.table-wrap{overflow:auto;border:1px solid #a5b4c6;background:white;max-width:100%}  
-table{border-collapse:collapse;width:100%;font-size:12px;white-space:nowrap}  
-th{background:linear-gradient(#eaf1fa,#cbd9e9);color:#173b67;text-align:left;font-weight:bold}  
-th,td{border:1px solid #c4cfdd;padding:7px 8px}  
-tbody tr:nth-child(even){background:#f0f5fb}tbody tr:hover{background:#fff1c9}  
-.empty{text-align:center;color:#66788c;padding:25px}.notice{padding:9px;border:1px solid #a4b7cb;background:#edf4fc;margin-bottom:8px;line-height:1.5}  
-.right-box{padding:8px;border-bottom:1px solid #e0e6ed}.right-box button{width:100%;margin-bottom:5px;text-align:left}  
-.muted{color:#6a7c91}.total-box{background:#edf3fa;border:1px solid #a5b4c6;padding:10px;text-align:right;font-weight:bold}  
-.hidden{display:none!important}.bill-grid{display:grid;grid-template-columns:repeat(6,minmax(110px,1fr));gap:8px}  
-.bill-type{background:#d5e3f4;border:1px solid #9eafc5;padding:9px 12px;margin-bottom:8px;color:#173b67}  
-.bill-item-box{border:1px solid #9eafc5;background:#f3f6fa;padding:12px;margin:10px 0}  
-.warning{color:#a11;font-weight:bold}.success{color:#17602b;font-weight:bold}  
-.modal-bg{position:fixed;inset:0;background:#0008;z-index:999;display:flex;align-items:center;justify-content:center;padding:12px}  
-.modal{box-shadow:0 10px 40px #0005;max-width:100%;overflow:auto;max-height:90vh}  /* MARG-inspired compact SALE ENTRY */
-.sale-window{border:1px solid #6f88a6;background:#dfe8f3;margin-bottom:9px;box-shadow:inset 0 0 0 1px #fff}
-.sale-title{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;background:linear-gradient(#4676aa,#183e70);color:white;padding:8px 10px;font-weight:bold}
-.sale-title strong{font-size:14px;letter-spacing:.3px}
-.sale-title span{font-size:11px}
-.sale-strip{display:flex;gap:5px;flex-wrap:wrap;background:#d5e1ef;border-bottom:1px solid #9eafc5;padding:6px}
-.sale-strip span{padding:4px 7px;border:1px solid #a7b7c9;background:#f8fbff;font-weight:bold;color:#183e70}
-.sale-section-title{background:linear-gradient(#eef4fb,#cbd9e9);border-bottom:1px solid #a8b8ca;padding:7px 9px;font-weight:bold;color:#183e70}
-.sale-details{padding:10px;background:#f8faff;border-bottom:1px solid #a8b8ca}
-.sale-details .formgrid{grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
-.sale-details .field label{font-size:11px}
-.sale-details .field input,.sale-details .field select{padding:5px 6px;min-height:28px}
-.sale-details .field input[readonly]{background:#edf1f6;color:#53677d}
-.sale-entry-grid{padding:9px;background:#e8eef6}
-.sale-entry-grid .bill-grid{grid-template-columns:repeat(6,minmax(85px,1fr));gap:6px}
-.sale-entry-grid .field label{font-size:11px}
-.sale-entry-grid .field input{min-height:29px;padding:5px 6px}
-.sale-entry-grid .field input[readonly]{background:#edf1f6}
-.sale-actions{display:flex;gap:5px;flex-wrap:wrap;padding:7px 9px;background:#d5e1ef;border-top:1px solid #a8b8ca}
-.sale-actions .btn{padding:6px 11px}
-.sale-register{background:white;border:1px solid #a6b7ca;padding:10px;margin-bottom:8px}
-.sale-register .view-head{margin-bottom:7px}
-.sale-grid-wrap{overflow:auto;border:1px solid #91a5bd;background:white}
-.sale-grid-wrap table{min-width:940px}
-.sale-grid-wrap th,.sale-grid-wrap td{padding:6px 7px}
-.sale-grid-wrap input{width:100%;min-width:55px;border:1px solid #9eafc5;padding:5px}
-.sale-totals{display:grid;grid-template-columns:minmax(0,1fr) minmax(240px,330px);gap:10px;align-items:start;margin-top:8px}
-.sale-info{border:1px solid #a6b7ca;background:#f6f9fd;padding:9px;line-height:1.8}
-.sale-total-panel{border:1px solid #91a5bd;background:#edf3fa;padding:10px;text-align:right;font-weight:bold;line-height:1.9}
-.sale-total-panel .net{font-size:18px;border-top:1px solid #9eafc5;margin-top:5px;padding-top:5px;color:#183e70}
-.sale-shortcuts{font-size:11px;background:#e1eaf5;border:1px solid #b1c0d1;padding:7px 9px;color:#405875;line-height:1.7}
-.sale-shortcuts b{color:#183e70}
-@media(max-width:1250px){.workspace{grid-template-columns:175px minmax(0,1fr)}.right-panel{display:none}.bill-grid{grid-template-columns:repeat(3,minmax(110px,1fr))}.sale-entry-grid .bill-grid{grid-template-columns:repeat(3,minmax(95px,1fr))}}
-@media(max-width:850px){.workspace{grid-template-columns:minmax(0,1fr)}.left-panel{display:none}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.formgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.quickgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.bill-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.sale-details .formgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.sale-totals{grid-template-columns:minmax(0,1fr)}}
-@media(max-width:480px){.bill-grid,.formgrid{grid-template-columns:minmax(0,1fr)}.titlebar{align-items:flex-start;flex-direction:column}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.banner{padding:12px}.banner h2{font-size:19px}.sale-entry-grid .bill-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.sale-details .formgrid{grid-template-columns:minmax(0,1fr)}.sale-title{align-items:flex-start;flex-direction:column}.sale-grid-wrap table{min-width:850px}}
-@media print{body{background:white}.titlebar,.menubar,.toolbar,.left-panel,.right-panel,.statusline,.view-head .btn,.form-actions,.no-print,.sale-actions,.sale-strip,.sale-shortcuts{display:none!important}.workspace{display:block;padding:0}.app{border:0}.card{break-inside:avoid}}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#321064">
+<title>SHREE ERP | Business Management</title>
+<style>
+:root{
+ --purple:#321064;--deep:#210742;--mid:#5423a0;--accent:#8150d8;
+ --bg:#dce2ed;--panel:#fff;--line:#a9b5c7;--text:#202b3c;
+ --muted:#637086;--green:#16804a;--red:#bd283b;--gold:#fff0c5;
+ --shadow:0 2px 7px #1d12351c;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);
+ font:12px "Segoe UI",Tahoma,Arial,sans-serif}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+.topbar{height:48px;background:linear-gradient(100deg,var(--deep),var(--purple),var(--mid));
+ color:white;display:flex;align-items:center;gap:12px;padding:5px 12px;
+ box-shadow:var(--shadow);position:sticky;top:0;z-index:20}
+.logo{font-weight:900;font-size:21px;letter-spacing:1px}
+.logo small{display:block;font-size:9px;font-weight:500;letter-spacing:2px}
+.top-info{margin-left:auto;text-align:right;font-size:11px}
+.top-info strong{display:block;font-size:12px}
+.menu-strip{display:flex;gap:2px;background:#f6f2fc;border-bottom:1px solid var(--line);
+ padding:4px 7px;overflow-x:auto;white-space:nowrap}
+.menu-strip button{border:1px solid transparent;background:transparent;
+ padding:6px 11px;color:var(--deep);font-weight:650;border-radius:3px}
+.menu-strip button:hover,.menu-strip button.active{background:#e5d8fa;border-color:#b49bdc}
+.app{display:grid;grid-template-columns:205px minmax(0,1fr) 205px;gap:7px;
+ padding:7px;max-width:1800px;margin:auto}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:3px;
+ box-shadow:var(--shadow);min-width:0;overflow:hidden}
+.panel-title{background:linear-gradient(90deg,#eee5fc,#f8f5ff);
+ color:var(--deep);font-weight:800;padding:8px 9px;border-bottom:1px solid #c9b9e4}
+.panel-body{padding:9px}
+.side-link{display:flex;width:100%;text-align:left;align-items:center;gap:8px;
+ padding:8px;border:0;border-bottom:1px solid #eef0f5;background:white;color:#273247}
+.side-link:hover{background:#f1e8ff;color:var(--deep)}
+.side-link .symbol{width:21px;text-align:center;font-size:15px}
+.section-label{color:#6a4b91;font-size:10px;font-weight:900;margin:10px 0 5px;
+ text-transform:uppercase;letter-spacing:.6px}
+.workspace{min-width:0;display:flex;flex-direction:column;gap:7px}
+.page-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+ padding:9px 11px;background:white;border:1px solid var(--line)}
+.page-head h1{font-size:17px;color:var(--deep);margin:0}
+.page-head .subtitle{color:var(--muted);font-size:11px}
+.page-head .spacer{flex:1}
+.banner{background:linear-gradient(110deg,#210742,#5423a0,#8150d8);color:white;
+ padding:18px;border-radius:4px;display:flex;justify-content:space-between;
+ align-items:center;gap:12px;min-height:110px}
+.banner h2{font-size:24px;margin:0 0 5px;letter-spacing:.6px}
+.banner p{margin:0;color:#e6d9ff}
+.banner .fy{border:1px solid #ffffff66;padding:9px;border-radius:3px;
+ text-align:center;min-width:100px}
+.banner .fy strong{display:block;font-size:17px}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}
+.stat{padding:11px;background:#fff;border:1px solid var(--line);border-top:3px solid var(--accent)}
+.stat .label{color:var(--muted);font-size:11px}
+.stat strong{display:block;font-size:20px;margin:5px 0;color:var(--deep)}
+.stat small{color:var(--muted)}
+.quick-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.quick{border:1px solid #c8b8e0;background:#fbf9ff;padding:11px 5px;
+ text-align:center;color:var(--deep);border-radius:3px;font-weight:700;min-height:67px}
+.quick:hover{background:#ede2ff;border-color:var(--accent)}
+.quick span{display:block;font-size:20px;margin-bottom:5px}
+.grid-two{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
+.btn{border:1px solid #b8c2d0;background:#f6f7fa;color:#263247;
+ padding:7px 10px;border-radius:3px;font-weight:650}
+.btn:hover{filter:brightness(.97)}
+.btn.primary{background:var(--purple);color:white;border-color:var(--deep)}
+.btn.accent{background:var(--accent);color:white;border-color:var(--mid)}
+.btn.success{background:#e3f5eb;color:#11683b;border-color:#91c9a8}
+.btn.danger{background:#fff0f0;color:#a51d2d;border-color:#e5a4ac}
+.btn.small{padding:4px 7px;font-size:11px}
+.btn-row{display:flex;gap:5px;flex-wrap:wrap;margin:7px 0}
+.form-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.field{min-width:0}
+.field label{display:block;margin-bottom:4px;font-weight:700;color:#38455b}
+.field input,.field select,.field textarea,.search{
+ width:100%;min-width:0;padding:7px 8px;border:1px solid #aeb9c9;
+ border-radius:2px;background:white;color:#202b3c;outline:none}
+.field input:focus,.field select:focus,.field textarea:focus,.search:focus{
+ border-color:var(--accent);box-shadow:0 0 0 2px #8150d820}
+.field input[readonly]{background:#f1f3f7}
+.form-section{padding:9px;border:1px solid #d4dbe5;background:#fff;margin-bottom:7px}
+.form-section h3{margin:0 0 9px;color:var(--deep);font-size:12px;
+ border-bottom:1px solid #e2d8f2;padding-bottom:6px}
+.table-wrap{overflow:auto;width:100%;border:1px solid #d5dce6;background:white}
+table{border-collapse:collapse;width:100%;font-size:11px;white-space:nowrap}
+th{background:#ece5f8;color:var(--deep);font-weight:800}
+th,td{padding:7px 8px;border:1px solid #d8dee8;text-align:left}
+tbody tr:nth-child(even){background:#f8f9fc}
+tbody tr:hover{background:#f0e9fc}
+.num{text-align:right}
+.empty{text-align:center;color:#718096;padding:22px}
+.total-bar{display:flex;justify-content:space-between;gap:10px;align-items:center;
+ background:#f2ebfc;border:1px solid #c7b3e7;padding:10px;margin-top:7px}
+.total-bar strong{font-size:20px;color:var(--deep)}
+.statusbar{position:sticky;bottom:0;background:#f4effb;border-top:1px solid #c7b7df;
+ padding:6px 10px;display:flex;gap:10px;justify-content:space-between;z-index:10;
+ color:var(--deep);font-size:11px}
+.hidden{display:none!important}
+.notice{padding:9px;background:#fff8e7;border:1px solid #ead6a2;margin-bottom:8px}
+.chip{display:inline-block;background:#eee5fc;color:var(--deep);padding:4px 7px;
+ border-radius:2px;font-size:10px;font-weight:800}
+.footer-note{color:var(--muted);font-size:10px;padding:7px}
+@media(max-width:1050px){
+ .app{grid-template-columns:180px minmax(0,1fr)}
+ .right-side{display:none}
+ .form-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media(max-width:700px){
+ .app{display:flex;flex-direction:column;padding:5px;gap:5px}
+ .left-side{display:none}
+ .right-side{display:block}
+ .topbar{height:44px;padding:4px 8px}
+ .logo{font-size:18px}
+ .top-info{font-size:10px}
+ .top-info strong{font-size:11px}
+ .banner{padding:13px;min-height:95px}
+ .banner h2{font-size:20px}
+ .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .quick-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .form-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .grid-two{grid-template-columns:1fr}
+ .page-head h1{font-size:15px}
+ .statusbar{font-size:10px}
+}
+@media(max-width:380px){
+ .form-grid{grid-template-columns:1fr}
+ .banner .fy{min-width:80px;padding:6px}
+ .banner h2{font-size:17px}
+ .field input,.field select{padding:8px 6px}
+}
+@media print{
+ .topbar,.menu-strip,.left-side,.right-side,.statusbar,.no-print{display:none!important}
+ .app{display:block;padding:0}
+ .workspace{display:block}
+ body{background:white;font-size:11px}
+ .panel{box-shadow:none;border:0}
+}
 </style>
+</head>
+<body>
+<header class="topbar">
+ <div class="logo">SHREE ERP<small>SMART BUSINESS MANAGEMENT</small></div>
+ <div class="top-info"><strong id="companyTop">SHREE BUSINESS</strong><span id="dateTop"></span></div>
+</header>
 
-</head>  
-<body>  
-<div class="app">  
-<header class="titlebar">  
- <div class="brand">▦ SHREE ERP <small>BUSINESS MANAGEMENT SYSTEM</small></div>  
- <div class="title-actions"><button class="btn" onclick="go('company')">Company</button><button class="btn" onclick="go('settings')">Settings</button></div>  
-</header>  
-<nav class="menubar">  
- <button data-view="dashboard" onclick="go('dashboard')">Dashboard</button>  
- <button data-view="items" onclick="go('items')">Masters</button>  
- <button data-view="retail" onclick="go('retail')">Retail Billing</button>  
- <button data-view="wholesale" onclick="go('wholesale')">Wholesale Billing</button>  
- <button data-view="receipt" onclick="go('receipt')">Accounts</button>  
- <button data-view="reports" onclick="go('reports')">Final Reports</button>  
- <button data-view="gst" onclick="go('gst')">GST</button>  
- <button data-view="stock" onclick="go('stock')">Stocks</button>  
- <button data-view="daily" onclick="go('daily')">Daily Reports</button>  
- <button data-view="ledger" onclick="go('ledger')">Ledger</button>  
-</nav>  
-<div class="toolbar">  
- <button class="btn primary" onclick="go('retail')">＋ Retail Bill (F4)</button>  
- <button class="btn primary" onclick="go('wholesale')">＋ Wholesale Bill</button>  
- <button class="btn" onclick="go('purchase')">＋ Purchase</button>  
- <button class="btn" onclick="go('items')">Item Master</button>  
- <button class="btn" onclick="go('parties')">Party Master</button>  
- <button class="btn" onclick="go('stock')">Stock / Expiry</button>  
- <button class="btn" onclick="go('ledger')">Ledger</button>  
- <button class="btn" onclick="backup()">⇩ Backup</button>  
-</div>  
-<div class="workspace">  
-<aside class="panel left-panel">  
- <div class="panel-title">☷ Navigation</div>  
- <button class="side-link" data-side="dashboard" onclick="go('dashboard')">⌂ Dashboard</button>  
- <div class="panel-title">MASTERS</div>  
- <button class="side-link" data-side="items" onclick="go('items')">▤ Item Master</button>  
- <button class="side-link" data-side="parties" onclick="go('parties')">♙ Party Master</button>  
- <button class="side-link" data-side="company" onclick="go('company')">▣ Company</button>  
- <div class="panel-title">TRANSACTIONS</div>  
- <button class="side-link" data-side="retail" onclick="go('retail')">₹ Retail Sales</button>  
- <button class="side-link" data-side="wholesale" onclick="go('wholesale')">▦ Wholesale Sales</button>  
- <button class="side-link" data-side="purchase" onclick="go('purchase')">＋ Purchase</button>  
- <button class="side-link" data-side="receipt" onclick="go('receipt')">↓ Receipt</button>  
- <button class="side-link" data-side="payment" onclick="go('payment')">↑ Payment</button>  
- <div class="panel-title">REPORT CENTRE</div>  
- <button class="side-link" data-side="stock" onclick="go('stock')">▤ Stock Summary</button>  
- <button class="side-link" data-side="expiry" onclick="go('expiry')">⌛ Batch / Expiry</button>  
- <button class="side-link" data-side="ledger" onclick="go('ledger')">▥ Party Ledger</button>  
- <button class="side-link" data-side="reports" onclick="go('reports')">▥ Final Reports</button>  
- <button class="side-link" data-side="daily" onclick="go('daily')">▧ Daily Reports</button>  
- <button class="side-link" data-side="gst" onclick="go('gst')">▦ GST Reports</button>  
-</aside>  
-<main class="center" id="main"></main>  
-<aside class="panel right-panel">  
- <div class="panel-title">⚡ Quick Access</div>  
- <div class="right-box"><h3>Transactions</h3>  
- <button class="btn" onclick="go('retail')">New Retail Sale (F4)</button>  
- <button class="btn" onclick="go('wholesale')">New Wholesale Sale</button>  
- <button class="btn" onclick="go('purchase')">New Purchase</button>  
- <button class="btn" onclick="go('receipt')">Receive Payment</button>  
- <button class="btn" onclick="go('payment')">Make Payment</button></div>  
- <div class="right-box"><h3>Masters & Reports</h3>  
- <button class="btn" onclick="go('items')">Item Master</button>  
- <button class="btn" onclick="go('parties')">Party Master</button>  
- <button class="btn" onclick="go('ledger')">Party Ledger</button>  
- <button class="btn" onclick="go('expiry')">Batch / Expiry</button></div>  
- <div class="right-box"><h3>Data Tools</h3>  
- <button class="btn" onclick="backup()">Export Backup</button>  
- <button class="btn" onclick="$('restoreFile').click()">Import Backup</button>  
- <input type="file" id="restoreFile" accept=".json,application/json" hidden onchange="restoreBackup(event)">  
- <p class="muted">Data is saved in this browser.</p></div>  
-</aside>  
-</div>  
-<div class="statusline"><span id="statusCompany">Company: My Business</span><span id="statusText">Ready</span><span id="statusDate"></span><span>F2 Party · F3 Rename · F4 Retail · Esc Home</span></div>  
-</div>  
-<div id="modalRoot"></div>  
-<script>  
-"use strict";  
-const KEY="shree_erp_purple_v2";  
-const $=id=>document.getElementById(id);  
-const esc=v=>String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));  
-const money=n=>"₹"+(Number(n)||0).toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2});  
-const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);  
-const today=()=>{let d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")};  
-const num=v=>Number.isFinite(Number(v))?Number(v):0;  
-const cleanQty=v=>Math.max(0,num(v));  
-const blank=()=>({company:{name:"My Business",address:"",phone:"",gstin:""},items:[],parties:[],bills:[],receipts:[],payments:[],purchases:[],batches:[]});  function normalizeDB(s){
-const d=blank();
-if(s&&typeof s==="object"){d.company={...d.company,...(s.company||{})};["items","parties","bills","receipts","payments","purchases","batches"].forEach(k=>d[k]=Array.isArray(s[k])?s[k]:[])}
-d.items=d.items.filter(x=>x&&typeof x==="object").map(x=>({...x,id:String(x.id||uid()),qty:cleanQty(x.qty)}));
-d.parties=d.parties.filter(Boolean).map(x=>({...x,id:String(x.id||uid())}));
-["bills","receipts","payments","purchases"].forEach(k=>d[k]=d[k].filter(Boolean).map(x=>({...x,id:String(x.id||uid())})));
-d.batches=d.batches.filter(Boolean).map(x=>({...x,id:String(x.id||uid()),itemId:String(x.itemId||""),batch:String(x.batch||"NO BATCH"),expiry:String(x.expiry||""),qty:cleanQty(x.qty),rate:cleanQty(x.rate),mrp:cleanQty(x.mrp)}));
-if(!d.batches.length)d.items.forEach(i=>{if(i.qty>0)d.batches.push({id:uid(),itemId:i.id,batch:"OPENING",expiry:"",qty:i.qty,rate:cleanQty(i.purchaseRate),mrp:cleanQty(i.mrp||i.rate),opening:true})});
-d.items.forEach(i=>{let sum=d.batches.filter(b=>b.itemId===i.id).reduce((s,b)=>s+cleanQty(b.qty),0);if(i.qty>sum+0.000001)d.batches.push({id:uid(),itemId:i.id,batch:"OPENING ADJUSTMENT",expiry:"",qty:i.qty-sum,rate:cleanQty(i.purchaseRate),mrp:cleanQty(i.mrp||i.rate),opening:true});i.qty=d.batches.filter(b=>b.itemId===i.id).reduce((s,b)=>s+cleanQty(b.qty),0)});
-return d;
+<nav class="menu-strip no-print" id="menuStrip">
+ <button onclick="go('dashboard')">Dashboard</button>
+ <button onclick="go('items')">Masters</button>
+ <button onclick="go('retail')">Transactions</button>
+ <button onclick="go('accounts')">Accounts</button>
+ <button onclick="go('reports')">Final Reports</button>
+ <button onclick="go('gst')">GST</button>
+ <button onclick="go('stock')">Stocks</button>
+ <button onclick="go('daily')">Daily Reports</button>
+ <button onclick="go('links')">Links</button>
+ <button onclick="go('settings')">Settings</button>
+</nav>
+
+<div class="app">
+ <aside class="panel left-side">
+  <div class="panel-title">REPORT CENTRE</div>
+  <div class="panel-body">
+   <div class="section-label">Most Viewed</div>
+   <button class="side-link" onclick="go('retail')"><span class="symbol">▤</span>Retail: Bill</button>
+   <button class="side-link" onclick="go('wholesale')"><span class="symbol">▤</span>Wholesale</button>
+   <button class="side-link" onclick="go('gst')"><span class="symbol">▦</span>GSTR 1</button>
+   <button class="side-link" onclick="go('daily')"><span class="symbol">▤</span>Party / Item Wise Sale</button>
+   <button class="side-link" onclick="go('gst')"><span class="symbol">▦</span>GSTR 3B</button>
+   <button class="side-link" onclick="go('accounts')"><span class="symbol">₹</span>Wallet / Receipt</button>
+   <button class="side-link" onclick="go('reports')"><span class="symbol">▥</span>Sale Book</button>
+   <button class="side-link" onclick="go('stock')"><span class="symbol">▧</span>Stock Valuation</button>
+   <div class="section-label">Recently Viewed</div>
+   <button class="side-link" onclick="go('purchases')">Purchase Register</button>
+   <button class="side-link" onclick="go('accounts')">Creditors / Ledgers</button>
+   <button class="side-link" onclick="go('parties')">Party Master</button>
+   <button class="side-link" onclick="go('items')">Item Master</button>
+   <button class="side-link" onclick="go('reports')">Reports</button>
+  </div>
+ </aside>
+
+ <main class="workspace" id="workspace"></main>
+
+ <aside class="panel right-side">
+  <div class="panel-title">QUICK ACCESS</div>
+  <div class="panel-body">
+   <button class="side-link" onclick="go('retail')"><span class="symbol">🧾</span>Bill - Retail (F4)</button>
+   <button class="side-link" onclick="go('wholesale')"><span class="symbol">📦</span>Bill - Wholesale</button>
+   <button class="side-link" onclick="go('purchases')"><span class="symbol">🛒</span>Purchase</button>
+   <button class="side-link" onclick="go('parties')"><span class="symbol">👥</span>Party Master</button>
+   <button class="side-link" onclick="go('items')"><span class="symbol">▦</span>Item Master</button>
+   <button class="side-link" onclick="go('accounts')"><span class="symbol">₹</span>Receipt / Payment</button>
+   <button class="side-link" onclick="go('stock')"><span class="symbol">▧</span>Stock</button>
+   <button class="side-link" onclick="go('reports')"><span class="symbol">▤</span>Reports</button>
+   <div class="section-label">Keyboard Shortcuts</div>
+   <p>F1 – Doctor / Help</p>
+   <p>F2 – Customer / Party</p>
+   <p>F3 – Rename Customer</p>
+   <p>F4 – Retail Bill</p>
+   <p>Enter – Next field / Submit</p>
+   <p>Esc – Back to Dashboard</p>
+  </div>
+ </aside>
+</div>
+
+<footer class="statusbar">
+ <span id="status">Ready</span>
+ <span id="statusRight">SHREE ERP • Local Database</span>
+</footer>
+
+<script>
+"use strict";
+
+/* Keep this key unchanged to preserve the existing SHREE ERP data. */
+const KEY="shree_erp_purple_v2";
+let db,view="dashboard",previousView="dashboard",editItemId=null,editPartyId=null;
+let billLines=[],accountType="receipt",itemReturnDraft=null;
+
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const money=n=>(Number(n)||0).toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2});
+const today=()=>{
+ const d=new Date(),off=d.getTimezoneOffset();
+ return new Date(d.getTime()-off*60000).toISOString().slice(0,10);
+};
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const num=id=>Number($(id)?.value)||0;
+const val=id=>$(id)?.value?.trim()||"";
+const setStatus=t=>{if($("status"))$("status").textContent=t;};
+
+function blank(){
+ return {
+  company:{name:"SHREE BUSINESS",address:"",phone:"",gstin:"",financialYear:"2026-2027"},
+  items:[],parties:[],bills:[],receipts:[],payments:[],purchases:[],expenses:[]
+ };
 }
-function load(){try{let r=localStorage.getItem(KEY);return r?normalizeDB(JSON.parse(r)):blank()}catch(e){return blank()}}
-let db=load(),view="dashboard",editId=null,draftLines=[],ledgerParty="";
-function reconcileItem(id){let i=db.items.find(x=>x.id===id);if(i)i.qty=db.batches.filter(b=>b.itemId===id).reduce((s,b)=>s+cleanQty(b.qty),0)}
-function reconcileAll(){db.items.forEach(i=>reconcileItem(i.id))}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(db));$("statusText").textContent="Saved successfully"}catch(e){$("statusText").textContent="Save failed";alert("Storage-এ জায়গা নেই। আগে Backup নাও।")}updateStatus()}
-function updateStatus(){$("statusCompany").textContent="Company: "+(db.company.name||"My Business");$("statusDate").textContent=new Date().toLocaleDateString("en-IN")}
-function go(v){view=v;editId=null;draftLines=[];document.querySelectorAll("[data-view]").forEach(b=>b.classList.toggle("active",b.dataset.view===v));document.querySelectorAll("[data-side]").forEach(b=>b.classList.toggle("active",b.dataset.side===v));render();window.scrollTo({top:0,behavior:"smooth"})}
-function head(t,s=""){return <div class="view-head"><div><h2>${esc(t)}</h2><div class="muted">${esc(s)}</div></div><button class="btn" onclick="go('dashboard')">⌂ Home</button></div>}
-function stat(l,v){return <div class="stat"><div class="label">${esc(l)}</div><strong>${v}</strong></div>}
-function table(h,r,empty="No records found"){return <div class="table-wrap"><table><thead><tr>${h.map(x=><th>${x}</th>).join("")}</tr></thead><tbody>${r||<tr><td class="empty" colspan="${h.length}">${empty}</td></tr>}</tbody></table></div>}
+function load(){
+ let d;
+ try{d=JSON.parse(localStorage.getItem(KEY)||"null");}catch(e){d=null;}
+ if(!d||typeof d!=="object")d=blank();
+ const base=blank();
+ db={...base,...d,company:{...base.company,...(d.company||{})}};
+ ["items","parties","bills","receipts","payments","purchases","expenses"].forEach(k=>{
+  if(!Array.isArray(db[k]))db[k]=[];
+ });
+ db.items.forEach(x=>{
+  if(x.id==null)x.id=uid();
+  if(x.stock==null)x.stock=0;
+  if(x.rate==null)x.rate=Number(x.saleRate)||0;
+  if(x.purchaseRate==null)x.purchaseRate=0;
+  if(!x.unit)x.unit="PCS";
+ });
+ db.parties.forEach(x=>{if(x.id==null)x.id=uid();});
+}
+function save(){
+ try{localStorage.setItem(KEY,JSON.stringify(db));setStatus("Saved successfully");}
+ catch(e){alert("Storage full or unavailable. Export a backup and try again.");}
+ updateHeader();
+}
+function updateHeader(){
+ $("companyTop").textContent=db.company.name||"SHREE BUSINESS";
+ $("dateTop").textContent=today()+" • FY "+(db.company.financialYear||"2026-2027");
+}
+function go(page){
+ previousView=view;view=page;editItemId=null;editPartyId=null;
+ billLines=[];render();window.scrollTo(0,0);
+}
+function goBack(){go("dashboard");}
+function head(title,subtitle="Business Management"){
+ return `<div class="page-head"><div><h1>${esc(title)}</h1><div class="subtitle">${esc(subtitle)}</div></div><span class="spacer"></span><button class="btn small no-print" onclick="goBack()">← Dashboard (Esc)</button></div>`;
+}
+function panel(title,body){
+ return `<section class="panel"><div class="panel-title">${title}</div><div class="panel-body">${body}</div></section>`;
+}
+function field(label,id,opts={}){
+ const type=opts.type||"text",value=opts.value??"",placeholder=opts.placeholder||"";
+ return `<div class="field"><label for="${id}">${label}</label><input id="${id}" type="${type}" value="${esc(value)}" placeholder="${esc(placeholder)}" ${opts.readonly?"readonly":""} ${opts.required?"required":""} ${opts.step?`step="${opts.step}"`:""} ${opts.min!=null?`min="${opts.min}"`:""}></div>`;
+}
+function selectField(label,id,options,value=""){
+ return `<div class="field"><label for="${id}">${label}</label><select id="${id}">${options.map(o=>`<option value="${esc(o.value)}" ${String(o.value)===String(value)?"selected":""}>${esc(o.label)}</option>`).join("")}</select></div>`;
+}
+function stat(label,value,note){
+ return `<div class="stat"><div class="label">${label}</div><strong>${value}</strong><small>${note}</small></div>`;
+}
+function table(headers,rows,empty="No records found"){
+ return `<div class="table-wrap"><table><thead><tr>${headers.map(h=>`<th>${h}</th>`).join("")}</tr></thead><tbody>${rows.length?rows.join(""):`<tr><td colspan="${headers.length}" class="empty">${empty}</td></tr>`}</tbody></table></div>`;
+}
+function itemName(id){return db.items.find(x=>String(x.id)===String(id))?.name||"Unknown item";}
+function partyName(id){return db.parties.find(x=>String(x.id)===String(id))?.name||"Cash";}
+function moneyTotal(b){return Number(b.total)||0;}
+function allSales(){return db.bills;}
+function totalSales(){return db.bills.reduce((s,b)=>s+moneyTotal(b),0);}
+function totalPurchases(){return db.purchases.reduce((s,b)=>s+moneyTotal(b),0);}
+function currentSales(){return db.bills.filter(b=>b.date===today()).reduce((s,b)=>s+moneyTotal(b),0);}
 function render(){
-updateStatus();let m=$("main");
-if(view==="dashboard")m.innerHTML=dashboard();
-else if(view==="items")m.innerHTML=itemsPage();
-else if(view==="parties")m.innerHTML=partiesPage();
-else if(view==="company")m.innerHTML=companyPage();
-else if(view==="settings")m.innerHTML=settingsPage();
-else if(["retail","wholesale","purchase"].includes(view))m.innerHTML=transactionPage(view);
-else if(["receipt","payment"].includes(view))m.innerHTML=accountPage(view);
-else if(view==="stock")m.innerHTML=stockPage();
-else if(view==="expiry")m.innerHTML=expiryPage();
-else if(view==="ledger")m.innerHTML=ledgerPage();
-else if(["reports","daily","gst","links"].includes(view))m.innerHTML=reportsPage(view);
-else m.innerHTML=dashboard();
+ updateHeader();
+ const w=$("workspace");
+ if(view==="dashboard")w.innerHTML=dashboardPage();
+ else if(view==="items")w.innerHTML=itemsPage();
+ else if(view==="parties")w.innerHTML=partiesPage();
+ else if(["retail","wholesale","purchases"].includes(view))w.innerHTML=billingPage(view);
+ else if(view==="accounts")w.innerHTML=accountsPage();
+ else if(view==="stock")w.innerHTML=stockPage();
+ else if(view==="reports")w.innerHTML=reportsPage();
+ else if(view==="daily")w.innerHTML=dailyPage();
+ else if(view==="gst")w.innerHTML=gstPage();
+ else if(view==="settings")w.innerHTML=settingsPage();
+ else if(view==="links")w.innerHTML=linksPage();
+ else w.innerHTML=dashboardPage();
+ attachLiveHandlers();
 }
-function dashboard(){
-let todaySales=db.bills.filter(b=>b.date===today()).reduce((s,b)=>s+num(b.total),0),sales=db.bills.reduce((s,b)=>s+num(b.total),0),purchases=db.purchases.reduce((s,b)=>s+num(b.total),0),stock=db.items.reduce((s,i)=>s+num(i.qty),0);
-let recent=[...db.bills.map(x=>({...x,kind:x.kind==="wholesale"?"Wholesale":"Retail"})),...db.purchases.map(x=>({...x,kind:"Purchase"}))].sort((a,b)=>(b.createdAt||"").localeCompare(a.createdAt||"")).slice(0,8);
-return ${head("Business Dashboard","SHREE ERP · Desktop Edition")}<div class="banner"><h2>Welcome to SHREE ERP</h2><p>Business Management System<br>Masters · Retail Billing · Wholesale Billing · Batch Stock · Accounts · Reports</p></div><div class="stats">${stat("Today's Sales",money(todaySales))}${stat("Total Sales",money(sales))}${stat("Total Purchase",money(purchases))}${stat("Items / Stock",db.items.length+" / "+stock)}</div><div class="card"><h3>Quick Transactions</h3><div class="quickgrid"><button class="btn primary" onclick="go('retail')">Retail Bill (F4)</button><button class="btn primary" onclick="go('wholesale')">Wholesale Bill</button><button class="btn" onclick="go('purchase')">Purchase Entry</button><button class="btn" onclick="go('receipt')">Receipt Entry</button><button class="btn" onclick="go('payment')">Payment Entry</button><button class="btn" onclick="go('items')">Item Master</button><button class="btn" onclick="go('parties')">Party Master (F2)</button><button class="btn" onclick="go('stock')">Stock Summary</button><button class="btn" onclick="go('ledger')">Party Ledger</button><button class="btn" onclick="go('expiry')">Expiry Alerts</button><button class="btn" onclick="go('reports')">Final Reports</button><button class="btn" onclick="backup()">Backup</button></div></div><div class="card"><h3>Recent Transactions</h3>${table(["Date","Type","Voucher No.","Party","Amount"],recent.map(x=><tr><td>${esc(x.date)}</td><td>${esc(x.kind)}</td><td>${esc(x.no)}</td><td>${esc(x.party)}</td><td>${money(x.total)}</td></tr>).join(""),"No transactions yet")}</div><div class="notice">Keyboard: F2 Party · F3 Rename Party · F4 Retail Billing · Esc Dashboard · Enter Next Field</div>;
+function dashboardPage(){
+ const billsToday=db.bills.filter(b=>b.date===today());
+ const countToday=billsToday.length;
+ const parties=db.parties.length;
+ return `${head("Dashboard","SHREE ERP Business Overview")}
+ <div class="banner"><div><h2>SHREE ERP BUSINESS</h2><p>Smart Business Management • Billing • Stock • Accounts</p></div><div class="fy"><span>FINANCIAL YEAR</span><strong>${esc(db.company.financialYear||"2026-2027")}</strong></div></div>
+ <div class="stats">
+ ${stat("Today's Sales","₹"+money(currentSales()),"Sales total today")}
+ ${stat("Bills Created",countToday,"Today's bills")}
+ ${stat("Stock Items",db.items.length,"Items in master")}
+ ${stat("Parties",parties,"Customers and suppliers")}
+ </div>
+ ${panel("QUICK TRANSACTIONS",`<div class="quick-grid">
+ <button class="quick" onclick="go('retail')"><span>🧾</span>Bill - Retail</button>
+ <button class="quick" onclick="go('wholesale')"><span>📦</span>Bill - Wholesale</button>
+ <button class="quick" onclick="go('accounts')"><span>₹</span>Receipt</button>
+ <button class="quick" onclick="openPayment()"><span>💳</span>Payment</button>
+ <button class="quick" onclick="go('purchases')"><span>🛒</span>Purchase</button>
+ <button class="quick" onclick="go('parties')"><span>👥</span>Party Master</button>
+ <button class="quick" onclick="go('items')"><span>▦</span>Item Master</button>
+ <button class="quick" onclick="go('reports')"><span>▤</span>Reports</button>
+ </div>`)}
+ <div class="grid-two">
+ ${panel("RECENT SALES",table(["Date","Bill No","Party","Type","Amount"],db.bills.slice().reverse().slice(0,6).map(b=>`<tr><td>${esc(b.date)}</td><td>${esc(b.billNo)}</td><td>${esc(b.partyName||partyName(b.partyId))}</td><td>${esc(b.kind||"Retail")}</td><td class="num">₹${money(b.total)}</td></tr>`)))}
+ ${panel("LOW STOCK ALERT",table(["Item","Stock","Unit"],db.items.filter(i=>Number(i.stock)<=5).slice(0,8).map(i=>`<tr><td>${esc(i.name)}</td><td>${esc(i.stock)}</td><td>${esc(i.unit)}</td></tr>`),"No low stock items"))}
+ </div>
+ <div class="footer-note">Keyboard: F1 Doctor/Help • F2 Customer • F3 Rename • F4 Retail Bill • Esc Dashboard</div>`;
 }
 
-/* ITEM MASTER */
 function itemsPage(){
-let q=($("itemSearch")?.value||"").toLowerCase(),list=db.items.filter(x=>[x.name,x.code,x.barcode,x.company,x.type].some(v=>String(v||"").toLowerCase().includes(q)));
-let rows=list.map(x=><tr><td>${esc(x.code||"")}</td><td>${esc(x.barcode||"")}</td><td>${esc(x.name)}</td><td>${esc(x.type||"Others")}</td><td>${esc(x.company||"")}</td><td>${esc(x.unit||"PCS")}</td><td>${money(x.rate)}</td><td>${cleanQty(x.qty)}</td><td><button class="btn" onclick="editItem('${esc(x.id)}')">Edit</button> <button class="btn danger" onclick="deleteRecord('items','${esc(x.id)}')">Del</button></td></tr>).join("");
-return ${head("Item Master","Product / Inventory / Barcode Master")}<div class="card"><h3>Add / Edit Item</h3><form onsubmit="saveItem(event)"><input type="hidden" id="itemId"><div class="formgrid"><div class="field"><label>Item Code</label><input id="iCode"></div><div class="field"><label>Barcode</label><input id="iBarcode"></div><div class="field"><label>Item Name *</label><input id="iName" required></div><div class="field"><label>Type</label><select id="iType"><option>Others</option><option>Medicine</option><option>Syrup</option><option>Tablet</option><option>Capsule</option><option>Food</option><option>General</option></select></div><div class="field"><label>Company / Brand</label><input id="iCompany"></div><div class="field"><label>Unit / Pack</label><input id="iUnit" value="PCS"></div><div class="field"><label>Sale Rate ₹</label><input id="iRate" type="number" min="0" step=".01" value="0"></div><div class="field"><label>Current Stock</label><input id="iQty" type="number" min="0" step=".01" value="0"></div><div class="field"><label>Purchase Rate ₹</label><input id="iPurchaseRate" type="number" min="0" step=".01" value="0"></div><div class="field"><label>Default MRP ₹</label><input id="iMrp" type="number" min="0" step=".01" value="0"></div></div><div class="form-actions"><button class="btn primary">Save Item</button><button class="btn" type="button" onclick="resetItemForm()">Clear</button></div></form></div><div class="card"><div class="view-head"><h3>Item List (${list.length})</h3><input id="itemSearch" class="searchbox" style="max-width:260px" placeholder="Search item / code / barcode" value="${esc(q)}" oninput="refreshItems()"></div>${table(["Code","Barcode","Item","Type","Company","Unit","Rate","Stock","Action"],rows)}</div>;
+ const rows=db.items.map(i=>`<tr><td>${esc(i.code||"")}</td><td>${esc(i.name)}</td><td>${esc(i.company||"")}</td><td>${esc(i.unit||"PCS")}</td><td class="num">${money(i.rate)}</td><td class="num">${money(i.purchaseRate)}</td><td class="num">${Number(i.stock)||0}</td><td><button class="btn small" onclick="editItem('${i.id}')">Edit</button> <button class="btn small danger" onclick="deleteItem('${i.id}')">Delete</button></td></tr>`);
+ const item=db.items.find(i=>String(i.id)===String(editItemId))||{};
+ return `${head("Item Master","Masters / Item & Stock")}
+ ${panel(editItemId?"EDIT ITEM":"ADD NEW ITEM",`<form id="itemForm" onsubmit="saveItem(event)">
+ <div class="form-grid">
+ ${field("Item Code","iCode",{value:item.code||""})}
+ ${field("Item Name *","iName",{value:item.name||"",required:true})}
+ ${field("Company / Brand","iCompany",{value:item.company||""})}
+ ${selectField("Type","iType",[{value:"Goods",label:"Goods"},{value:"Service",label:"Service"}],item.type||"Goods")}
+ ${field("Unit / Pack","iUnit",{value:item.unit||"PCS"})}
+ ${field("Sale Rate","iRate",{type:"number",step:"0.01",min:0,value:item.rate??item.saleRate??0})}
+ ${field("Purchase Rate","iPurchase",{type:"number",step:"0.01",min:0,value:item.purchaseRate||0})}
+ ${field("Opening / Current Stock","iStock",{type:"number",step:"0.001",value:item.stock||0})}
+ </div><div class="btn-row"><button class="btn primary" type="submit">${editItemId?"Update Item":"Save Item"}</button><button class="btn" type="button" onclick="cancelItemEdit()">Clear</button></div>
+ </form>`)}
+ ${panel("ITEM REGISTER",`<input class="search" id="itemSearch" placeholder="Search code, item or company..." oninput="filterTable('itemSearch','itemTable')">
+ <div id="itemTable">${table(["Code","Item Name","Company","Unit","Sale Rate","Purchase Rate","Stock","Action"],rows)}</div>`)}
+ `;
 }
-function refreshItems(){let v=$("itemSearch").value,p=$("itemSearch").selectionStart;render();$("itemSearch").value=v;$("itemSearch").focus();try{$("itemSearch").setSelectionRange(p,p)}catch(e){}}
 function saveItem(e){
-e.preventDefault();let id=$("itemId").value||uid(),old=db.items.find(x=>x.id===id),qty=cleanQty($("iQty").value);
-let x={...(old||{}),id,code:$("iCode").value.trim(),barcode:$("iBarcode").value.trim(),name:$("iName").value.trim(),type:$("iType").value,company:$("iCompany").value.trim(),unit:$("iUnit").value.trim()||"PCS",rate:cleanQty($("iRate").value),qty,purchaseRate:cleanQty($("iPurchaseRate").value),mrp:cleanQty($("iMrp").value)};
-if(!x.name)return alert("Item name লিখো।");if(x.barcode&&db.items.some(a=>a.id!==id&&String(a.barcode||"")===x.barcode))return alert("Barcode ইতিমধ্যে ব্যবহৃত হয়েছে।");
-if(old){let diff=qty-cleanQty(old.qty),plan=[],left=Math.max(0,-diff);if(left>0){let batches=db.batches.filter(z=>z.itemId===id).slice().sort((a,b)=>Number(!!b.opening)-Number(!!a.opening));for(let b of batches){let take=Math.min(left,cleanQty(b.qty));if(take>0)plan.push({id:b.id,take});left-=take;if(left<=0)break}if(left>0.000001)return alert("Stock adjustment সম্ভব হয়নি। বর্তমান Batch stock পরীক্ষা করো।")}
-if(diff>0){let b=db.batches.find(z=>z.itemId===id&&z.opening);if(!b){b={id:uid(),itemId:id,batch:"OPENING ADJUSTMENT",expiry:"",qty:0,rate:x.purchaseRate,mrp:x.mrp,opening:true};db.batches.push(b)}b.qty=cleanQty(b.qty)+diff}else if(diff<0)plan.forEach(p=>{let b=db.batches.find(z=>z.id===p.id);if(b)b.qty=cleanQty(b.qty-p.take)});
-db.items=db.items.map(a=>a.id===id?x:a)}else{db.items.push(x);if(qty>0)db.batches.push({id:uid(),itemId:id,batch:"OPENING",expiry:"",qty,rate:x.purchaseRate,mrp:x.mrp,opening:true})}
-reconcileItem(id);save();render();alert("Item saved.");
+ e.preventDefault();const name=val("iName");if(!name)return alert("Enter item name");
+ const obj={id:editItemId||uid(),code:val("iCode"),name,company:val("iCompany"),type:val("iType"),unit:val("iUnit")||"PCS",rate:num("iRate"),purchaseRate:num("iPurchase"),stock:num("iStock")};
+ if(editItemId){const ix=db.items.findIndex(i=>String(i.id)===String(editItemId));if(ix>=0)db.items[ix]={...db.items[ix],...obj};}
+ else db.items.push(obj);
+ save();editItemId=null;render();setStatus("Item saved");
 }
-function editItem(id){let x=db.items.find(a=>a.id===id);if(!x)return;render();$("itemId").value=x.id;$("iCode").value=x.code||"";$("iBarcode").value=x.barcode||"";$("iName").value=x.name||"";$("iType").value=x.type||"Others";$("iCompany").value=x.company||"";$("iUnit").value=x.unit||"PCS";$("iRate").value=x.rate||0;$("iQty").value=x.qty||0;$("iPurchaseRate").value=x.purchaseRate||0;$("iMrp").value=x.mrp||x.rate||0;$("iName").focus()}
-function resetItemForm(){render()}
+function editItem(id){editItemId=id;view="items";render();}
+function cancelItemEdit(){editItemId=null;render();}
+function deleteItem(id){
+ const i=db.items.find(x=>String(x.id)===String(id));if(!i)return;
+ if(!confirm("Delete item "+i.name+"?"))return;
+ db.items=db.items.filter(x=>String(x.id)!==String(id));save();render();
+}
+function filterTable(inputId,tableId){
+ const q=($(inputId)?.value||"").toLowerCase();
+ const t=$(tableId);if(!t)return;
+ t.querySelectorAll("tbody tr").forEach(r=>r.style.display=r.textContent.toLowerCase().includes(q)?"":"none");
+}
 
-/* PARTY MASTER */
 function partiesPage(){
-let rows=db.parties.map(x=><tr><td>${esc(x.name)}</td><td>${esc(x.type||"Customer")}</td><td>${esc(x.phone||"")}</td><td>${esc(x.address||"")}</td><td>${esc(x.gstin||"")}</td><td>${esc(x.dlNo||"")}</td><td>${money(x.balance)}</td><td><button class="btn" onclick="editParty('${esc(x.id)}')">Edit</button> <button class="btn" onclick="openLedger('${esc(x.id)}')">Ledger</button> <button class="btn danger" onclick="deleteRecord('parties','${esc(x.id)}')">Del</button></td></tr>).join("");
-return ${head("Party Master","Customer / Supplier Account")}<div class="card"><h3>Add / Edit Party</h3><form onsubmit="saveParty(event)"><input type="hidden" id="pId"><div class="formgrid"><div class="field"><label>Party Name *</label><input id="pName" required></div><div class="field"><label>Party Type</label><select id="pType"><option>Customer</option><option>Supplier</option><option>Both</option></select></div><div class="field"><label>Mobile</label><input id="pPhone"></div><div class="field"><label>Address</label><input id="pAddress"></div><div class="field"><label>GSTIN</label><input id="pGstin"></div><div class="field"><label>DL No.</label><input id="pDl"></div><div class="field"><label>Opening Balance ₹</label><input id="pBalance" type="number" step=".01" value="0"></div></div><div class="form-actions"><button class="btn primary">Save Party</button><button class="btn" type="button" onclick="clearPartyForm()">Clear</button></div></form></div><div class="card"><h3>Party List (${db.parties.length})</h3>${table(["Name","Type","Phone","Address","GSTIN","DL No.","Balance","Action"],rows)}</div>;
+ const p=db.parties.find(x=>String(x.id)===String(editPartyId))||{};
+ const rows=db.parties.map(x=>`<tr><td>${esc(x.name)}</td><td>${esc(x.type||"Customer")}</td><td>${esc(x.phone||x.mobile||"")}</td><td>${esc(x.address||"")}</td><td>${esc(x.gstin||"")}</td><td class="num">₹${money(x.balance||x.openingBalance||0)}</td><td><button class="btn small" onclick="editParty('${x.id}')">Edit</button> <button class="btn small danger" onclick="deleteParty('${x.id}')">Delete</button></td></tr>`);
+ return `${head("Party Master","Masters / Customer / Supplier")}
+ ${panel(editPartyId?"EDIT PARTY":"ADD PARTY",`<form onsubmit="saveParty(event)">
+ <div class="form-grid">
+ ${field("Party Name *","pName",{value:p.name||"",required:true})}
+ ${selectField("Party Type","pType",[{value:"Customer",label:"Customer"},{value:"Supplier",label:"Supplier"},{value:"Both",label:"Both"}],p.type||"Customer")}
+ ${field("Mobile","pPhone",{value:p.phone||p.mobile||""})}
+ ${field("Address","pAddress",{value:p.address||""})}
+ ${field("GSTIN","pGSTIN",{value:p.gstin||""})}
+ ${field("Drug Licence / DL No.","pDL",{value:p.dlNo||p.dl||""})}
+ ${field("Opening Balance","pBalance",{type:"number",step:"0.01",value:p.balance??p.openingBalance??0})}
+ </div><div class="btn-row"><button class="btn primary" type="submit">${editPartyId?"Update Party":"Save Party"}</button><button class="btn" type="button" onclick="cancelPartyEdit()">Clear</button></div></form>`)}
+ ${panel("PARTY REGISTER",`<input class="search" id="partySearch" placeholder="Search party, mobile or GSTIN..." oninput="filterTable('partySearch','partyTable')"><div id="partyTable">${table(["Party Name","Type","Mobile","Address","GSTIN","Balance","Action"],rows)}</div>`)}
+ `;
 }
-function saveParty(e){e.preventDefault();let id=$("pId").value||uid(),old=db.parties.find(x=>x.id===id),name=$("pName").value.trim();if(!name)return alert("Party name লিখো।");if(db.parties.some(x=>x.id!==id&&x.name.toLowerCase()===name.toLowerCase()))return alert("এই Party আগে আছে।");let x={...(old||{}),id,name,type:$("pType").value,phone:$("pPhone").value.trim(),address:$("pAddress").value.trim(),gstin:$("pGstin").value.trim(),dlNo:$("pDl").value.trim(),balance:num($("pBalance").value)};if(old)db.parties=db.parties.map(p=>p.id===id?x:p);else db.parties.push(x);save();render()}
-function clearPartyForm(){render()}
-function editParty(id){let x=db.parties.find(p=>p.id===id);if(!x)return;render();$("pId").value=x.id;$("pName").value=x.name||"";$("pType").value=x.type||"Customer";$("pPhone").value=x.phone||"";$("pAddress").value=x.address||"";$("pGstin").value=x.gstin||"";$("pDl").value=x.dlNo||"";$("pBalance").value=x.balance||0;$("pName").focus()}
-function companyPage(){return ${head("Company Information","Business Profile")}<div class="card"><form onsubmit="saveCompany(event)"><div class="formgrid"><div class="field"><label>Company Name *</label><input id="cName" required value="${esc(db.company.name||"")}"></div><div class="field"><label>Phone</label><input id="cPhone" value="${esc(db.company.phone||"")}"></div><div class="field"><label>GSTIN</label><input id="cGstin" value="${esc(db.company.gstin||"")}"></div><div class="field" style="grid-column:1/-1"><label>Address</label><textarea id="cAddress">${esc(db.company.address||"")}</textarea></div></div><div class="form-actions"><button class="btn primary">Save Company</button></div></form></div>}
-function saveCompany(e){e.preventDefault();db.company={...db.company,name:$("cName").value.trim(),phone:$("cPhone").value.trim(),gstin:$("cGstin").value.trim(),address:$("cAddress").value.trim()};save();render();alert("Company saved")}
-function settingsPage(){return ${head("Settings & Data Tools","Browser storage / Backup")}<div class="card"><h3>Backup & Restore</h3><p>নিয়মিত JSON backup রাখো।</p><div class="form-actions"><button class="btn primary" onclick="backup()">Export JSON Backup</button><button class="btn" onclick="$('restoreFile').click()">Import Backup</button></div></div><div class="card"><h3>Data Status</h3><p>Storage key: <b>${KEY}</b></p><p>Items ${db.items.length} · Parties ${db.parties.length} · Sales ${db.bills.length} · Purchases ${db.purchases.length} · Batches ${db.batches.length}</p></div><div class="card"><h3>Keyboard Shortcuts</h3><p>F2 Party · F3 Rename Party · F4 Retail · Esc Home · Enter Next Field</p></div><div class="card"><h3>Danger Zone</h3><button class="btn danger" onclick="clearData()">Clear All ERP Data</button></div>}
-
-/* MARG-INSPIRED SALE ENTRY / TRANSACTIONS */
-function transactionPage(kind){
-const purchase=kind==="purchase",retail=kind==="retail",key=purchase?"purchases":"bills";
-const title=purchase?"Purchase Entry":retail?"Retail Sale Entry":"Wholesale Sale Entry";
-const allowed=purchase?["Supplier","Both"]:["Customer","Both"];
-const opts=db.parties.filter(p=>allowed.includes(p.type)).map(p=><option value="${esc(p.name)}">${esc(p.name)}</option>).join("");
-const records=db[key].slice().reverse().map(x=><tr><td>${esc(x.date)}</td><td>${esc(x.no)}</td><td>${esc(x.party)}</td><td>${money(x.total)}</td><td><button class="btn" onclick="printVoucher('${key}','${esc(x.id)}')">Print</button> <button class="btn danger" onclick="deleteRecord('${key}','${esc(x.id)}')">Del</button></td></tr>).join("");
-return `${head(title,"MARG-style Sale Entry · F1 Doctor · F2 Party · F3 Rename · Enter Next Field")}
-
- <div class="sale-window">  
-  <div class="sale-title"><strong>${retail?"SALE ENTRY — RETAIL":purchase?"PURCHASE ENTRY":"SALE ENTRY — WHOLESALE"}</strong><span>SHREE ERP · ${retail?"Retail Counter":purchase?"Purchase / Stock In":"Wholesale / Distributor"}</span></div>  
-  <div class="sale-strip"><span>${retail?"Retail Sale":purchase?"Purchase Entry":"Wholesale Sale"}</span><span>F1 Doctor</span><span>F2 Party</span><span>F3 Rename</span><span>Esc Home</span></div>  
-  <form id="transactionForm" onsubmit="saveTransaction(event,'${kind}')">  
-   <div class="sale-section-title">Voucher & Party Details</div>  
-   <div class="sale-details"><div class="formgrid">  
-    <div class="field"><label>Bill / Voucher No. *</label><input id="tNo" required value="${purchase?"PUR":retail?"RS":"WS"}-${Date.now().toString().slice(-6)}"></div>  
-    <div class="field"><label>Date *</label><input id="tDate" type="date" value="${today()}" required></div>  
-    <div class="field"><label>${purchase?"Supplier Name (F2)":"Customer / Patient (F2)"}</label><div style="display:flex;gap:4px"><select id="tParty" onchange="showPartyInfo()" style="flex:1;min-width:0"><option value="">Cash / Walk-in</option>${opts}</select><button class="btn small" type="button" title="Select or add party (F2)" onclick="openPartyPicker()">F2</button></div></div>  
-    ${retail?`<div class="field"><label>Doctor (F1)</label><input id="tDoctor" placeholder="Doctor name"></div><div class="field"><label>Reg. No.</label><input id="tReg" placeholder="Registration number"></div>`:""}  
-    <div class="field"><label>Address</label><input id="tAddress" placeholder="Party address"></div>  
-    <div class="field"><label>Mobile</label><input id="tMobile" placeholder="Mobile number"></div>  
-    ${retail?`<div class="field"><label>Patient / Customer ID</label><input id="tPatientId" placeholder="Patient ID (optional)"></div>`:`<div class="field"><label>GSTIN</label><input id="tGstin" placeholder="GST number"></div>`}  
-   </div></div>  
-   <div class="sale-section-title">${retail?"Retail Item / Batch Entry":purchase?"Purchase Item / Batch Entry":"Wholesale Item / Batch Entry"}</div>  
-   <div class="sale-entry-grid"><div class="bill-grid">  
-    <div class="field"><label>Product / Barcode *</label><input id="lineSearch" list="itemHints" placeholder="Type / scan item" autocomplete="off" oninput="searchBillItem()" onchange="searchBillItem()"><datalist id="itemHints">${db.items.map(i=>`<option value="${esc(i.barcode||i.code||i.name)}"></option>`).join("")}</datalist><input id="lineItem" type="hidden"></div>  
-    <div class="field"><label>Pack / Unit</label><input id="linePack" placeholder="PCS / STRIP"></div>  
-    <div class="field"><label>Batch No.</label><input id="lineBatch" list="batchHints" placeholder="Batch number" onchange="selectBillBatch()" oninput="selectBillBatch()"><datalist id="batchHints"></datalist></div>  
-    <div class="field"><label>Expiry Month</label><input id="lineExpiry" type="month"></div>  
-    <div class="field"><label>Qty</label><input id="lineQty" type="number" min=".01" step=".01" value="1" oninput="calcLinePreview()"></div>  
-    ${!retail?`<div class="field"><label>Free Qty</label><input id="lineFree" type="number" min="0" step=".01" value="0" oninput="calcLinePreview()"></div>`:""}  
-    <div class="field"><label>Rate ₹</label><input id="lineRate" type="number" min="0" step=".01" value="0" oninput="calcLinePreview()"></div>  
-    ${retail?`<div class="field"><label>MRP ₹</label><input id="lineMrp" type="number" min="0" step=".01" value="0" oninput="calcLinePreview()"></div><div class="field"><label>M.B.P. ₹</label><input id="lineMbp" type="number" min="0" step=".01" value="0"></div>`:`<div class="field"><label>${purchase?"Purchase Discount %":"Distributor Discount %"}</label><input id="lineDist" type="number" min="0" max="100" step=".01" value="0" oninput="calcLinePreview()"></div>`}  
-    <div class="field"><label>Line Discount ₹</label><input id="lineDiscount" type="number" min="0" step=".01" value="0" oninput="calcLinePreview()"></div>  
-    <div class="field"><label>GST %</label><input id="lineGst" type="number" min="0" max="100" step=".01" value="0" oninput="calcLinePreview()"></div>  
-    <div class="field"><label>Available Stock</label><input id="lineStock" readonly value="—"></div>  
-    <div class="field"><label>Amount (incl. GST)</label><input id="linePreview" readonly value="₹0.00"></div>  
-   </div></div>  
-   <div class="sale-actions"><button class="btn primary" type="button" onclick="addBillLine('${kind}')">＋ Add Item (Enter)</button><button class="btn" type="button" onclick="clearLineForm()">Clear Item</button><button class="btn" type="button" onclick="openPartyPicker()">F2 Select Party</button><button class="btn" type="button" onclick="renameCustomer()">F3 Rename Party</button></div>  
-   <div class="sale-section-title">Bill Item Register</div>  
-   <div class="sale-register"><div id="draftLineTable">${renderDraftLines()}</div></div>  
-   <div class="sale-details"><div class="formgrid">  
-    <div class="field"><label>Bill Discount ₹</label><input id="tBillDiscount" type="number" min="0" step=".01" value="0" oninput="updateBillTotal()"></div>  
-    <div class="field"><label>Round Off ₹</label><input id="tRound" type="number" step=".01" value="0" oninput="updateBillTotal()"></div>  
-    <div class="field"><label>Challan No.</label><input id="tNote" placeholder="Challan / notes"></div>  
-    ${retail?`<div class="field"><label>Registration / Reference</label><input id="tReference" placeholder="Optional reference"></div>`:""}  
-   </div></div>  
-   <div class="sale-totals">  
-    <div class="sale-info"><b>Entry Summary</b><br><span id="saleSummary">পণ্য যোগ করলে এখানে bill summary দেখা যাবে।</span><br><span class="muted">Save করার আগে party, item, batch ও quantity যাচাই করো।</span></div>  
-    <div class="sale-total-panel"><div>Taxable Subtotal: <span id="tSubtotal">${money(0)}</span></div><div>GST Total: <span id="tGstTotal">${money(0)}</span></div><div>Bill Discount: <span id="tDiscountShow">${money(0)}</span></div><div>Round Off: <span id="tRoundShow">${money(0)}</span></div><div class="net">Net Total: <span id="tTotal">${money(0)}</span></div></div>  
-   </div>  
-   <div class="sale-actions"><button class="btn primary" type="submit">Save Voucher</button><button class="btn" type="button" onclick="go('${kind}')">Clear / New Bill</button><button class="btn" type="button" onclick="backup()">Backup</button><button class="btn" type="button" onclick="window.print()">Print Screen</button></div>  
-  </form>  
- </div>  
- <div class="sale-shortcuts"><b>Keyboard:</b> F1 Doctor · F2 Select/Add Party · F3 Rename Party · F4 Retail Bill · Enter Next Field · Esc Dashboard. Batch stock is checked before saving sales.</div>  
- <div class="card"><div class="view-head"><h3>Voucher Register (${db[key].length})</h3><span class="muted">${purchase?"Purchase history":retail?"Retail sales history":"Wholesale sales history"}</span></div>${table(["Date","Voucher","Party","Total","Action"],records)}</div>`;  
-}  /* Item search: exact match first; partial match only when unique. /
-function searchBillItem(){
-let el=$("lineSearch"),raw=el?.value.trim().toLowerCase();if(!raw){if($("lineItem"))$("lineItem").value="";return}
-let fields=i=>[i.name,i.code,i.barcode,i.id].map(v=>String(v||"").toLowerCase()).filter(Boolean);
-let exact=db.items.filter(i=>fields(i).some(v=>v===raw));
-let matches=exact.length?exact:db.items.filter(i=>fields(i).some(v=>v.startsWith(raw)));
-if(!matches.length)matches=db.items.filter(i=>fields(i).some(v=>v.includes(raw)));
-if(matches.length!==1){$("lineItem").value="";return}
-$("lineItem").value=matches[0].id;fillLineRate();
+function saveParty(e){
+ e.preventDefault();const name=val("pName");if(!name)return alert("Enter party name");
+ const obj={id:editPartyId||uid(),name,type:val("pType"),phone:val("pPhone"),mobile:val("pPhone"),address:val("pAddress"),gstin:val("pGSTIN"),dlNo:val("pDL"),balance:num("pBalance"),openingBalance:num("pBalance")};
+ if(editPartyId){const ix=db.parties.findIndex(p=>String(p.id)===String(editPartyId));if(ix>=0)db.parties[ix]={...db.parties[ix],...obj};}
+ else db.parties.push(obj);
+ save();editPartyId=null;render();
 }
-function currentItem(){return db.items.find(i=>i.id===$("lineItem")?.value)}
-function itemBatches(id){return db.batches.filter(b=>b.itemId===id&&cleanQty(b.qty)>0).sort((a,b)=>String(a.expiry||"9999-12").localeCompare(String(b.expiry||"9999-12")))}
-function fillLineRate(){
-let i=currentItem();if(!i)return;
-$("lineSearch").value=i.barcode||i.code||i.name;$("linePack").value=i.unit||"PCS";
-$("lineRate").value=view==="purchase"?(i.purchaseRate||i.rate||0):(i.rate||0);
-if($("lineMrp"))$("lineMrp").value=i.mrp||i.rate||0;
-let bs=itemBatches(i.id);$("batchHints").innerHTML=bs.map(b=><option value="${esc(b.batch)}"></option>).join("");
-let typed=$("lineBatch").value.trim(),b=bs.find(x=>x.batch.toLowerCase()===typed.toLowerCase())||bs[0];
-if(b){$("lineBatch").value=b.batch||"";$("lineExpiry").value=b.expiry||"";$("lineStock").value=cleanQty(b.qty)}
-else{$("lineBatch").value="";$("lineExpiry").value="";$("lineStock").value=view==="purchase"?cleanQty(i.qty):0}
-calcLinePreview();
-}
-function selectBillBatch(){
-let i=currentItem();if(!i)return;let typed=$("lineBatch").value.trim();
-let b=itemBatches(i.id).find(x=>String(x.batch).toLowerCase()===typed.toLowerCase());
-if(b){$("lineExpiry").value=b.expiry||"";$("lineStock").value=cleanQty(b.qty)}else $("lineStock").value=view==="purchase"?"New batch":0;
-calcLinePreview();
-}
-function calcLinePreview(){
-if(!$("lineQty"))return;
-let q=cleanQty($("lineQty").value),r=cleanQty($("lineRate").value),d=Math.min(100,cleanQty($("lineDist")?.value)),disc=cleanQty($("lineDiscount").value),g=Math.min(100,cleanQty($("lineGst").value));
-let gross=qr*(1-d/100),base=Math.max(0,gross-disc),tax=baseg/100;$("linePreview").value=money(base+tax);
-}
-function clearLineForm(){
-["lineItem","lineSearch","linePack","lineBatch","lineExpiry","lineFree","lineRate","lineMrp","lineMbp","lineDist","lineDiscount","lineGst"].forEach(id=>{if($(id))$(id).value=["lineFree","lineRate","lineMrp","lineMbp","lineDist","lineDiscount","lineGst"].includes(id)?"0":""});
-$("lineQty").value="1";$("lineStock").value="—";$("linePreview").value=money(0);$("lineSearch").focus();
-}
-function addBillLine(kind){
-let i=currentItem();if(!i)return alert("Item-এর নাম, Code বা Barcode থেকে সঠিক পণ্য নির্বাচন করো।");
-let q=num($("lineQty").value),free=num($("lineFree")?.value),r=num($("lineRate").value),dist=num($("lineDist")?.value),disc=num($("lineDiscount").value),gst=num($("lineGst").value);
-if(q<=0||r<0||free<0||dist<0||dist>100||disc<0||gst<0||gst>100)return alert("Qty, Rate, Discount বা GST পরীক্ষা করো।");
-let gross=qr*(1-dist/100);if(disc>gross+0.000001)return alert("Line discount, line-এর gross amount-এর চেয়ে বেশি হতে পারবে না।");
-let batch=null,typed=$("lineBatch").value.trim(),expiry=$("lineExpiry").value;
-if(kind!=="purchase"){
-let bs=itemBatches(i.id);batch=typed?bs.find(b=>String(b.batch).toLowerCase()===typed.toLowerCase()):bs[0];
-if(!batch)return alert("এই পণ্যের available batch নেই। Purchase Entry-তে stock যোগ করো।");
-if(batch.expiry&&daysToExpiry(batch.expiry)<0)return alert("মেয়াদোত্তীর্ণ Batch বিক্রি করা যাবে না।");
-if(expiry&&batch.expiry&&expiry!==batch.expiry)return alert("Batch-এর expiry date মিলছে না।");
-let already=draftLines.filter(l=>l.batchId===batch.id).reduce((s,l)=>s+l.qty+l.free,0);
-if(cleanQty(batch.qty)<already+q+(kind==="retail"?0:free))return alert("Batch stock পর্যাপ্ত নেই। Available: "+cleanQty(batch.qty));
-expiry=batch.expiry||expiry;
-}else if(!typed)return alert("Purchase-এর জন্য Batch লিখো। না থাকলে NO BATCH লিখতে পারো।");
-let base=Math.max(0,gross-disc),tax=basegst/100;
-draftLines.push({id:uid(),itemId:i.id,item:i.name,pack:$("linePack").value.trim()||i.unit||"PCS",batchId:batch?.id||"",batch:typed||(batch?.batch)||"NO BATCH",expiry,qty:q,free:kind==="retail"?0:free,rate:r,dist,discount:disc,gst,tax,mrp:num($("lineMrp")?.value)||i.mrp||i.rate||0,mbp:num($("lineMbp")?.value),amount:base+tax});
-renderDraftLinesIntoPage();clearLineForm();updateBillTotal();
-}
-function renderDraftLines(){
-if(!draftLines.length)return <div class="empty">উপরের Item Entry থেকে পণ্য যোগ করো।</div>;
-return <div class="sale-grid-wrap"><table><thead><tr>${["#","Product","Pack","Batch","Expiry","Qty","Free","Rate","Dist %","Discount","GST","Amount","Action"].map(x=><th>${x}</th>).join("")}</tr></thead><tbody>${draftLines.map((x,n)=><tr><td>${n+1}</td><td>${esc(x.item)}</td><td>${esc(x.pack)}</td><td>${esc(x.batch||"—")}</td><td>${esc(x.expiry||"—")}</td><td>${x.qty}</td><td>${x.free}</td><td>${money(x.rate)}</td><td>${x.dist||0}%</td><td>${money(x.discount)}</td><td>${x.gst}%</td><td><b>${money(x.amount)}</b></td><td><button class="btn danger small" type="button" onclick="removeBillLine('${x.id}')">Remove</button></td></tr>).join("")}</tbody></table></div>;
-}
-function renderDraftLinesIntoPage(){if($("draftLineTable"))$("draftLineTable").innerHTML=renderDraftLines()}
-function removeBillLine(id){draftLines=draftLines.filter(x=>x.id!==id);renderDraftLinesIntoPage();updateBillTotal()}
-function getLineTotals(){
-let subtotal=draftLines.reduce((s,x)=>s+Math.max(0,x.qtyx.rate*(1-x.dist/100)-x.discount),0),gst=draftLines.reduce((s,x)=>s+x.tax,0),discount=cleanQty($("tBillDiscount")?.value),round=num($("tRound")?.value);
-return{subtotal,gst,billDiscount:discount,round,total:Math.max(0,subtotal+gst-discount+round)};
-}
-function updateBillTotal(){
-if(!$("tTotal"))return;let t=getLineTotals();$("tSubtotal").textContent=money(t.subtotal);$("tGstTotal").textContent=money(t.gst);$("tDiscountShow").textContent=money(t.billDiscount);$("tRoundShow").textContent=money(t.round);$("tTotal").textContent=money(t.total);
-let s=$("saleSummary");if(s)s.textContent=Items: ${draftLines.length} · Total Qty: ${draftLines.reduce((a,l)=>a+l.qty,0)} · GST: ${money(t.gst)} · Net: ${money(t.total)};
-}
-function showPartyInfo(){let p=db.parties.find(x=>x.name===$("tParty")?.value);if($("tAddress"))$("tAddress").value=p?.address||"";if($("tMobile"))$("tMobile").value=p?.phone||"";if($("tGstin"))$("tGstin").value=p?.gstin||""}
-function normalizedBatchName(v){return String(v||"").trim()||"NO BATCH"}
-function findOrCreateBatch(l){
-let name=normalizedBatchName(l.batch),expiry=String(l.expiry||"");
-let b=db.batches.find(x=>x.itemId===l.itemId&&normalizedBatchName(x.batch).toLowerCase()===name.toLowerCase()&&String(x.expiry||"")===expiry);
-if(!b){b={id:uid(),itemId:l.itemId,batch:name,expiry,qty:0,rate:cleanQty(l.rate),mrp:cleanQty(l.mrp)};db.batches.push(b)}
-return b;
-}
-function saveTransaction(e,kind){
-e.preventDefault();if(!draftLines.length)return alert("Bill-এ অন্তত একটি পণ্য যোগ করো।");
-let purchase=kind==="purchase",key=purchase?"purchases":"bills",no=$("tNo").value.trim();
-if(!no)return alert("Voucher number লিখো।");if(db[key].some(x=>String(x.no||"").toLowerCase()===no.toLowerCase()))return alert("এই voucher number আগে আছে।");
-for(let l of draftLines)if(!db.items.some(i=>i.id===l.itemId))return alert("একটি পণ্য আর পাওয়া যাচ্ছে না।");
-if(!purchase){
-let required={};for(let l of draftLines){if(!l.batchId)return alert("Sales line-এ batch নির্বাচন করো।");required[l.batchId]=(required[l.batchId]||0)+l.qty+(kind==="retail"?0:l.free)}
-for(let [id,q] of Object.entries(required)){let b=db.batches.find(x=>x.id===id);if(!b||cleanQty(b.qty)+.000001<q)return alert("Batch stock পর্যাপ্ত নেই।");if(b.expiry&&daysToExpiry(b.expiry)<0)return alert("Expired batch বিক্রি করা যাবে না।")}
-}
-let t=getLineTotals();if(t.billDiscount>t.subtotal+t.gst+.000001)return alert("Bill discount মোট বিলের চেয়ে বেশি।");
-if(purchase)draftLines.forEach(l=>{let b=findOrCreateBatch(l);l.batchId=b.id;l.batch=normalizedBatchName(l.batch)});
-let x={id:uid(),no,date:$("tDate").value,party:$("tParty").value||"Cash / Walk-in",kind,lines:draftLines.map(l=>({...l})),subtotal:t.subtotal,gstTotal:t.gst,discount:t.billDiscount,roundOff:t.round,total:t.total,address:$("tAddress")?.value||"",phone:$("tMobile")?.value||"",gstin:$("tGstin")?.value||"",doctor:$("tDoctor")?.value||"",regNo:$("tReg")?.value||"",patientId:$("tPatientId")?.value||"",reference:$("tReference")?.value||"",note:$("tNote")?.value||"",createdAt:new Date().toISOString()};
-x.item=draftLines.map(l=>l.item).join(", ");x.qty=draftLines.reduce((s,l)=>s+l.qty,0);x.itemId=draftLines.length===1?draftLines[0].itemId:"";x.rate=draftLines.length===1?draftLines[0].rate:0;
-if(purchase){draftLines.forEach(l=>{let b=db.batches.find(z=>z.id===l.batchId);if(b){b.qty=cleanQty(b.qty)+l.qty+l.free;b.rate=cleanQty(l.rate);b.mrp=cleanQty(l.mrp||b.mrp)}})}
-else{let req={};draftLines.forEach(l=>req[l.batchId]=(req[l.batchId]||0)+l.qty+(kind==="retail"?0:l.free));Object.entries(req).forEach(([id,q])=>{let b=db.batches.find(x=>x.id===id);b.qty=cleanQty(b.qty-q)})}
-reconcileAll();db[key].push(x);save();let printCopy={...x,company:{...db.company}};draftLines=[];render();
-if(confirm("Voucher saved. Invoice print করবে?"))printObject(printCopy);
-}
-
-/* RECEIPT / PAYMENT */
-function accountPage(kind){
-let receipt=kind==="receipt",key=receipt?"receipts":"payments";
-let rows=db[key].slice().reverse().map(x=><tr><td>${esc(x.date)}</td><td>${esc(x.no)}</td><td>${esc(x.party)}</td><td>${esc(x.mode)}</td><td>${money(x.amount)}</td><td><button class="btn" onclick="printVoucher('${key}','${esc(x.id)}')">Print</button> <button class="btn danger" onclick="deleteRecord('${key}','${esc(x.id)}')">Del</button></td></tr>).join("");
-return ${head(receipt?"Receipt Entry":"Payment Entry","Cash / Bank Account Register")}<div class="card"><form onsubmit="saveAccount(event,'${key}')"><div class="formgrid"><div class="field"><label>Voucher No.</label><input id="aNo" required value="${receipt?"REC":"PAY"}-${Date.now().toString().slice(-6)}"></div><div class="field"><label>Date</label><input id="aDate" type="date" value="${today()}" required></div><div class="field"><label>Party / Account</label><select id="aParty"><option>Cash Account</option>${db.parties.map(p=><option>${esc(p.name)}</option>).join("")}</select></div><div class="field"><label>Mode</label><select id="aMode"><option>Cash</option><option>Bank</option><option>UPI</option><option>Cheque</option></select></div><div class="field"><label>Amount ₹</label><input id="aAmount" type="number" min=".01" step=".01" required></div><div class="field"><label>Narration</label><input id="aNote"></div></div><div class="form-actions"><button class="btn primary">Save Entry</button></div></form></div><div class="card"><h3>Register</h3>${table(["Date","Voucher","Party","Mode","Amount","Action"],rows)}</div>;
-}
-function saveAccount(e,key){e.preventDefault();let amount=num($("aAmount").value),no=$("aNo").value.trim();if(amount<=0)return alert("Valid amount লিখো।");if(db[key].some(x=>String(x.no||"").toLowerCase()===no.toLowerCase()))return alert("Voucher number আগে আছে।");db[key].push({id:uid(),no,date:$("aDate").value,party:$("aParty").value,mode:$("aMode").value,amount,note:$("aNote").value,createdAt:new Date().toISOString()});save();render();alert("Entry saved.")}
-
-/* STOCK / EXPIRY /
-function stockPage(){
-let rows=db.items.map(i=>{let bs=db.batches.filter(b=>b.itemId===i.id),value=bs.reduce((s,b)=>s+cleanQty(b.qty)(num(b.rate)||num(i.purchaseRate)),0);return <tr><td>${esc(i.code||"")}</td><td>${esc(i.barcode||"")}</td><td>${esc(i.name)}</td><td>${esc(i.unit||"PCS")}</td><td>${cleanQty(i.qty)}</td><td>${bs.length}</td><td>${money(i.rate)}</td><td>${money(value)}</td></tr>}).join("");
-return ${head("Stock Summary","Inventory Position · Batch-wise Stock")}<div class="stats">${stat("Total Items",db.items.length)}${stat("Total Quantity",db.items.reduce((s,i)=>s+i.qty,0))}${stat("Stock Value",money(db.batches.reduce((s,b)=>s+b.qty*b.rate,0)))}${stat("Low / Zero Stock",db.items.filter(i=>i.qty<=5).length)}</div><div class="card"><div class="view-head"><h3>Stock Register</h3><button class="btn" onclick="go('expiry')">Batch / Expiry</button></div>${table(["Code","Barcode","Item","Unit","Qty","Batches","Sale Rate","Stock Value"],rows)}</div>;
-}
-function daysToExpiry(v){if(!v)return Infinity;let p=String(v).split("-").map(Number);if(p.length<2||!p[0]||!p[1])return Infinity;let d=new Date(p[0],p[1],0,23,59,59),n=new Date();n.setHours(0,0,0,0);return Math.ceil((d-n)/86400000)}
-function expiryPage(){
-let q=($("expirySearch")?.value||"").toLowerCase(),list=db.batches.map(b=>({...b,itemName:db.items.find(i=>i.id===b.itemId)?.name||"Unknown item"})).filter(b=>b.qty>0&&[b.itemName,b.batch,b.expiry].some(v=>String(v||"").toLowerCase().includes(q))).sort((a,b)=>String(a.expiry||"9999-12").localeCompare(String(b.expiry||"9999-12")));
-let rows=list.map(b=>{let d=daysToExpiry(b.expiry),status=!b.expiry?"No expiry":d<0?"EXPIRED":d<=30?"Expires within 30 days":d<=60?"Expires within 60 days":"OK";return <tr><td>${esc(b.itemName)}</td><td>${esc(b.batch)}</td><td>${esc(b.expiry||"—")}</td><td>${b.qty}</td><td>${money(b.rate)}</td><td class="${d<0||d<=60?"warning":"success"}">${status}</td><td>${Number.isFinite(d)?d+" days":"—"}</td></tr>}).join("");
-return ${head("Batch / Expiry Alerts","Available batches and expiry tracking")}<div class="stats">${stat("Active Batches",list.length)}${stat("Expired",list.filter(b=>daysToExpiry(b.expiry)<0).length)}${stat("Expiring in 60 Days",list.filter(b=>daysToExpiry(b.expiry)>=0&&daysToExpiry(b.expiry)<=60).length)}${stat("No Expiry",list.filter(b=>!b.expiry).length)}</div><div class="card"><div class="view-head"><h3>Batch Register</h3><input id="expirySearch" class="searchbox" style="max-width:260px" placeholder="Search item / batch" value="${esc(q)}" oninput="refreshExpiry()"></div>${table(["Item","Batch","Expiry Month","Qty","Purchase Rate","Status","Days Left"],rows)}</div>;
-}
-function refreshExpiry(){let v=$("expirySearch").value,p=$("expirySearch").selectionStart;render();$("expirySearch").value=v;$("expirySearch").focus();try{$("expirySearch").setSelectionRange(p,p)}catch(e){}}
-
-/* LEDGER / REPORTS */
-function openLedger(id){ledgerParty=id;go("ledger")}
-function ledgerPage(){
-let ps=db.parties.slice().sort((a,b)=>a.name.localeCompare(b.name)),p=ps.find(x=>x.id===ledgerParty)||ps.find(x=>x.name===ledgerParty)||ps[0];
-if(!p)return ${head("Party Ledger","Customer / Supplier Statement")}<div class="card">Party Master-এ আগে একটি party যোগ করো।<button class="btn primary" onclick="go('parties')">Party Master</button></div>;
-let es=[{date:"",no:"OPENING",type:"Opening",debit:num(p.balance),credit:0}];
-db.bills.filter(x=>x.party===p.name).forEach(x=>es.push({date:x.date,no:x.no,type:x.kind==="wholesale"?"Wholesale":"Retail",debit:x.total,credit:0}));
-db.purchases.filter(x=>x.party===p.name).forEach(x=>es.push({date:x.date,no:x.no,type:"Purchase",debit:0,credit:x.total}));
-db.receipts.filter(x=>x.party===p.name).forEach(x=>es.push({date:x.date,no:x.no,type:"Receipt",debit:0,credit:x.amount}));
-db.payments.filter(x=>x.party===p.name).forEach(x=>es.push({date:x.date,no:x.no,type:"Payment",debit:x.amount,credit:0}));
-es.sort((a,b)=>String(a.date||"").localeCompare(String(b.date||"")));let bal=0;
-let rows=es.map(x=>{bal+=num(x.debit)-num(x.credit);return <tr><td>${esc(x.date||"—")}</td><td>${esc(x.type)}</td><td>${esc(x.no)}</td><td>${money(x.debit)}</td><td>${money(x.credit)}</td><td>${money(Math.abs(bal))} ${bal>0?"Dr":bal<0?"Cr":""}</td></tr>}).join("");
-return ${head("Party Ledger","Customer / Supplier Statement")}<div class="card"><div class="formgrid"><div class="field"><label>Select Party</label><select onchange="ledgerParty=this.value;render()">${ps.map(x=><option value="${esc(x.id)}" ${x.id===p.id?"selected":""}>${esc(x.name)}</option>).join("")}</select></div><div class="field"><label>Type</label><input readonly value="${esc(p.type||"Customer")}"></div><div class="field"><label>Phone</label><input readonly value="${esc(p.phone||"")}"></div></div><div class="form-actions"><button class="btn" onclick="window.print()">Print Ledger</button><button class="btn" onclick="go('receipt')">Receipt</button><button class="btn" onclick="go('payment')">Payment</button></div></div><div class="stats">${stat("Debit",money(es.reduce((s,x)=>s+num(x.debit),0)))}${stat("Credit",money(es.reduce((s,x)=>s+num(x.credit),0)))}${stat("Balance",money(Math.abs(bal)))}${stat("Type",bal>0?"Dr":bal<0?"Cr":"Settled")}</div><div class="card">${table(["Date","Type","Voucher","Debit","Credit","Balance"],rows)}</div>;
-}
-function reportsPage(kind){
-let title={reports:"Final Reports",daily:"Daily Reports",gst:"GST Reports",links:"Links & Shortcuts"}[kind]||"Reports";
-if(kind==="links")return ${head(title,"Quick Navigation")}<div class="card"><div class="quickgrid">${[["Dashboard","dashboard"],["Items","items"],["Parties","parties"],["Retail","retail"],["Wholesale","wholesale"],["Purchase","purchase"],["Stock","stock"],["Expiry","expiry"],["Ledger","ledger"],["Receipt","receipt"],["Payment","payment"],["Company","company"],["Settings","settings"]].map(x=><button class="btn" onclick="go('${x[1]}')">${x[0]}</button>).join("")}</div></div>;
-let rows;
-if(kind==="gst")rows=db.bills.map(x=><tr><td>${esc(x.date)}</td><td>${esc(x.no)}</td><td>${esc(x.party)}</td><td>${money(x.subtotal??x.total)}</td><td>${money(x.gstTotal||0)}</td><td>${money(x.total)}</td></tr>).join("");
-else{let list=[...db.bills.map(x=>({...x,type:x.kind==="wholesale"?"Wholesale":"Retail"})),...db.purchases.map(x=>({...x,type:"Purchase"}))];if(kind==="daily")list=list.filter(x=>x.date===today());rows=list.reverse().map(x=><tr><td>${esc(x.date)}</td><td>${esc(x.type)}</td><td>${esc(x.no)}</td><td>${esc(x.party)}</td><td>${money(x.total)}</td></tr>).join("")}
-let sales=db.bills.reduce((s,x)=>s+num(x.total),0),purch=db.purchases.reduce((s,x)=>s+num(x.total),0),rec=db.receipts.reduce((s,x)=>s+num(x.amount),0),pay=db.payments.reduce((s,x)=>s+num(x.amount),0);
-return ${head(title,kind==="daily"?"Today's Transactions":kind==="gst"?"GST Summary":"Business Transaction Summary")}<div class="stats">${stat("Total Sales",money(sales))}${stat("Total Purchase",money(purch))}${stat("Receipts",money(rec))}${stat("Payments",money(pay))}</div><div class="card"><div class="view-head"><h3>Transaction Report</h3><button class="btn" onclick="window.print()">Print Report</button></div>${kind==="gst"?table(["Date","Invoice","Party","Taxable","GST","Total"],rows):table(["Date","Type","Voucher","Party","Total"],rows,kind==="daily"?"No transactions today":"No transactions")}</div>${kind==="gst"?<div class="notice">এটি একটি basic GST summary; সরকারি GST return filing-এর বিকল্প নয়।</div>:""};
-}
-
-/* DELETE / BACKUP / RESTORE /
-function recordLines(x){if(Array.isArray(x.lines))return x.lines;if(x.itemId)return [{itemId:x.itemId,batchId:"",batch:"",expiry:"",qty:num(x.qty),free:0,rate:num(x.rate)}];return []}
-function resolveLineBatch(l){return db.batches.find(b=>l.batchId&&b.id===l.batchId)||db.batches.find(b=>b.itemId===l.itemId&&normalizedBatchName(b.batch).toLowerCase()===normalizedBatchName(l.batch).toLowerCase()&&String(b.expiry||"")===String(l.expiry||""))}
-function deleteRecord(key,id){
-let x=db[key]?.find(r=>r.id===id);if(!x)return;
-if(key==="parties"){let name=x.name,used=["bills","purchases","receipts","payments"].some(k=>db[k].some(r=>r.party===name));if(used)return alert("এই Party-এর transaction history আছে। History নষ্ট না করতে Party delete করা হয়নি।")}
-if(!confirm("এই record delete করবে?"))return;
-if(key==="bills"||key==="purchases"){
-let purchase=key==="purchases",lines=recordLines(x);
-if(purchase){for(let l of lines){let b=resolveLineBatch(l),q=num(l.qty)+num(l.free);if(!b||b.qty+0.000001<q)return alert("Purchase-এর stock ইতিমধ্যে বিক্রি/ব্যবহৃত হয়েছে অথবা batch পাওয়া যাচ্ছে না। নিরাপদে delete করা হয়নি।")}}
-if(!lines.length&&x.itemId)return alert("পুরোনো voucher-এর stock তথ্য অসম্পূর্ণ; delete করা হয়নি।");
-lines.forEach(l=>{let q=num(l.qty)+(purchase?num(l.free):0),b=resolveLineBatch(l);if(purchase){if(b)b.qty=cleanQty(b.qty-q)}else{if(!b){b={id:uid(),itemId:l.itemId,batch:normalizedBatchName(l.batch||"RESTORED"),expiry:l.expiry||"",qty:0,rate:num(l.rate),opening:true};db.batches.push(b)}b.qty=cleanQty(b.qty+q)}});reconcileAll();
-}
-if(key==="items"){if(db.bills.some(b=>recordLines(b).some(l=>l.itemId===id))||db.purchases.some(b=>recordLines(b).some(l=>l.itemId===id)))return alert("এই item-এর voucher history আছে। আগে history/stock যাচাই করো।");db.batches=db.batches.filter(b=>b.itemId!==id)}
-db[key]=db[key].filter(r=>r.id!==id);save();render();
-}
-function backup(){
-try{let blob=new Blob([JSON.stringify({format:"SHREE-ERP",version:2,exportedAt:new Date().toISOString(),data:db},null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="SHREE-ERP-backup-"+today()+".json";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1500);$("statusText").textContent="Backup download requested"}catch(e){alert("Backup তৈরি করা যায়নি।")}
-}
-function restoreBackup(e){
-let f=e.target.files?.[0];if(!f)return;if(f.size>251024*1024){alert("File 25 MB-এর বেশি।");e.target.value="";return}
-let r=new FileReader();r.onload=()=>{try{let z=JSON.parse(r.result),s=z.data&&typeof z.data==="object"?z.data:z;if(!s||!Array.isArray(s.items)||!Array.isArray(s.parties))throw Error();for(let k of ["items","parties","bills","receipts","payments","purchases","batches"])if(s[k]!==undefined&&!Array.isArray(s[k]))throw Error();let next=normalizeDB(s);if(!confirm("বর্তমান data replace হবে। আগে backup নিয়েছ?"))return;localStorage.setItem(KEY,JSON.stringify(next));db=next;draftLines=[];ledgerParty="";go("dashboard");alert("Backup imported.")}catch(err){alert("Backup invalid অথবা import করা যায়নি। Current data পরিবর্তন করা হয়নি।")}finally{e.target.value=""}};r.onerror=()=>{alert("File পড়া যায়নি।");e.target.value=""};r.readAsText(f);
-}
-function clearData(){if(!confirm("সব ERP data মুছতে চাও?"))return;if(!confirm("শেষবার নিশ্চিত করো। Backup নিয়েছ?"))return;db=blank();save();go("dashboard")}
-
-/* INVOICE PRINT */
-function printVoucher(key,id){let x=db[key].find(v=>v.id===id);if(x)printObject({...x,company:db.company})}
-function printObject(x){
-let c=x.company||db.company||{},account=x.amount!==undefined,body="";
-if(account)body=<tr><td>Party / Account</td><td>${esc(x.party)}</td></tr><tr><td>Mode</td><td>${esc(x.mode||"")}</td></tr><tr><td>Narration</td><td>${esc(x.note||"")}</td></tr><tr><th>Amount</th><th>${money(x.amount)}</th></tr>;
-else{let ls=Array.isArray(x.lines)?x.lines:[{item:x.item,qty:x.qty,rate:x.rate,amount:x.total}];body=<tr><td colspan="8"><b>Party:</b> ${esc(x.party)} · ${esc(x.phone||"")}<br>${esc(x.address||"")}</td></tr>;if(x.doctor)body+=<tr><td colspan="8"><b>Doctor:</b> ${esc(x.doctor)} &nbsp; <b>Reg No:</b> ${esc(x.regNo||"")}</td></tr>;body+=<tr><th>Item</th><th>Pack</th><th>Batch</th><th>Expiry</th><th>Qty</th><th>Rate</th><th>GST</th><th>Amount</th></tr>;body+=ls.map(l=><tr><td>${esc(l.item)}</td><td>${esc(l.pack||"")}</td><td>${esc(l.batch||"—")}</td><td>${esc(l.expiry||"—")}</td><td>${esc(l.qty)}${num(l.free)>0?" + "+esc(l.free)+" free":""}</td><td>${money(l.rate)}</td><td>${esc(l.gst||0)}%</td><td>${money(l.amount??num(l.qty)*num(l.rate))}</td></tr>).join("");body+=<tr><td colspan="7" class="right">Taxable Subtotal</td><td>${money(x.subtotal??x.total)}</td></tr><tr><td colspan="7" class="right">GST</td><td>${money(x.gstTotal||0)}</td></tr><tr><td colspan="7" class="right">Bill Discount</td><td>${money(x.discount)}</td></tr><tr><td colspan="7" class="right">Round Off</td><td>${money(x.roundOff||0)}</td></tr><tr><th colspan="7" class="right">Net Total</th><th>${money(x.total)}</th></tr>}
-let title=x.kind==="purchase"?"PURCHASE VOUCHER":x.kind==="wholesale"?"WHOLESALE INVOICE":account?"ACCOUNT VOUCHER":"RETAIL INVOICE",w=window.open("","_blank","width=900,height=750");if(!w)return alert("Print window blocked; browser pop-up allow করো।");
-w.document.write(<!doctype html><html><head><meta charset="utf-8"><title>${esc(title)}</title><style>body{font:12px Arial;padding:20px;color:#222;max-width:1000px;margin:auto}.top{display:flex;justify-content:space-between;border-bottom:2px solid #183e70;padding-bottom:12px}h1{color:#183e70;margin:0 0 5px;font-size:23px}h2{font-size:17px;margin-top:18px}.muted{color:#555;line-height:1.5}table{border-collapse:collapse;width:100%;margin-top:16px}td,th{border:1px solid #7c8794;padding:8px;text-align:left}th{background:#eaf1fa}.right{text-align:right}.signature{margin-top:50px;display:flex;justify-content:space-between}@page{size:A4;margin:12mm}@media print{body{padding:0}.no-print{display:none}}</style></head><body><div class="top"><div><h1>${esc(c.name||"SHREE ERP")}</h1><div class="muted">${esc(c.address||"")}<br>${esc(c.phone||"")} ${c.gstin?"· GSTIN: "+esc(c.gstin):""}</div></div><div><b>SHREE ERP</b><br>Business Management</div></div><h2>${title}</h2><p><b>Voucher:</b> ${esc(x.no||"")} &nbsp; <b>Date:</b> ${esc(x.date||"")}</p><table>${body}</table><p>${esc(x.note||"")}</p><div class="signature"><span>Customer Signature __________________</span><span>Authorised Signature __________________</span></div><p class="muted">Computer-generated document. Verify details before accounting or tax filing.</p><button class="no-print" onclick="window.print()">Print</button><script>window.onload=()=>window.print()<\/script></body></html>);w.document.close();
-}
-
-/* PARTY PICKER / QUICK ADD */
-function openPartyPicker(){
-if(!["retail","wholesale","purchase"].includes(view)){go("parties");return}
-let allowed=view==="purchase"?["Supplier","Both"]:["Customer","Both"];
-$("modalRoot").innerHTML=<div class="modal-bg" onclick="if(event.target===this)closeModal()"><div class="modal" style="background:#edf2f8;border:1px solid #58708e;width:min(560px,100%);max-height:90vh;overflow:auto"><div style="padding:10px;background:#183e70;color:white">F2 · Select / Add Party <button class="btn" onclick="closeModal()">✕</button></div><div style="padding:15px"><div class="field"><label>Party</label><select id="pickerParty"><option value="">Cash / Walk-in</option>${db.parties.filter(p=>allowed.includes(p.type)).map(p=><option value="${esc(p.name)}">${esc(p.name)} · ${esc(p.phone||"")}</option>).join("")}</select></div><div class="form-actions"><button class="btn primary" onclick="chooseParty()">Select Party</button><button class="btn" onclick="showQuickParty()">＋ New Party</button></div></div></div></div>;$("pickerParty").focus();
-}
-function closeModal(){$("modalRoot").innerHTML=""}
-function chooseParty(){if($("tParty")){$("tParty").value=$("pickerParty").value;showPartyInfo()}closeModal()}
-function showQuickParty(){
-$("modalRoot").innerHTML=<div class="modal-bg"><div class="modal" style="background:#edf2f8;width:min(560px,100%);max-height:90vh;overflow:auto"><div style="padding:10px;background:#183e70;color:white">New Customer / Party <button class="btn" onclick="closeModal()">✕</button></div><div style="padding:15px"><div class="field"><label>Name *</label><input id="qName"></div><div class="field"><label>Mobile</label><input id="qPhone"></div><div class="field"><label>Address</label><input id="qAddress"></div><div class="field"><label>GSTIN</label><input id="qGstin"></div><div class="field"><label>DL No.</label><input id="qDl"></div><div class="form-actions"><button class="btn primary" onclick="saveQuickParty()">Save & Select</button><button class="btn" onclick="openPartyPicker()">Back</button></div></div></div></div>;$("qName").focus();
-}
-function saveQuickParty(){
-let name=$("qName").value.trim();if(!name)return alert("Party name লিখো।");
-let p=db.parties.find(x=>x.name.toLowerCase()===name.toLowerCase());
-if(!p){p={id:uid(),name,type:view==="purchase"?"Supplier":"Customer",phone:$("qPhone").value.trim(),address:$("qAddress").value.trim(),gstin:$("qGstin").value.trim(),dlNo:$("qDl").value.trim(),balance:0};db.parties.push(p);save()}
-if($("tParty")){let s=$("tParty");if(![...s.options].some(o=>o.value===p.name)){let op=document.createElement("option");op.value=p.name;op.textContent=p.name;s.appendChild(op)}s.value=p.name;showPartyInfo()}
-closeModal();
+function editParty(id){editPartyId=id;view="parties";render();}
+function cancelPartyEdit(){editPartyId=null;render();}
+function deleteParty(id){
+ const p=db.parties.find(x=>String(x.id)===String(id));if(!p)return;
+ if(!confirm("Delete party "+p.name+"?"))return;
+ db.parties=db.parties.filter(x=>String(x.id)!==String(id));save();render();
 }
 function renameCustomer(){
-let current=$("tParty")?.value||$("aParty")?.value||"";
-if(!current||current==="Cash Account"||current==="Cash / Walk-in")current=prompt("যে Party-এর নাম বদলাবে, বর্তমান নাম লিখো:");
-if(!current)return;let p=db.parties.find(x=>x.name===current);if(!p)return alert("Party Master-এ নামটি পাওয়া যায়নি।");
-let next=prompt("নতুন নাম লিখো:",p.name);if(!next||!next.trim())return;next=next.trim();
-if(db.parties.some(x=>x.id!==p.id&&x.name.toLowerCase()===next.toLowerCase()))return alert("এই নাম আগে থেকেই আছে।");
-let old=p.name;p.name=next;["bills","purchases","receipts","payments"].forEach(k=>db[k].forEach(x=>{if(x.party===old)x.party=next}));save();render();alert("Party name updated.");
+ if(!["retail","wholesale","purchases"].includes(view)){go("parties");return;}
+ const old=val("tParty");if(!old)return alert("Select or enter the customer name first.");
+ const next=prompt("Enter new customer name:",old);if(!next||!next.trim())return;
+ const p=db.parties.find(x=>x.name===old);
+ if(p)p.name=next.trim();
+ [...db.bills,...db.purchases].forEach(b=>{if(b.partyName===old)b.partyName=next.trim();});
+ if($("tParty"))$("tParty").value=next.trim();
+ save();render();setStatus("Customer name updated");
 }
 
-/* KEYBOARD */
+function billingPage(kind){
+ const isPurchase=kind==="purchases",isWholesale=kind==="wholesale";
+ const title=isPurchase?"Purchase Entry":isWholesale?"Sale Entry - Wholesale":"Sale Entry - Retail";
+ const voucher=(isPurchase?"PUR":isWholesale?"WS":"RTL")+"-"+today().replaceAll("-","")+"-"+String((isPurchase?db.purchases:db.bills).length+1).padStart(3,"0");
+ const parties=db.parties.filter(p=>isPurchase?["Supplier","Both"].includes(p.type):["Customer","Both"].includes(p.type));
+ const itemOptions=db.items.map(i=>({value:i.id,label:i.name+" (Stock: "+(Number(i.stock)||0)+")"}));
+ const partyOptions=[{value:"",label:"Cash / Walk-in Customer"},...parties.map(p=>({value:p.name,label:p.name}))];
+ const lines=billLines.map((l,i)=>`<tr><td>${i+1}</td><td>${esc(l.name)}</td><td>${esc(l.pack||"")}</td><td>${esc(l.batch||"")}</td><td class="num">${l.qty}</td><td class="num">${l.free||0}</td><td class="num">${money(l.rate)}</td><td class="num">${money(l.discount||0)}</td><td class="num">${money(l.gst||0)}%</td><td class="num">${money(l.amount)}</td><td><button class="btn small danger" onclick="removeBillLine(${i})">×</button></td></tr>`);
+ return `${head(title,"Transactions / Voucher Entry")}
+ <div class="notice">Shortcut keys: <b>F1</b> Doctor / Help · <b>F2</b> Customer · <b>F3</b> Rename Customer · <b>F4</b> Retail Bill · <b>Esc</b> Dashboard</div>
+ ${panel("VOUCHER DETAILS",`<div class="form-grid">
+ ${field("Voucher / Bill No.","tBillNo",{value:voucher})}
+ ${field("Date","tDate",{type:"date",value:today()})}
+ ${selectField("Customer / Supplier (F2)","tParty",partyOptions,"")}
+ ${field("Mobile","tPhone")}
+ ${field("Address","tAddress")}
+ ${field("GSTIN","tGSTIN")}
+ ${field("Doctor (F1)","tDoctor")}
+ ${field("Reg. No.","tRegNo")}
+ ${field("Challan No.","tChallan")}
+ ${field("DL No.","tDLNo")}
+ </div>`)}
+ ${panel("ITEM ENTRY",`<div class="form-grid">
+ ${selectField("Product / Item","lineItem",[{value:"",label:"Select item..."},...itemOptions],"")}
+ ${field("Pack / Unit","linePack",{value:"PCS"})}
+ ${field("Batch No.","lineBatch")}
+ ${field("Expiry","lineExpiry",{type:"text",placeholder:"MM/YY"})}
+ ${field("Qty","lineQty",{type:"number",step:"0.001",min:0,value:1})}
+ ${field("Free Qty","lineFree",{type:"number",step:"0.001",min:0,value:0})}
+ ${field(isWholesale?"Rate":"Sale Rate","lineRate",{type:"number",step:"0.01",min:0,value:0})}
+ ${field(isWholesale?"Distributor %":"Discount %","lineDiscount",{type:"number",step:"0.01",min:0,value:0})}
+ ${field("GST %","lineGST",{type:"number",step:"0.01",min:0,value:0})}
+ ${field("MRP","lineMRP",{type:"number",step:"0.01",min:0,value:0})}
+ </div><div class="btn-row"><button class="btn accent" onclick="addBillLine()">＋ Add Item</button><button class="btn" onclick="clearLineEntry()">Clear Item</button><span class="footer-note">Choose an item, enter quantity and rate, then Add Item.</span></div>`)}
+ ${panel("ITEM DETAILS",table(["#","Product","Pack","Batch","Qty","Free","Rate","Disc / Dist","GST","Amount",""],lines,"No items added yet"))}
+ ${panel("BILL TOTAL",`<div class="form-grid">
+ ${field("Bill Discount ₹","tBillDiscount",{type:"number",step:"0.01",min:0,value:0})}
+ ${field("Round Off ₹","tRound",{type:"number",step:"0.01",value:0})}
+ ${field("Payment Received ₹","tPaid",{type:"number",step:"0.01",min:0,value:0})}
+ ${field("Remarks","tRemarks")}
+ </div><div class="total-bar"><div><span>Items: ${billLines.length}</span><br><span>Subtotal: ₹<span id="subTotal">${money(billLines.reduce((s,l)=>s+l.amount,0))}</span></span></div><div><span>Net Payable</span><br><strong>₹<span id="netTotal">${money(calculateBillTotal())}</span></strong></div></div>
+ <div class="btn-row no-print"><button class="btn primary" onclick="saveBill('${kind}')">Save ${isPurchase?"Purchase":"Bill"}</button><button class="btn" onclick="clearBillForm()">New / Clear</button><button class="btn" onclick="print()">Print</button><button class="btn" onclick="go('${isPurchase?"purchases":"reports"}')">Voucher Register</button></div>`)}
+ ${panel("RECENT VOUCHERS",table(["Date","Voucher No","Party","Amount","Action"],(isPurchase?db.purchases:db.bills).slice().reverse().slice(0,8).map(b=>`<tr><td>${esc(b.date)}</td><td>${esc(b.billNo)}</td><td>${esc(b.partyName||"Cash")}</td><td>₹${money(b.total)}</td><td><button class="btn small" onclick="printVoucher('${kind}','${b.id}')">Print</button> <button class="btn small danger" onclick="deleteVoucher('${kind}','${b.id}')">Delete</button></td></tr>`)))}
+ `;
+}
+function attachLiveHandlers(){
+ const li=$("lineItem");
+ if(li)li.addEventListener("change",fillItemDetails);
+ const party=$("tParty");
+ if(party)party.addEventListener("change",fillPartyDetails);
+ ["tBillDiscount","tRound","tPaid"].forEach(id=>$(id)?.addEventListener("input",updateBillTotal));
+}
+function fillPartyDetails(){
+ const name=val("tParty");
+ const p=db.parties.find(x=>x.name===name);
+ if($("tPhone"))$("tPhone").value=p?.phone||p?.mobile||"";
+ if($("tGSTIN"))$("tGSTIN").value=p?.gstin||"";
+ if($("tAddress"))$("tAddress").value=p?.address||"";
+ if($("tDLNo"))$("tDLNo").value=p?.dlNo||p?.dl||"";
+}
+function fillItemDetails(){
+ const item=db.items.find(i=>String(i.id)===String(val("lineItem")));
+ if(!item)return;
+ if($("lineRate"))$("lineRate").value=view==="purchases"?(Number(item.purchaseRate)||Number(item.rate)||0):(Number(item.rate)||0);
+ if($("linePack")&&!val("linePack"))$("linePack").value=item.unit||"PCS";
+ if($("lineMRP")&&!num("lineMRP"))$("lineMRP").value=Number(item.rate)||0;
+}
+function clearLineEntry(){
+ ["lineBatch","lineExpiry","lineMRP"].forEach(id=>{if($(id))$(id).value="";});
+ if($("lineQty"))$("lineQty").value=1;
+ if($("lineFree"))$("lineFree").value=0;
+ if($("lineDiscount"))$("lineDiscount").value=0;
+ if($("lineGST"))$("lineGST").value=0;
+ if($("lineRate"))$("lineRate").value=0;
+ if($("linePack"))$("linePack").value="PCS";
+ if($("lineItem"))$("lineItem").value="";
+}
+function addBillLine(){
+ const id=val("lineItem");
+ const item=db.items.find(i=>String(i.id)===String(id));
+ if(!item)return alert("Select a product first.");
+ const qty=num("lineQty"),free=num("lineFree"),rate=num("lineRate"),discount=num("lineDiscount"),gst=num("lineGST");
+ if(qty<=0)return alert("Quantity must be greater than zero.");
+ if(rate<0)return alert("Rate cannot be negative.");
+ const gross=qty*rate;
+ const discountAmount=view==="wholesale"?gross*(discount/100):gross*(discount/100);
+ const taxable=Math.max(0,gross-discountAmount);
+ const tax=taxable*gst/100;
+ billLines.push({itemId:item.id,name:item.name,pack:val("linePack")||item.unit||"PCS",
+ batch:val("lineBatch"),expiry:val("lineExpiry"),qty,free,rate,discount,gst,
+ mrp:num("lineMRP"),amount:taxable+tax,taxAmount:tax,discountAmount});
+ render();
+ setStatus("Item added to voucher");
+}
+function removeBillLine(i){billLines.splice(i,1);render();}
+function calculateBillTotal(){
+ const subtotal=billLines.reduce((s,l)=>s+(Number(l.amount)||0),0);
+ return Math.max(0,subtotal-num("tBillDiscount"))+num("tRound");
+}
+function updateBillTotal(){
+ if($("subTotal"))$("subTotal").textContent=money(billLines.reduce((s,l)=>s+l.amount,0));
+ if($("netTotal"))$("netTotal").textContent=money(calculateBillTotal());
+}
+function clearBillForm(){
+ billLines=[];render();setStatus("New voucher");
+}
+function saveBill(kind){
+ const isPurchase=kind==="purchases";
+ if(!billLines.length)return alert("Add at least one item.");
+ const billNo=val("tBillNo");if(!billNo)return alert("Enter voucher number.");
+ const list=isPurchase?db.purchases:db.bills;
+ if(list.some(b=>b.billNo===billNo))return alert("Voucher number already exists.");
+ const partyNameValue=val("tParty")||"Cash";
+ const total=calculateBillTotal();
+ const b={id:uid(),billNo,date:val("tDate")||today(),kind:isPurchase?"Purchase":kind==="wholesale"?"Wholesale":"Retail",
+ partyName:partyNameValue,partyId:db.parties.find(p=>p.name===partyNameValue)?.id||"",
+ phone:val("tPhone"),address:val("tAddress"),gstin:val("tGSTIN"),doctor:val("tDoctor"),regNo:val("tRegNo"),
+ challan:val("tChallan"),dlNo:val("tDLNo"),remarks:val("tRemarks"),
+ lines:billLines.map(l=>({...l})),subtotal:billLines.reduce((s,l)=>s+l.amount,0),
+ discount:num("tBillDiscount"),round:num("tRound"),paid:num("tPaid"),total,createdAt:new Date().toISOString()};
+ for(const l of billLines){
+  const item=db.items.find(i=>String(i.id)===String(l.itemId));
+  if(!item)continue;
+  if(!isPurchase&&Number(item.stock)<l.qty+l.free){
+   if(!confirm(`${item.name} stock is ${item.stock}. Continue selling anyway?`))return;
+  }
+ }
+ list.push(b);
+ billLines.forEach(l=>{
+  const item=db.items.find(i=>String(i.id)===String(l.itemId));if(!item)return;
+  item.stock=(Number(item.stock)||0)+(isPurchase?(l.qty+l.free):-(l.qty+l.free));
+ });
+ if(!isPurchase&&b.paid>0){
+  db.receipts.push({id:uid(),date:b.date,voucherNo:"RC-"+b.billNo,partyName:b.partyName,amount:Math.min(b.paid,b.total),note:"Bill payment"});
+ }
+ save();alert(`${isPurchase?"Purchase":"Bill"} saved successfully. Voucher: ${billNo}`);
+ billLines=[];go(isPurchase?"purchases":kind);
+}
+function deleteVoucher(kind,id){
+ const isPurchase=kind==="purchases",list=isPurchase?db.purchases:db.bills;
+ const b=list.find(x=>String(x.id)===String(id));if(!b)return;
+ if(!confirm("Delete voucher "+b.billNo+"? Stock will be adjusted."))return;
+ (b.lines||[]).forEach(l=>{
+  const item=db.items.find(i=>String(i.id)===String(l.itemId));if(!item)return;
+  item.stock=(Number(item.stock)||0)+(isPurchase?-(Number(l.qty||0)+Number(l.free||0)):(Number(l.qty||0)+Number(l.free||0)));
+ });
+ if(isPurchase)db.purchases=db.purchases.filter(x=>String(x.id)!==String(id));
+ else db.bills=db.bills.filter(x=>String(x.id)!==String(id));
+ save();render();
+}
+function printVoucher(kind,id){
+ const b=(kind==="purchases"?db.purchases:db.bills).find(x=>String(x.id)===String(id));
+ if(!b)return;
+ const lines=(b.lines||[]).map((l,i)=>`<tr><td>${i+1}</td><td>${esc(l.name)}</td><td>${esc(l.batch||"")}</td><td>${l.qty}</td><td>${money(l.rate)}</td><td>${money(l.amount)}</td></tr>`).join("");
+ const win=window.open("","_blank");if(!win)return alert("Allow pop-ups to print.");
+ win.document.write(`<html><head><title>${esc(b.billNo)}</title><style>body{font:12px Arial;padding:20px}table{border-collapse:collapse;width:100%}td,th{border:1px solid #888;padding:7px;text-align:left}</style></head><body><h2>${esc(db.company.name)}</h2><p>${esc(db.company.address||"")}</p><hr><h3>${esc(b.kind||kind)}: ${esc(b.billNo)}</h3><p>Date: ${esc(b.date)} | Party: ${esc(b.partyName)}</p><table><tr><th>#</th><th>Item</th><th>Batch</th><th>Qty</th><th>Rate</th><th>Amount</th></tr>${lines}</table><h3 style="text-align:right">Total: ₹${money(b.total)}</h3><p>GSTIN: ${esc(b.gstin||"")}</p><script>window.onload=()=>window.print()<\/script></body></html>`);
+ win.document.close();
+}
+
+function accountsPage(){
+ const rows=[...db.receipts.map(x=>({...x,type:"Receipt"})),...db.payments.map(x=>({...x,type:"Payment"}))].sort((a,b)=>(b.date||"").localeCompare(a.date||""));
+ return `${head("Accounts","Receipt / Payment / Ledger")}
+ <div class="grid-two">
+ ${panel("RECEIPT ENTRY",`<form onsubmit="saveAccount(event,'receipt')"><div class="form-grid">
+ ${field("Date","aDate",{type:"date",value:today()})}
+ ${field("Voucher No.","aVoucher",{value:"RC-"+today().replaceAll("-","")+"-"+(db.receipts.length+1)})}
+ ${field("Party Name","aParty")}
+ ${field("Amount ₹","aAmount",{type:"number",step:"0.01",min:0,required:true})}
+ ${field("Remarks","aNote")}
+ </div><div class="btn-row"><button class="btn primary" type="submit">Save Receipt</button></div></form>`)}
+ ${panel("PAYMENT ENTRY",`<form onsubmit="saveAccount(event,'payment')"><div class="form-grid">
+ ${field("Date","payDate",{type:"date",value:today()})}
+ ${field("Voucher No.","payVoucher",{value:"PY-"+today().replaceAll("-","")+"-"+(db.payments.length+1)})}
+ ${field("Party Name","payParty")}
+ ${field("Amount ₹","payAmount",{type:"number",step:"0.01",min:0,required:true})}
+ ${field("Remarks","payNote")}
+ </div><div class="btn-row"><button class="btn primary" type="submit">Save Payment</button></div></form>`)}
+ </div>
+ ${panel("ACCOUNT VOUCHER REGISTER",table(["Date","Voucher No","Type","Party","Amount","Remarks"],rows.map(x=>`<tr><td>${esc(x.date)}</td><td>${esc(x.voucherNo||"")}</td><td>${esc(x.type)}</td><td>${esc(x.partyName||"")}</td><td>₹${money(x.amount)}</td><td>${esc(x.note||"")}</td></tr>`)))}
+ `;
+}
+function openPayment(){go("accounts");setTimeout(()=>$("payParty")?.focus(),30);}
+function saveAccount(e,type){
+ e.preventDefault();
+ const isR=type==="receipt";
+ const voucher=val(isR?"aVoucher":"payVoucher");
+ const list=isR?db.receipts:db.payments;
+ if(!val(isR?"aParty":"payParty"))return alert("Enter party name.");
+ const amount=num(isR?"aAmount":"payAmount");if(amount<=0)return alert("Amount must be greater than zero.");
+ if(list.some(x=>x.voucherNo===voucher))return alert("Voucher number already exists.");
+ list.push({id:uid(),date:val(isR?"aDate":"payDate")||today(),voucherNo:voucher,
+ partyName:val(isR?"aParty":"payParty"),amount,note:val(isR?"aNote":"payNote")});
+ save();render();
+}
+
+function stockPage(){
+ const rows=db.items.map(i=>`<tr><td>${esc(i.code||"")}</td><td>${esc(i.name)}</td><td>${esc(i.unit||"PCS")}</td><td class="num">${Number(i.stock)||0}</td><td class="num">₹${money(i.purchaseRate)}</td><td class="num">₹${money((Number(i.stock)||0)*(Number(i.purchaseRate)||0))}</td><td class="num">₹${money(i.rate)}</td></tr>`);
+ const qty=db.items.reduce((s,i)=>s+(Number(i.stock)||0),0);
+ const valStock=db.items.reduce((s,i)=>s+(Number(i.stock)||0)*(Number(i.purchaseRate)||0),0);
+ return `${head("Stock Summary","Inventory / Stock Valuation")}
+ <div class="stats">${stat("Item Types",db.items.length,"Items in master")}${stat("Total Units",qty,"Current quantity")}${stat("Stock Valuation","₹"+money(valStock),"At purchase rate")}${stat("Low Stock",db.items.filter(i=>Number(i.stock)<=5).length,"5 units or below")}</div>
+ ${panel("CURRENT STOCK",`<input class="search" id="stockSearch" placeholder="Search stock..." oninput="filterTable('stockSearch','stockTable')"><div id="stockTable">${table(["Code","Item","Unit","Stock","Purchase Rate","Stock Value","Sale Rate"],rows)}</div>`)}
+ `;
+}
+function reportsPage(){
+ const rows=db.bills.slice().reverse().map(b=>`<tr><td>${esc(b.date)}</td><td>${esc(b.billNo)}</td><td>${esc(b.kind||"Retail")}</td><td>${esc(b.partyName||"Cash")}</td><td class="num">₹${money(b.subtotal??b.total)}</td><td class="num">₹${money(b.discount||0)}</td><td class="num">₹${money(b.total)}</td><td><button class="btn small" onclick="printVoucher('retail','${b.id}')">Print</button> <button class="btn small danger" onclick="deleteVoucher('${b.kind==='Purchase'?'purchases':'retail'}','${b.id}')">Delete</button></td></tr>`);
+ return `${head("Final Reports","Sale Book / Voucher Register")}
+ <div class="stats">${stat("Total Sales","₹"+money(totalSales()),"All saved sales")}${stat("Total Purchase","₹"+money(totalPurchases()),"All saved purchases")}${stat("Bills",db.bills.length,"Saved sales vouchers")}${stat("Receipts","₹"+money(db.receipts.reduce((s,x)=>s+Number(x.amount||0),0)),"Total receipts")}</div>
+ ${panel("SALES REGISTER",`<div class="btn-row no-print"><button class="btn" onclick="exportCSV()">Export CSV</button><button class="btn" onclick="print()">Print Report</button></div>${table(["Date","Bill No","Type","Party","Subtotal","Discount","Net Total","Action"],rows)}`)}
+ ${panel("PURCHASE REGISTER",table(["Date","Voucher No","Party","Amount","Action"],db.purchases.slice().reverse().map(b=>`<tr><td>${esc(b.date)}</td><td>${esc(b.billNo)}</td><td>${esc(b.partyName)}</td><td>₹${money(b.total)}</td><td><button class="btn small" onclick="printVoucher('purchases','${b.id}')">Print</button> <button class="btn small danger" onclick="deleteVoucher('purchases','${b.id}')">Delete</button></td></tr>`)))}
+ `;
+}
+function dailyPage(){
+ const day=db.bills.filter(b=>b.date===today());
+ const byParty={};day.forEach(b=>byParty[b.partyName||"Cash"]=(byParty[b.partyName||"Cash"]||0)+Number(b.total||0));
+ return `${head("Daily Reports","Today's Sales / Party Wise Sale")}
+ <div class="stats">${stat("Today's Sales","₹"+money(day.reduce((s,b)=>s+Number(b.total||0),0)),"Net sales")}${stat("Bills",day.length,"Today")}${stat("Customers",Object.keys(byParty).length,"Parties billed")}${stat("Today's Purchase","₹"+money(db.purchases.filter(b=>b.date===today()).reduce((s,b)=>s+Number(b.total||0),0)),"Purchase total")}</div>
+ ${panel("TODAY'S BILLS",table(["Date","Bill No","Type","Party","Amount"],day.map(b=>`<tr><td>${esc(b.date)}</td><td>${esc(b.billNo)}</td><td>${esc(b.kind)}</td><td>${esc(b.partyName)}</td><td>₹${money(b.total)}</td></tr>`)))}
+ ${panel("PARTY WISE SALE",table(["Party","Total Sale"],Object.entries(byParty).map(([n,v])=>`<tr><td>${esc(n)}</td><td>₹${money(v)}</td></tr>`)))}
+ `;
+}
+function gstPage(){
+ const rows=db.bills.map(b=>{
+  const taxable=(b.lines||[]).reduce((s,l)=>s+(Number(l.amount||0)-Number(l.taxAmount||0)),0);
+  const tax=(b.lines||[]).reduce((s,l)=>s+Number(l.taxAmount||0),0);
+  return `<tr><td>${esc(b.date)}</td><td>${esc(b.billNo)}</td><td>${esc(b.partyName||"Cash")}</td><td>${esc(b.gstin||"")}</td><td class="num">₹${money(taxable)}</td><td class="num">₹${money(tax)}</td><td class="num">₹${money(b.total)}</td></tr>`;
+ });
+ return `${head("GST Reports","GST Summary / GSTR-1 style register")}
+ <div class="notice">This is a local billing summary, not a government GST filing or validation service. Verify GST classification and tax details before filing.</div>
+ ${panel("GST SALES REGISTER",`<div class="btn-row"><button class="btn" onclick="exportCSV()">Export CSV</button><button class="btn" onclick="print()">Print</button></div>${table(["Date","Invoice","Party","GSTIN","Taxable Value","GST Amount","Invoice Total"],rows)}`)}
+ `;
+}
+function settingsPage(){
+ const c=db.company;
+ return `${head("Company & Settings","Company Profile / Backup / Restore")}
+ ${panel("COMPANY PROFILE",`<form onsubmit="saveCompany(event)"><div class="form-grid">
+ ${field("Company Name","cName",{value:c.name||"",required:true})}
+ ${field("Address","cAddress",{value:c.address||""})}
+ ${field("Phone","cPhone",{value:c.phone||""})}
+ ${field("GSTIN","cGSTIN",{value:c.gstin||""})}
+ ${field("Financial Year","cFY",{value:c.financialYear||"2026-2027"})}
+ </div><div class="btn-row"><button class="btn primary" type="submit">Save Company Details</button></div></form>`)}
+ ${panel("DATABASE BACKUP & RESTORE",`<p>Export a backup before changing or replacing the HTML file. Backup contains the records stored in this browser.</p>
+ <div class="btn-row"><button class="btn primary" onclick="backup()">Download JSON Backup</button><button class="btn" onclick="$('restoreFile').click()">Restore JSON Backup</button><input class="hidden" type="file" id="restoreFile" accept=".json,application/json" onchange="restoreBackup(event)"></div>
+ <p><b>Database key:</b> <code>shree_erp_purple_v2</code></p>
+ <div class="notice">Do not clear browser site data if you want to keep your local ERP records. This version stores data in this browser on this device.</div>`)}
+ ${panel("DATA COUNTS",`<div class="grid-two"><div>Items: <b>${db.items.length}</b></div><div>Parties: <b>${db.parties.length}</b></div><div>Sales bills: <b>${db.bills.length}</b></div><div>Purchases: <b>${db.purchases.length}</b></div><div>Receipts: <b>${db.receipts.length}</b></div><div>Payments: <b>${db.payments.length}</b></div></div>`)}
+ `;
+}
+function saveCompany(e){
+ e.preventDefault();db.company={...db.company,name:val("cName"),address:val("cAddress"),phone:val("cPhone"),gstin:val("cGSTIN"),financialYear:val("cFY")||"2026-2027"};
+ save();render();setStatus("Company settings saved");
+}
+function backup(){
+ const blob=new Blob([JSON.stringify(db,null,2)],{type:"application/json"});
+ const a=document.createElement("a");a.href=URL.createObjectURL(blob);
+ a.download="SHREE-ERP-Backup-"+today()+".json";a.click();URL.revokeObjectURL(a.href);
+ setStatus("Backup downloaded");
+}
+function restoreBackup(e){
+ const file=e.target.files?.[0];if(!file)return;
+ const reader=new FileReader();
+ reader.onload=()=>{
+  try{
+   const parsed=JSON.parse(reader.result);
+   if(!parsed||typeof parsed!=="object"||!Array.isArray(parsed.items)||!Array.isArray(parsed.parties))throw new Error("Invalid backup");
+   if(!confirm("Restore this backup and replace the current local data? Download a backup first if needed."))return;
+   const base=blank();db={...base,...parsed,company:{...base.company,...(parsed.company||{})}};
+   ["items","parties","bills","receipts","payments","purchases","expenses"].forEach(k=>{if(!Array.isArray(db[k]))db[k]=[];});
+   save();go("dashboard");alert("Backup restored.");
+  }catch(err){alert("Could not restore this file. Please select a valid SHREE ERP JSON backup.");}
+ };
+ reader.readAsText(file);
+}
+function linksPage(){
+ return `${head("Links","SHREE ERP Modules")}
+ ${panel("MODULE SHORTCUTS",`<div class="quick-grid">
+ <button class="quick" onclick="go('dashboard')"><span>⌂</span>Dashboard</button>
+ <button class="quick" onclick="go('items')"><span>▦</span>Item Master</button>
+ <button class="quick" onclick="go('parties')"><span>👥</span>Party Master</button>
+ <button class="quick" onclick="go('retail')"><span>🧾</span>Retail Bill</button>
+ <button class="quick" onclick="go('wholesale')"><span>📦</span>Wholesale Bill</button>
+ <button class="quick" onclick="go('purchases')"><span>🛒</span>Purchase</button>
+ <button class="quick" onclick="go('accounts')"><span>₹</span>Accounts</button>
+ <button class="quick" onclick="go('stock')"><span>▧</span>Stock</button>
+ <button class="quick" onclick="go('reports')"><span>▤</span>Reports</button>
+ <button class="quick" onclick="go('gst')"><span>▦</span>GST</button>
+ <button class="quick" onclick="go('daily')"><span>▤</span>Daily Reports</button>
+ <button class="quick" onclick="go('settings')"><span>⚙</span>Settings</button>
+ </div>`)}
+ `;
+}
+function exportCSV(){
+ const rows=[["Date","Bill No","Type","Party","GSTIN","Total"]];
+ db.bills.forEach(b=>rows.push([b.date,b.billNo,b.kind,b.partyName,b.gstin,b.total]));
+ const csv=rows.map(r=>r.map(v=>`"${String(v??"").replace(/"/g,'""')}"`).join(",")).join("\r\n");
+ const blob=new Blob(["\ufeff"+csv],{type:"text/csv;charset=utf-8"});
+ const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="SHREE-ERP-Sales.csv";a.click();URL.revokeObjectURL(a.href);
+}
+
 document.addEventListener("keydown",e=>{
-if(e.key==="Escape"){if($("modalRoot").innerHTML){closeModal();e.preventDefault();return}if(view!=="dashboard"){go("dashboard");e.preventDefault()}return}
-if(e.key==="F2"){e.preventDefault();openPartyPicker();return}
-if(e.key==="F3"){e.preventDefault();renameCustomer();return}
-if(e.key==="F4"){e.preventDefault();go("retail");return}
-if(e.key==="F1"&&["retail","wholesale"].includes(view)){e.preventDefault();if($("tDoctor"))$("tDoctor").focus();else alert("Doctor field Retail Billing-এ আছে।");return}
-if(e.key==="Enter"&&!e.ctrlKey&&!e.altKey&&!e.shiftKey){
-let t=e.target;if(t.closest(".modal-bg"))return;
-if(!t.matches("input,select,textarea")||t.matches("[type=submit],[type=button],[readonly]")||t.tagName==="TEXTAREA")return;
-let f=t.closest("form");if(!f)return;
-if(t.id==="lineSearch"){searchBillItem();if(currentItem()){e.preventDefault();fillLineRate();$("linePack").focus();return}}
-let a=[...f.querySelectorAll("input:not([type=hidden]):not([type=button]):not([type=submit]):not([readonly]),select,textarea")].filter(x=>!x.disabled&&x.offsetParent!==null),i=a.indexOf(t);
-if(i>=0){e.preventDefault();if(i<a.length-1)a[i+1].focus();else if(f.requestSubmit)f.requestSubmit();else f.dispatchEvent(new Event("submit",{cancelable:true,bubbles:true}))}
-}
+ const tag=document.activeElement?.tagName?.toLowerCase();
+ const typing=["input","textarea","select"].includes(tag);
+ if(e.key==="Escape"){e.preventDefault();go("dashboard");return;}
+ if(e.key==="F4"){e.preventDefault();go("retail");return;}
+ if(e.key==="F2"){
+  e.preventDefault();
+  if(["retail","wholesale","purchases"].includes(view)){
+   if($("tParty")){$("tParty").focus();$("tParty").click();}
+   else go("parties");
+  }else go("parties");
+  return;
+ }
+ if(e.key==="F3"){e.preventDefault();renameCustomer();return;}
+ if(e.key==="F1"){
+  e.preventDefault();
+  if($("tDoctor"))$("tDoctor").focus();
+  else alert("SHREE ERP Help: F2 Customer, F3 Rename Customer, F4 Retail Bill, Esc Dashboard.");
+  return;
+ }
+ if(e.key==="Enter"&&typing){
+  const form=document.activeElement.closest("form");
+  if(form&&tag==="input"){
+   const els=[...form.querySelectorAll("input:not([readonly]),select,button[type=submit]")].filter(x=>!x.disabled&&x.offsetParent!==null);
+   const i=els.indexOf(document.activeElement);
+   if(i>=0&&i<els.length-1){e.preventDefault();els[i+1].focus();}
+  }
+ }
 });
-render();updateStatus();
+load();render();updateHeader();setStatus("Ready • Local database loaded");
 </script>
-
-</body>  
+</body>
 </html>
+
 
