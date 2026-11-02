@@ -187,15 +187,21 @@ table{border-collapse:collapse!important;background:#fff!important;font-size:11p
 </header>
 <nav class="menubar" id="menubar">
  <button class="active" data-view="dashboard" onclick="go('dashboard')">Dashboard</button>
- <button data-view="items" onclick="go('items')">Masters</button>
- <button data-view="retail" onclick="go('retail')">Transactions</button>
- <button data-view="receipt" onclick="go('receipt')">Accounts</button>
- <button data-view="reports" onclick="go('reports')">Final Reports</button>
- <button data-view="gst" onclick="go('gst')">GST</button>
- <button data-view="stock" onclick="go('stock')">Stocks</button>
- <button data-view="daily" onclick="go('daily')">Daily Reports</button>
- <button data-view="ledger" onclick="go('ledger')">Ledger</button>
- <button data-view="links" onclick="go('links')">Links</button>
+ <button data-view="menu_my" onclick="go('menu_my')">My Menu</button>
+ <button data-view="menu_masters" onclick="go('menu_masters')">Masters</button>
+ <button data-view="menu_transactions" onclick="go('menu_transactions')">Transactions</button>
+ <button data-view="menu_accounts" onclick="go('menu_accounts')">Accounts</button>
+ <button data-view="menu_digital" onclick="go('menu_digital')">Digital</button>
+ <button data-view="menu_books" onclick="go('menu_books')">Books</button>
+ <button data-view="menu_final" onclick="go('menu_final')">Final Reports</button>
+ <button data-view="menu_gst" onclick="go('menu_gst')">GST</button>
+ <button data-view="menu_eway" onclick="go('menu_eway')">e-Way</button>
+ <button data-view="menu_stocks" onclick="go('menu_stocks')">Stocks</button>
+ <button data-view="menu_daily" onclick="go('menu_daily')">Daily Reports</button>
+ <button data-view="menu_reports" onclick="go('menu_reports')">Reports</button>
+ <button data-view="menu_hotkeys" onclick="go('menu_hotkeys')">Hot Keys</button>
+ <button data-view="menu_links" onclick="go('menu_links')">Links</button>
+ <button data-view="dashboard" onclick="if(confirm('Dashboard-এ ফিরে যাবেন?'))go('dashboard')">Exit</button>
 </nav>
 <div class="toolbar">
  <button class="btn" onclick="go('retail')">＋ Retail Bill (F4)</button>
@@ -331,6 +337,7 @@ function render(){
  else if(view==="expiry")root.innerHTML=expiryPage();
  else if(view==="ledger")root.innerHTML=ledgerPage();
  else if(["reports","daily","gst","links"].includes(view))root.innerHTML=reportsPage(view);
+ else if(view.startsWith("menu_"))root.innerHTML=menuPage(view.slice(5));
  else root.innerHTML=dashboard();
 }
 function dashboard(){
@@ -1457,6 +1464,70 @@ function renameCustomer(){
     document.head.appendChild(style);
   }
 })();
+
+/* SHREE ERP MENU TREE — menu navigation for the supplied MARG reference list.
+   Existing working modules are linked to their current pages. External/API-dependent
+   services are identified honestly and are not represented as completed integrations. */
+const SHREE_MENU={
+my:{title:"My Menu – ব্যক্তিগত মেনু",groups:[["My Menu",["Add My Menu","Modify My Menu","Rename My Menu","Delete My Menu","User-wise Menu"]]]},
+masters:{title:"Masters – মাস্টার ডেটা",groups:[
+["Item Master",["New Item","Modify Item","Item List","Item Group","Unit Master","Company Master","HSN Master","GST Rate","Barcode","Item Multi Editing"]],
+["Party Master",["New Party","Modify Party","Party List","Customer","Supplier","Area Master","Route Master","Party Multi Editing"]],
+["Ledger Master",["New Ledger","Modify Ledger","Ledger List"]],
+["Marg Setups",["Control Room","Search in All","Sale Entry","Purchase Entry","Return Entry","Challan"]],
+["Passwords & Powers",["Operator's","New Operator","Modify Operator","Update Operator Power","User-wise Rights","Supervisor Powers"]],
+["Ease of GST Adoption",["Item GST% Updation","HSN Updation","Rates Updation"]]
+]},
+transactions:{title:"Transactions – লেনদেন",groups:[
+["Sale / Bill",["Retail Bill","Wholesale Bill","New Challan","Modify Challan","Sale Return","Credit Note","Bill Modification"]],
+["Purchase",["Purchase Bill","Purchase Challan","Purchase Return","Debit Note","Purchase Order"]],
+["Pending",["Cashier","Pending Bills","Receipt","Open Bill","Delivery Man"]],
+["GST Inward (Expense)",["Inward Entry"]],
+["Bill & Challan Utilities",["Bill Conversion","Challan Transfer","Challan Pending","Challan Modify"]]
+]},
+accounts:{title:"Accounts – হিসাব",groups:[["Voucher Entry",["Payment","Receipt","Journal","Debit Note","Credit Note","Contra","Purchase"]],["Other Entry",["Single Entry","Cheque/Cash","P.D. Cheque/Cash"]]]},
+digital:{title:"Digital – ডিজিটাল পরিষেবা",groups:[["Connected Banking",["Banking Payment"]],["Digital Delivery",["Bill Delivery"]],["ERP to ERP",["Send Order","Receive Order"]],["WhatsApp Services",["Bill Sharing","Outstanding Sharing","Stock & Sales Analysis Sharing","Ledger Sharing","Reminder"]],["Email Services",["Email Bill PDF","Email Reports"]],["SMS Setup",["SMS Setup"]],["Cloud Backup",["Google Drive Backup","OneDrive Backup"]]]},
+books:{title:"Books – হিসাবের বই",groups:[["Books",["All Ledgers","Voucher Date-wise","User Detail","Duplicate Voucher","Outstanding","Cash Book","Bank Book"]]]},
+final:{title:"Final Reports – চূড়ান্ত রিপোর্ট",groups:[["Financial Statements",["Trial Balance","Profit & Loss","Income","Expenses","Balance Sheet","Assets","Liabilities","Cash Flow","Funds Flow","Ratio Analysis"]]]},
+gst:{title:"GST – জিএসটি",groups:[["GST Returns",["GSTR-1","GSTR-2","GSTR-3B"]],["GST Data",["HSN/SAC","Tax Rate","GSTIN"]],["GST Reports",["Sales GST Report","Purchase GST Report","JSON Export"]]]},
+eway:{title:"e-Way – ই-ওয়ে বিল",groups:[["E-Way Bill",["E-Way Bill Generation","Transport Details","Vehicle Details","Distance Details","Update E-Way Bill"]]]},
+stocks:{title:"Stocks – স্টক",groups:[["Stock Status",["Item-wise Stock","Batch-wise Stock","Godown-wise Stock"]],["Stock Tools",["Stock & Sales Analysis","Re-Order","S/R Expiry","P/R Expiry","Stock Transfer","Stock Valuation"]]]},
+daily:{title:"Daily Reports – দৈনিক রিপোর্ট",groups:[["Daily Analysis (MIS)",["Business Analysis","Patient-wise","Item-wise","Sale Analysis","Summary","Detail","Detailed Summary","Today's Gross Profit","Daily Sales Analysis","Daily Purchase Analysis"]]]},
+reports:{title:"Reports – রিপোর্ট",groups:[["Business Reports",["Sale Analysis","Purchase Analysis","Inventory Report","Management Report"]],["Utilities",["Change Cash Date","Delete Special Deals","Multi Deletion","Multi Editing","Item Master Multi Editing","Item Master Manual Edit","Item/Company Masters","Company-wise Rack No. Feeding","Party Master Multi Editing","Station Shift in Area/Route","Party/Area/Route/M.R."]]]},
+hotkeys:{title:"Hot Keys – শর্টকাট",groups:[["Keyboard Shortcuts",["F1 – Change Company","Ctrl+U – Change User","Ctrl+7 – Data Entry","Ctrl+F9 – Bill Adjustments","Shift+F12 – Calendar","F12 – Calculator","Ctrl+F1 – Personal Directory","Ctrl+F11 – Printer Setup","Ctrl+J – Switch Over","Ctrl+F12 – Standard Narration","Ctrl+S – Flush Memory","Ctrl+Q – Quit"]]]},
+links:{title:"Links & Home Screen Shortcuts",groups:[["Quick Links",["Wallet","Marketplace","Message","Ticket","MARG HELP","Sessions","Community","Dashboard","Search","Update MARG ERP","What's New"]],["Add-ons / Business Features",["WhatsApp Bill & Report Sharing","Direct Call from Computer","My Shop QR Code","eRetail Web Application","Order Calling","Google Maps Sales Analysis","Cloud Backup","PharmaNXT Drug Information","Gate Entry before Purchase Entry","Floor-wise Store Room Billing","Online Purchase Import","Credit Limit Management","Loss Management","Suggested Item","Alternate Item","Subscription Billing","Self Define Fields","Stock Clearance Items","Mode of Payment","Cheque Management","SMS Setup","Email Setup"]]]}
+};
+function menuTarget(label,section){
+ const x=String(label).toLowerCase();
+ if(/dashboard|wallet|marketplace|message|ticket|help|community|sessions|what's new|update marg|search in all/.test(x))return x.includes("dashboard")?"dashboard":"links";
+ if(/item|barcode|unit master|hsn|gst rate|company-wise rack/.test(x))return "items";
+ if(/party|customer|supplier|area master|route master|doctor|salesman|credit limit/.test(x))return "parties";
+ if(/ledger|outstanding|cash book|bank book|all ledgers/.test(x))return "ledger";
+ if(/retail|sale entry|sale return|bill modification|bill conversion|pending bills|open bill|cashier/.test(x))return "retail";
+ if(/wholesale/.test(x))return "wholesale";
+ if(/purchase/.test(x))return "purchase";
+ if(/receipt/.test(x))return "receipt";
+ if(/payment|cheque|contra|journal|debit note|credit note|single entry/.test(x))return "payment";
+ if(/stock|re-order|inventory|godown|transfer|valuation/.test(x))return "stock";
+ if(/expiry/.test(x))return "expiry";
+ if(/gstr|gst|hsn\/sac|tax rate|json export/.test(x))return "gst";
+ if(/daily|today's gross|business analysis/.test(x))return "daily";
+ if(/trial balance|profit|income|expenses|balance sheet|assets|liabilities|cash flow|funds flow|ratio|report|analysis|summary|detail/.test(x))return section==="daily"?"daily":"reports";
+ if(/operator|power|rights|control room|setup|password|user|change company|backup|restore|printer|calendar|calculator|financial year/.test(x))return "settings";
+ return "";
+}
+function openMenuOption(label,section){
+ const target=menuTarget(label,section);
+ if(target){go(target);return;}
+ const integration=/whatsapp|email|sms|cloud|google drive|onedrive|banking|e-way|transport|vehicle|distance|erp to erp|send order|receive order|direct call|google maps|pharmanxt|online purchase|subscription|qr code|delivery|challan|operator|user-wise|power|multi editing|multi deletion|my menu|rename my menu|delete my menu|add my menu|modify my menu|calendar|calculator|printer|flush memory|quit|change user|switch over/.test(label.toLowerCase());
+ const reason=integration?"এই অপশনটির জন্য আলাদা API, provider credentials, permission অথবা অতিরিক্ত module দরকার। বর্তমান offline browser build-এ এটি সংযুক্ত নয়।":"এই অপশনের আলাদা entry screen এখনও তৈরি হয়নি। এটি menu reference-এ রাখা হয়েছে, কিন্তু completed feature হিসেবে দেখানো হচ্ছে না।";
+ $("modalRoot").innerHTML=`<div class="modal-bg" onclick="if(event.target===this)closeModal()"><div class="modal"><div class="modal-head">${esc(label)}</div><div class="modal-body"><p><b>SHREE ERP Feature Status</b></p><p>${esc(reason)}</p><p class="muted">যে core page ইতিমধ্যে আছে, সেটি সংশ্লিষ্ট menu থেকে খোলা যাবে। API বা server সংযোগ ছাড়া external service চালানো সম্ভব নয়।</p><div class="form-actions"><button class="btn primary" onclick="closeModal()">ঠিক আছে</button><button class="btn" onclick="closeModal();go('settings')">Settings</button></div></div></div></div>`;
+}
+function menuPage(section){
+ const data=SHREE_MENU[section];if(!data)return `${head("Menu","Menu reference")}<div class="card">Menu not found.</div>`;
+ const groups=data.groups.map(([group,items])=>`<div class="card"><h3>${esc(group)}</h3><div class="quickgrid">${items.map(label=>`<button class="btn" type="button" onclick="openMenuOption(${JSON.stringify(label).replace(/"/g,"&quot;")},${JSON.stringify(section).replace(/"/g,"&quot;")})">${esc(label)}</button>`).join("")}</div></div>`).join("");
+ return `${head(data.title,"Menu options based on the supplied MARG ERP 9+ reference tree")}<div class="notice">এটি SHREE ERP-এর menu navigation। অপশন দেখা মানেই MARG-এর official edition-এ থাকা বা external service connected থাকা বোঝায় না।</div>${groups}`;
+}
 
 // Initialize the application view after all functions and handlers are defined.
 render();
