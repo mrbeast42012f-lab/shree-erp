@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>SHREE ERP AI+ | Inventory | Accounting | GST</title>
+<title>Shree ERP | Inventory | Accounting | GST</title>
 <style>
 :root{
   --marg-top-bg: linear-gradient(to bottom, #0c2b64, #184285);
@@ -102,7 +102,7 @@ body{
   filter: brightness(1.15);
 }
 
-/* MAIN WORKSPACE LAYOUT (3 PANELS EXACT LIKE MARG IMAGE) */
+/* MAIN WORKSPACE LAYOUT */
 .workspace {
   display: grid;
   grid-template-columns: 210px 1fr 220px;
@@ -152,7 +152,7 @@ body{
   padding: 4px;
 }
 
-/* HERO BRAND BANNER (CENTER TOP) */
+/* HERO BRAND BANNER */
 .hero-banner {
   background: linear-gradient(135deg, #091e42 0%, #174276 50%, #0d2d57 100%);
   border: 2px solid #000;
@@ -234,7 +234,7 @@ body{
   font-weight: bold;
 }
 
-/* FIND MEDICINE & PROMO CARDS BAR */
+/* PROMO CARDS BAR */
 .promo-grid {
   display: grid;
   grid-template-columns: 1.2fr 1.2fr 1.2fr 1fr;
@@ -256,7 +256,7 @@ body{
   color: #ffe600;
 }
 
-/* CENTER DASHBOARD LOWER TABLES */
+/* DASHBOARD LOWER TABLES */
 .dashboard-content-split {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -277,7 +277,7 @@ body{
   font-size: 11px;
 }
 
-/* RIGHT ACTION SIDEBAR (EXACT MATCHING BUTTONS) */
+/* RIGHT ACTION SIDEBAR */
 .right-panel {
   background: #c5daf2;
   border: 1px solid var(--marg-border);
@@ -305,7 +305,7 @@ body{
   background: linear-gradient(to bottom, #d92b5a, #8c0f32);
 }
 
-/* BOTTOM LICENSING & STATUS BAR (MATCHING IMAGE FOOTER) */
+/* FOOTER LICENSING & STATUS BAR */
 .footer-info-panel {
   background: #b0cced;
   border: 1px solid var(--marg-border);
@@ -388,7 +388,7 @@ tr:hover { background: #ffeaa7; }
     </div>
   </div>
 
-  <!-- MAIN MENU BAR (EXACT MARG 9+ OPTIONS) -->
+  <!-- MAIN MENU BAR -->
   <nav class="menubar" id="mainMenuBar">
     <button class="active" onclick="showDashboard()">Masters</button>
     <button onclick="openModule('retail')">Transactions</button>
@@ -406,12 +406,12 @@ tr:hover { background: #ffeaa7; }
     <button onclick="showDashboard()">Exit</button>
   </nav>
 
-  <!-- SUB TOOLBAR WITH MARG ACTION BUTTONS -->
+  <!-- SUB TOOLBAR -->
   <div class="sub-toolbar">
     <button class="btn-pink" onclick="openModule('receipt')">Wallet</button>
     <button class="btn-pink" onclick="openModule('links')">Message</button>
     <button class="btn-pink" onclick="openModule('links')">Ticket</button>
-    <button class="btn-pink" onclick="openModule('links')">MARG HELP</button>
+    <button class="btn-pink" onclick="openModule('links')">SHREE HELP</button>
     <button class="btn-blue" onclick="openModule('links')">Training</button>
     <button class="btn-pink" onclick="openModule('links')">Offer</button>
     <button class="btn-blue" onclick="openModule('links')">Community</button>
@@ -422,7 +422,7 @@ tr:hover { background: #ffeaa7; }
   <!-- MAIN WORKSPACE -->
   <div class="workspace">
 
-    <!-- LEFT PANEL (NAVIGATION & MASTERS) -->
+    <!-- LEFT PANEL -->
     <aside class="left-panel" id="leftPanel">
       <div class="menu-category-title">MASTERS MENU</div>
       <div class="side-item" onclick="openModule('items')">Item Master</div>
@@ -434,7 +434,7 @@ tr:hover { background: #ffeaa7; }
       
       <div class="menu-category-title" style="margin-top:5px;">CONTROL & SETUPS</div>
       <div class="side-item" onclick="openModule('settings')">Control Room</div>
-      <div class="side-item" onclick="openModule('settings')">MARG Setups</div>
+      <div class="side-item" onclick="openModule('settings')">Shree Setups</div>
       <div class="side-item" onclick="openModule('settings')">Passwords & Powers</div>
       <div class="side-item" onclick="openModule('settings')">Printer Setup</div>
       <div class="side-item" onclick="openModule('company')">Change Company</div>
@@ -446,16 +446,16 @@ tr:hover { background: #ffeaa7; }
       <!-- DEFAULT DASHBOARD VIEW -->
       <div id="dashboardView" style="display:flex; flex-direction:column; gap:4px; height:100%;">
         
-        <!-- HERO MARG ERP AI+ BANNER -->
+        <!-- HERO BRAND BANNER -->
         <div class="hero-banner">
           <div class="hero-left">
             <div class="ambassador-img">
               Suniell Shetty<br>Brand<br>Ambassador
             </div>
             <div class="hero-brand-text">
-              <div class="marg-logo-large">Marg</div>
+              <div class="marg-logo-large">Shree</div>
               <div class="marg-tagline">The Business Backbone</div>
-              <div class="marg-ai-title">MARG ERP AI+</div>
+              <div class="marg-ai-title">SHREE ERP AI+</div>
               <div style="font-size:10px; color:#d0e4ff; margin-top:2px;">Inventory | Accounting | GST</div>
             </div>
           </div>
@@ -523,14 +523,14 @@ tr:hover { background: #ffeaa7; }
 
       </div>
 
-      <!-- DYNAMIC MODULE VIEW CONTAINER (HIDDEN BY DEFAULT) -->
+      <!-- DYNAMIC MODULE VIEW CONTAINER -->
       <div id="moduleViewContainer" class="view-container hidden">
         <!-- Dynamic content injected by JavaScript -->
       </div>
 
     </main>
 
-    <!-- RIGHT PANEL (EXACT MARG 9+ RIGHT ACTION BUTTONS) -->
+    <!-- RIGHT PANEL -->
     <aside class="right-panel">
       <button class="right-btn highlight" onclick="openModule('retail')">Bill-Retail (F4)</button>
       <button class="right-btn" onclick="openModule('wholesale')">Bill-Wholesale</button>
@@ -562,7 +562,7 @@ tr:hover { background: #ffeaa7; }
   <!-- FOOTER LICENSING & SYSTEM INFO -->
   <div class="footer-info-panel">
     <div class="license-box">
-      <strong>MARG ERP LTD.</strong><br>
+      <strong>SHREE ERP LTD.</strong><br>
       PLOT NO 7 NEAR WAJIRPUR PRESS AREA, DELHI<br>
       Financial Period : Apr, 2026 - Mar, 2027
     </div>
@@ -592,7 +592,6 @@ tr:hover { background: #ffeaa7; }
 </div>
 
 <script>
-// INITIALIZE & SYNC WITH ORIGINAL ERP LOGIC
 const DB_KEY = "shree_erp_purple_v2";
 
 function getDB() {
@@ -638,7 +637,7 @@ function openModule(viewName) {
             </div>`;
   } else if(viewName === 'retail' || viewName === 'wholesale') {
     html = `<h2>${viewName.toUpperCase()} BILLING ENTRY (F4)</h2>
-            <p style="margin-bottom:10px; color:#1b4987;">Fast counter entry mode enabled</p>
+            <p style="margin-top:10px; color:#1b4987;">Fast counter entry mode enabled</p>
             <div style="background:white; padding:10px; border:1px solid #7b9ebd;">
               <label>Party / Customer: </label>
               <input type="text" placeholder="Cash / Walk-in" style="padding:4px; width:200px; margin-right:10px;">
@@ -682,7 +681,6 @@ function loadRecentTransactions() {
   `).join('');
 }
 
-// Global Keyboard Hotkeys matching Marg
 document.addEventListener('keydown', function(e) {
   if (e.key === 'F4') {
     e.preventDefault();
@@ -697,4 +695,5 @@ loadRecentTransactions();
 
 </body>
 </html>
+
 
