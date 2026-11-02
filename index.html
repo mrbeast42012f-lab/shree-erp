@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#174a7e">
-<title>SHREE ERP | Classic Business Management</title>
+<meta name="theme-color" content="#183e70">
+<title>SHREE ERP | Business Management</title>
 <style>
 :root{--navy:#183e70;--blue:#245a96;--light:#eaf1fa;--line:#9eafc5;--bg:#cbd5e2}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);font:12px Tahoma,Arial,sans-serif;color:#172b45}
@@ -58,101 +58,6 @@ th,td{border:1px solid #c4cfdd;padding:7px 8px}tbody tr:nth-child(even){backgrou
 @media(max-width:380px){.formgrid,.bill-grid{grid-template-columns:1fr}.title-actions .btn{padding:5px}.stat strong{font-size:16px}}
 @media print{body{background:white}.titlebar,.menubar,.toolbar,.left-panel,.right-panel,.statusline,.view-head .btn,.form-actions,.no-print{display:none!important}.workspace{display:block;padding:0}.app{border:0}.card{break-inside:avoid}}
 
-/* SHREE ERP Professional Purple UI Upgrade — keeps the existing ERP workflow/data */
-:root{
- --navy:#174a7e;--blue:#245f96;--light:#eaf3fb;--line:#c7d9e9;--bg:#e9f0f7;
- --deep:#103454;--mid:#245f96;--accent:#3b82c4;
-}
-body{background:linear-gradient(135deg,#e9f0f7 0%,#dce8f4 100%);color:#2b2140;font:12px "Segoe UI",Tahoma,Arial,sans-serif}
-.app{background:#f7fafd;border:1px solid #9fb7ce;box-shadow:0 8px 28px #174a7e18}
-.titlebar{background:linear-gradient(115deg,#103454,#174a7e 58%,#245f96);padding:12px 15px;box-shadow:0 2px 7px #10345425}
-.brand{font-size:19px;letter-spacing:.8px}.brand small{letter-spacing:.45px;color:#dceafa}
-.btn{border:1px solid #b5cbe0;background:linear-gradient(#fff,#e7f0f9);color:#174a7e;border-radius:5px;padding:7px 11px;transition:background .15s,border-color .15s,transform .15s}
-.btn:hover{background:linear-gradient(#fff,#d9e9f8);border-color:#3b82c4}
-.btn:active{transform:translateY(1px)}
-.btn.primary{background:linear-gradient(135deg,#3b82c4,#245f96);color:#fff;border-color:#245f96;box-shadow:0 2px 5px #245f9625}
-.btn.primary:hover{background:linear-gradient(135deg,#4e91c7,#174a7e)}
-.btn.danger{color:#a52345;border-color:#e7b6c3;background:linear-gradient(#fff,#fff0f3)}
-.menubar{background:#dce9f5;border-bottom:1px solid #b8cfe2}
-.menubar button{border-right:1px solid #c5d8e9;color:#174a7e;padding:10px 12px}
-.menubar button:hover,.menubar button.active{background:#fff;color:#245f96;box-shadow:inset 0 -3px #3b82c4}
-.toolbar{background:#f1f6fb;border-bottom:1px solid #c7d9e9;padding:8px}
-.workspace{gap:8px;padding:8px}
-.panel{border:1px solid #c2d4e5;background:#fff;border-radius:6px;overflow:hidden}
-.panel-title{background:linear-gradient(#f1f6fb,#dce9f5);border-bottom:1px solid #c7d9e9;color:#174a7e;padding:9px}
-.side-link{background:#fff;color:#344c62;border-bottom:1px solid #f0eaf8;padding:9px 10px}
-.side-link:hover,.side-link.active{background:#e5f0fa;color:#245f96;box-shadow:inset 3px 0 #3b82c4}
-.statusline{background:#eee5f9;border-top:1px solid #d0bee8;color:#4d3a68}
-.view-head{background:linear-gradient(120deg,#f3ecfc,#dce9f5);border:1px solid #d5c4eb;border-radius:6px;padding:11px}
-h2,h3{color:#174a7e}
-.banner{background:linear-gradient(115deg,#103454,#174a7e 54%,#3b82c4);border:1px solid #174a7e;border-radius:7px;box-shadow:0 5px 14px #174a7e20}
-.stats{gap:8px}
-.stat{border:1px solid #d2e0ed;border-radius:6px;box-shadow:0 2px 6px #174a7e08;padding:13px 10px}
-.stat .label{color:#586b7d}.stat strong{color:#245f96}
-.stat:nth-child(2){background:#f0f9ed}.stat:nth-child(3){background:#fff8e8}.stat:nth-child(4){background:#e9f3fc}
-.card{border:1px solid #d2e0ed;border-radius:7px;box-shadow:0 2px 8px #174a7e08;padding:13px}
-.quickgrid{gap:8px}.quickgrid button{min-height:45px}
-.field label{color:#344c62}
-.field input,.field select,.field textarea,.searchbox{border:1px solid #cbb9e5;border-radius:4px;padding:8px;color:#2b2140;background:#fff}
-.field input:focus,.field select:focus,.field textarea:focus,.searchbox:focus{outline:2px solid #3b82c4;outline-offset:0;border-color:#3b82c4;box-shadow:0 0 0 3px #3b82c41a}
-.table-wrap{border:1px solid #c9dbea;border-radius:5px}
-th{background:linear-gradient(#f3ecfc,#dce9f5);color:#174a7e}
-th,td{border-color:#dbe6f0;padding:8px}
-tbody tr:nth-child(even){background:#f7fafd}tbody tr:hover{background:#eaf3fb}
-.notice{border:1px solid #d5c4eb;background:#edf4fa;border-radius:5px}
-.right-box{border-bottom:1px solid #eee6f7}
-.total-box,.bill-type{background:#f1eafb;border:1px solid #c5d8e9;border-radius:5px}
-.modal{background:#fbf8ff;border:1px solid #a88acb;border-radius:8px;box-shadow:0 18px 55px #10345435}
-.modal-head{background:linear-gradient(115deg,#103454,#245f96)}
-.modal-body{padding:16px}
-.hotkey{border:1px solid #cbb9e5;color:#245f96;border-radius:4px}
-.success{color:#207545}
-@media(max-width:650px){
- .titlebar{padding:10px}.workspace{gap:6px}.card{padding:10px}
- .toolbar{gap:5px}.toolbar .btn{min-width:calc(50% - 5px)}
- .menubar{position:relative}
-}
-@media print{
- .banner{box-shadow:none}.card,.panel,.stat{box-shadow:none;border-radius:0}
-}
-
-
-/* SHREE ERP Classic desktop workspace — original SHREE styling, compact ERP workflow */
-:root{--navy:#174a7e;--blue:#1b527f;--light:#f1ebfa;--line:#9a86b7;--bg:#d9d4e1;--purple:#174a7e;--deep:#103454;--mid:#245f96;--accent:#3b82c4}
-html{background:#c9d5e2}body{font:12px Tahoma,Arial,sans-serif;color:#211b2c;background:linear-gradient(#e9f0f7,#d5e0eb);min-height:100vh}
-button,input,select,textarea{font:12px Tahoma,Arial,sans-serif;border-radius:2px}
-button{transition:background .12s,border-color .12s}button:focus,input:focus,select:focus,textarea:focus{outline:1px solid #2e6ea5;outline-offset:0;box-shadow:0 0 0 1px #d6c5f0}
-.app,.shell,.layout{border-radius:0!important;box-shadow:none!important}
-.topbar{background:linear-gradient(#235d8d,#123a5b)!important;color:#fff!important;border-bottom:2px solid #9a75cb!important;min-height:48px!important;box-shadow:inset 0 1px rgba(255,255,255,.2)!important}
-.brand,.logo,.topbar h1,.topbar .brand-name{color:#fff!important;letter-spacing:.25px}
-.topbar small,.topbar .muted{color:#e5d8f6!important}
-.nav,.nav-bar,.menubar,.main-nav{background:linear-gradient(#fdfcff,#e2d9ef)!important;border:1px solid #a99abc!important;border-top:0!important;gap:0!important;padding:2px!important;box-shadow:0 1px 2px #b9afc5!important}
-.nav button,.nav a,.nav-link,.menu-btn{border:1px solid transparent!important;border-radius:2px!important;background:transparent!important;color:#342047!important;padding:7px 10px!important;font-weight:600!important}
-.nav button:hover,.nav a:hover,.nav-link:hover,.menu-btn:hover{background:#eee5fa!important;border-color:#b5a0d0!important;color:#174a7e!important}
-button.active,.nav .active,.side-link.active{background:linear-gradient(#347db5,#1c5a8b)!important;color:#fff!important;border-color:#174a7e!important}
-.side,.sidebar,.left-panel,.right-panel,.panel{background:#f4f0f8!important;border:1px solid #9eb2c5!important;border-radius:0!important;box-shadow:inset 0 1px #fff!important}
-.side-link,.sidebar button,.side button{display:block;width:100%;text-align:left;border:1px solid transparent!important;border-radius:2px!important;background:transparent!important;color:#332641!important;padding:6px 8px!important;margin:1px 0!important}
-.side-link:hover,.sidebar button:hover,.side button:hover{background:#e2edf7!important;border-color:#a8bfd3!important}
-.panel-title,.section-title,.card h3,.right-box h3{background:linear-gradient(#e2edf6,#d1e1ef)!important;color:#174a7e!important;border-bottom:1px solid #9eb2c5!important;padding:7px 8px!important;margin:-1px -1px 8px!important;font-size:12px!important;font-weight:bold!important}
-.card,.right-box,.stat,.banner,.modal,.form-card{border:1px solid #9eb2c5!important;border-radius:2px!important;background:#f8fbfd!important;box-shadow:0 1px 1px rgba(38,15,60,.08)!important}
-.card{padding:8px!important;margin:7px 0!important}.banner{background:linear-gradient(105deg,#f2f7fb,#dbe9f6)!important;border-left:4px solid #245f96!important;color:#23384b!important;padding:12px!important}.banner h2{color:#174a7e!important}
-.btn,button.btn,.quickgrid .btn{border:1px solid #a69ab4!important;border-radius:2px!important;background:linear-gradient(#fff,#e5edf5)!important;color:#2d2139!important;padding:5px 9px!important;min-height:25px!important;box-shadow:inset 0 1px #fff!important}
-.btn:hover,button.btn:hover{background:linear-gradient(#f2f7fb,#d4e5f3)!important;border-color:#7553a0!important}
-.btn.primary,.primary{background:linear-gradient(#27649a,#452078)!important;color:#fff!important;border-color:#174a7e!important;text-shadow:0 1px rgba(0,0,0,.18)!important}
-.btn.danger{color:#7d1f29!important;background:linear-gradient(#fff,#f5e3e3)!important;border-color:#c7a3a6!important}
-.field label,label{color:#332443!important;font-weight:600!important;font-size:11px!important;margin-bottom:3px!important}
-input,select,textarea{background:#fff!important;color:#241b2e!important;border:1px solid #a99db7!important;border-radius:1px!important;min-height:25px!important;padding:4px 6px!important}
-input[readonly],input:disabled,select:disabled{background:#e9eff5!important;color:#5c6a77!important}
-.formgrid{gap:7px 9px!important}.field{min-width:0!important}.formgrid input,.formgrid select{width:100%}
-table{border-collapse:collapse!important;background:#fff!important;font-size:11px!important}th,thead th{background:linear-gradient(#e2edf6,#d3e2ef)!important;color:#174a7e!important;border:1px solid #a9bdce!important;padding:6px 7px!important;font-weight:bold!important;white-space:nowrap}td{border:1px solid #cfdae5!important;padding:5px 7px!important;color:#2b2233!important}tbody tr:nth-child(even){background:#f5f9fc!important}tbody tr:hover{background:#e5f0f8!important}
-.stats{gap:6px!important}.stat{padding:8px!important;min-height:58px!important}.stat strong,.stat .value{color:#174a7e!important;font-size:17px!important}.quickgrid{gap:5px!important}.quickgrid .btn{text-align:left!important}
-.statusline,.status-bar,.footerbar{background:linear-gradient(#edf4fa,#d3dfeb)!important;border-top:1px solid #9bb2c6!important;color:#33485c!important;font:11px Tahoma,Arial,sans-serif!important;padding:5px 8px!important}
-.modal-bg{background:rgba(24,8,39,.45)!important}.modal{border:1px solid #4d7fa8!important;box-shadow:0 8px 28px rgba(25,7,42,.3)!important}.modal-head{background:linear-gradient(#245f96,#174a7e)!important;color:#fff!important;padding:8px 10px!important}
-.notice{background:#edf4fa!important;border:1px solid #bfd2e2!important;color:#4a3263!important;padding:7px!important}
-@media(min-width:1000px){.app,.shell{max-width:none!important;width:100%!important}.layout{gap:7px!important}.center,main{min-width:0!important}.left-panel{width:210px!important;flex:0 0 210px!important}.right-panel{width:230px!important;flex:0 0 230px!important}}
-@media(max-width:800px){.topbar{flex-wrap:wrap!important}.nav,.nav-bar,.menubar,.main-nav{overflow-x:auto!important;white-space:nowrap!important}.side,.sidebar,.left-panel,.right-panel{width:100%!important;flex:auto!important}.formgrid{grid-template-columns:repeat(2,minmax(0,1fr))!important}.card{overflow-x:auto!important}table{min-width:620px!important}}
-@media(max-width:460px){.formgrid{grid-template-columns:1fr!important}.stats{grid-template-columns:repeat(2,minmax(0,1fr))!important}.quickgrid{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
-
 /* SHREE ERP classic desktop dashboard: compact three-panel ERP layout */
 .dashboard-mode .workspace{display:block;padding:5px;min-height:0}
 .dashboard-mode .left-panel,.dashboard-mode .right-panel{display:none!important}
@@ -187,21 +92,15 @@ table{border-collapse:collapse!important;background:#fff!important;font-size:11p
 </header>
 <nav class="menubar" id="menubar">
  <button class="active" data-view="dashboard" onclick="go('dashboard')">Dashboard</button>
- <button data-view="menu_my" onclick="go('menu_my')">My Menu</button>
- <button data-view="menu_masters" onclick="go('menu_masters')">Masters</button>
- <button data-view="menu_transactions" onclick="go('menu_transactions')">Transactions</button>
- <button data-view="menu_accounts" onclick="go('menu_accounts')">Accounts</button>
- <button data-view="menu_digital" onclick="go('menu_digital')">Digital</button>
- <button data-view="menu_books" onclick="go('menu_books')">Books</button>
- <button data-view="menu_final" onclick="go('menu_final')">Final Reports</button>
- <button data-view="menu_gst" onclick="go('menu_gst')">GST</button>
- <button data-view="menu_eway" onclick="go('menu_eway')">e-Way</button>
- <button data-view="menu_stocks" onclick="go('menu_stocks')">Stocks</button>
- <button data-view="menu_daily" onclick="go('menu_daily')">Daily Reports</button>
- <button data-view="menu_reports" onclick="go('menu_reports')">Reports</button>
- <button data-view="menu_hotkeys" onclick="go('menu_hotkeys')">Hot Keys</button>
- <button data-view="menu_links" onclick="go('menu_links')">Links</button>
- <button data-view="dashboard" onclick="if(confirm('Dashboard-এ ফিরে যাবেন?'))go('dashboard')">Exit</button>
+ <button data-view="items" onclick="go('items')">Masters</button>
+ <button data-view="retail" onclick="go('retail')">Transactions</button>
+ <button data-view="receipt" onclick="go('receipt')">Accounts</button>
+ <button data-view="reports" onclick="go('reports')">Final Reports</button>
+ <button data-view="gst" onclick="go('gst')">GST</button>
+ <button data-view="stock" onclick="go('stock')">Stocks</button>
+ <button data-view="daily" onclick="go('daily')">Daily Reports</button>
+ <button data-view="ledger" onclick="go('ledger')">Ledger</button>
+ <button data-view="links" onclick="go('links')">Links</button>
 </nav>
 <div class="toolbar">
  <button class="btn" onclick="go('retail')">＋ Retail Bill (F4)</button>
@@ -349,8 +248,8 @@ function dashboard(){
  const recentReports=[['Sale Book','reports'],['Retail C/Note','reports'],['Stock Valuation','stock'],['Purchase Register','reports'],['Creditors Ledgers','ledger'],['Wholesale D/Note','reports'],['Receive Orders','links']];
  const right=[['Bill-Retail (F4)','retail'],['Bill-Wholesale','wholesale'],['S/R Expiry','expiry'],['P/R Expiry','expiry'],['Receipt','receipt'],['Payment','payment'],['Cash & Bank Book','ledger'],['Ledger A/c','ledger'],['Outstanding','ledger'],['Stock Status','stock'],['Stock & Sales Analysis','reports'],['Re-Order','stock'],['Sales Book','reports'],['Dispatch Summary','reports'],['Bill Tagging','reports'],['Daily Analysis (MIS)','daily'],["Today's Gross Profit",'reports'],['Exit / Home','dashboard']];
  const btn=(label,target,primary=false)=>`<button class="btn ${primary?'primary':''}" onclick="go('${target}')">${label}</button>`;
- return `<div class="dash-head">${[['My Menu','dashboard'],['Masters','items'],['Transactions','retail'],['Accounts','receipt'],['Digital','links'],['Books','reports'],['Final Reports','reports'],['GST','gst'],['e-Way','gst'],['Stocks','stock'],['Daily Reports','daily'],['Reports','reports'],['Hot Keys','links'],['Links','links'],['Exit','dashboard']].map(x=>btn(x[0],x[1])).join('')}</div>
- <div class="dash-head">${[['Wallet','receipt'],['Marketplace','links'],['Message','links'],['Ticket','links'],['SHREE HELP','links'],['Sessions','settings'],['Community','links'],['Dashboard','dashboard'],['Search Items','items']].map(x=>btn(x[0],x[1])).join('')}</div>
+ return `<div class="dash-head">${[['My Menu','menu_my'],['Masters','menu_masters'],['Transactions','menu_transactions'],['Accounts','menu_accounts'],['Digital','menu_digital'],['Books','menu_books'],['Final Reports','menu_final'],['GST','menu_gst'],['e-Way','menu_eway'],['Stocks','menu_stocks'],['Daily Reports','menu_daily'],['Reports','menu_reports'],['Hot Keys','menu_hotkeys'],['Links','menu_links'],['Exit','dashboard']].map(x=>btn(x[0],x[1])).join('')}</div>
+ <div class="dash-head">${[['Wallet','receipt'],['Marketplace','links'],['Message','links'],['Ticket','links'],['SHREE HELP','links'],['Sessions','settings'],['Community','links'],['Dashboard','dashboard'],['Search Items','items'],['Quick Access','menu_quick'],['Footer Keys','menu_footer'],['Editions','menu_edition'],['Business Types','menu_business']].map(x=>btn(x[0],x[1])).join('')}</div>
  <div class="dash-layout">
   <section class="dash-panel"><div class="dash-panel-title">Most Viewed Reports</div>${reports.map(x=>`<button class="dash-report" onclick="go('${x[1]}')">› ${x[0]}</button>`).join('')}<div class="dash-panel-title">Recently Viewed Reports</div>${recentReports.map(x=>`<button class="dash-report" onclick="go('${x[1]}')">› ${x[0]}</button>`).join('')}<button class="dash-report" onclick="go('items')">› Item Master</button><button class="dash-report" onclick="go('parties')">› Party Master</button></section>
   <section class="dash-panel"><div class="dash-promo"><div class="dash-logo">▦ SHREE ERP</div><div class="dash-subtitle">THE BUSINESS BACKBONE · BUSINESS MANAGEMENT</div><div style="font-size:12px;margin-top:15px;color:#34536f">Billing · Inventory · Accounts · GST · Reports</div><div style="font-size:11px;margin-top:7px;color:#647b90">Financial Year: 2026–2027</div></div><div class="dash-panel-title">Quick Transactions</div><div class="dash-shortcuts">${btn('BILL - RETAIL (F4)','retail',true)}${btn('BILL - WHOLESALE','wholesale',true)}${btn('PURCHASE ENTRY','purchase')}${btn('CHALLAN / ORDERS','links')}${btn('RECEIPT VOUCHER','receipt')}${btn('PAYMENT VOUCHER','payment')}${btn('PARTY MASTER (F2)','parties')}${btn('ITEM MASTER (Ctrl+I)','items')}${btn('STOCK SUMMARY','stock')}${btn('FINAL REPORTS','reports')}${btn('COMPANY DETAILS','company')}${btn('BACKUP / RESTORE','settings')}</div><div class="dash-panel-title">Recent Transactions</div>${table(['Date','Type','Bill No.','Party','Amount'],recent.map(x=>`<tr><td>${esc(x.date||'')}</td><td>${esc(x.kind)}</td><td>${esc(x.no||'')}</td><td>${esc(x.party||'')}</td><td>${money(x.total)}</td></tr>`).join(''),'No transactions yet')}</section>
@@ -1464,7 +1363,6 @@ function renameCustomer(){
     document.head.appendChild(style);
   }
 })();
-
 /* SHREE ERP MENU TREE — menu navigation for the supplied MARG reference list.
    Existing working modules are linked to their current pages. External/API-dependent
    services are identified honestly and are not represented as completed integrations. */
@@ -1496,10 +1394,16 @@ daily:{title:"Daily Reports – দৈনিক রিপোর্ট",groups:[[
 reports:{title:"Reports – রিপোর্ট",groups:[["Business Reports",["Sale Analysis","Purchase Analysis","Inventory Report","Management Report"]],["Utilities",["Change Cash Date","Delete Special Deals","Multi Deletion","Multi Editing","Item Master Multi Editing","Item Master Manual Edit","Item/Company Masters","Company-wise Rack No. Feeding","Party Master Multi Editing","Station Shift in Area/Route","Party/Area/Route/M.R."]]]},
 hotkeys:{title:"Hot Keys – শর্টকাট",groups:[["Keyboard Shortcuts",["F1 – Change Company","Ctrl+U – Change User","Ctrl+7 – Data Entry","Ctrl+F9 – Bill Adjustments","Shift+F12 – Calendar","F12 – Calculator","Ctrl+F1 – Personal Directory","Ctrl+F11 – Printer Setup","Ctrl+J – Switch Over","Ctrl+F12 – Standard Narration","Ctrl+S – Flush Memory","Ctrl+Q – Quit"]]]},
 links:{title:"Links & Home Screen Shortcuts",groups:[["Quick Links",["Wallet","Marketplace","Message","Ticket","MARG HELP","Sessions","Community","Dashboard","Search","Update MARG ERP","What's New"]],["Add-ons / Business Features",["WhatsApp Bill & Report Sharing","Direct Call from Computer","My Shop QR Code","eRetail Web Application","Order Calling","Google Maps Sales Analysis","Cloud Backup","PharmaNXT Drug Information","Gate Entry before Purchase Entry","Floor-wise Store Room Billing","Online Purchase Import","Credit Limit Management","Loss Management","Suggested Item","Alternate Item","Subscription Billing","Self Define Fields","Stock Clearance Items","Mode of Payment","Cheque Management","SMS Setup","Email Setup"]]]}
+,quick:{title:"Quick Access Shortcuts – দ্রুত প্রবেশ",groups:[["Quick Access",["Bill – Retail","Bill – Wholesale","S/R Expiry","P/R Expiry","Receipt","Payment","Cash & Bank Book","Ledger A/c","Outstanding","Stock Status","Stock & Sales Analysis","Re-Order","Sales Book","Dispatch Summary","Bill Tagging","Daily Analysis (MIS)","Today's Gross Profit","Exit"]]]}
+,footer:{title:"Footer Shortcuts – কীবোর্ড শর্টকাট",groups:[["Footer Shortcuts",["F1 – Company","Ctrl+I – Item","+L – Party","+U – User","+F1 – Directory","+F10 – Calendar","+F11 – Printer"]]]}
+,edition:{title:"Edition Comparison – সংস্করণ তুলনা",groups:[["Basic",["Limited user/company facilities – edition reference"]],["Silver",["Full Rights and View-only User facilities – edition reference"]],["Gold",["Unlimited Users – edition reference"]]]}
+,business:{title:"Business Coverage – ব্যবসার ধরন",groups:[["Business Types",["Retail","Wholesale","Distribution","Pharmaceutical / Chemist","FMCG","Grocery","Garments","Electronics","Hardware","Automobile Parts","Mobile & Accessories","Cosmetics","Footwear","General Trading","Manufacturing / Other Business"]]]}
+
 };
 function menuTarget(label,section){
  const x=String(label).toLowerCase();
- if(/dashboard|wallet|marketplace|message|ticket|help|community|sessions|what's new|update marg|search in all/.test(x))return x.includes("dashboard")?"dashboard":"links";
+ if(/dashboard|exit/.test(x))return "dashboard";
+ if(/wallet|marketplace|message|ticket|help|community|sessions|what's new|update marg|search in all/.test(x))return "links";
  if(/item|barcode|unit master|hsn|gst rate|company-wise rack/.test(x))return "items";
  if(/party|customer|supplier|area master|route master|doctor|salesman|credit limit/.test(x))return "parties";
  if(/ledger|outstanding|cash book|bank book|all ledgers/.test(x))return "ledger";
@@ -1514,6 +1418,7 @@ function menuTarget(label,section){
  if(/daily|today's gross|business analysis/.test(x))return "daily";
  if(/trial balance|profit|income|expenses|balance sheet|assets|liabilities|cash flow|funds flow|ratio|report|analysis|summary|detail/.test(x))return section==="daily"?"daily":"reports";
  if(/operator|power|rights|control room|setup|password|user|change company|backup|restore|printer|calendar|calculator|financial year/.test(x))return "settings";
+ if(/f1 – company|ctrl\+i|\+l – party/.test(x))return x.includes("company")?"company":(x.includes("party")?"parties":"items");
  return "";
 }
 function openMenuOption(label,section){
