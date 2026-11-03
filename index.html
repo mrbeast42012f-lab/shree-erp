@@ -173,8 +173,8 @@ tr:hover{background:#ffeaa7}
     </aside>
   </div>
   <div class="footer-info-panel">
-    <div class="license-box"><strong>SHREE ERP LTD.</strong><br>PLOT NO 7 NEAR WAJIRPUR PRESS AREA, DELHI<br>Financial Period : Apr, 2026 - Mar, 2027</div>
-    <div class="license-box"><strong>Authorised User :</strong> JANAKINATH BHANDER<br>Reg. Email : janakinath1977@gmail.com | Reg. Mobile : 9733635584<br>KAKDWIP RATHTALA BIRENDRA MARKET 24PGS(S), PIN-743347</div>
+    <div class="license-box"><strong>SHREE ERP LTD.</strong><br>Gobindarampur, kakdwip, south 24 parganas<br>Financial Period : Apr, 2026 - Mar, 2027</div>
+    <div class="license-box"><strong>Authorised User :</strong> JANAKINATH BHANDER<br>Reg. Email : janakinath1977@gmail.com | Reg. Mobile : 9733635584<br>Gobindarampur, kakdwip, south 24 parganas</div>
   </div>
   <div class="bottom-status-bar">
     <div>
@@ -194,7 +194,7 @@ tr:hover{background:#ffeaa7}
 /* ===== STORAGE (swap load/save later for API/database) ===== */
 const K='shree_erp_v3';let db,ed=null,S={},bill=[];
 const $=i=>document.getElementById(i),o=(a,fn)=>a.map(fn).join(''),f=n=>(+n||0).toFixed(2),td=()=>new Date().toISOString().slice(0,10),
-dc=n=>f(Math.abs(n))+(n<0?' Cr':' Dr'),esc=s=>String(s??'').replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c])),sd=(x,y)=>x.d>y.d?1:-1;
+dc=n=>f(Math.abs(n))+(n<0?' Cr':' Dr'),esc=s=>String(s??'').replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]),sd=(x,y)=>x.d>y.d?1:-1;
 function load(){let r;try{r=JSON.parse(localStorage.getItem(K))}catch(e){}
  db=Object.assign({items:[{id:'1',code:'ITM101',name:'PARACETAMOL 650MG',group:'Tablet',unit:'STRIP',hsn:'3004',gst:12,pur:12,rate:15.5,mrp:20,qty:150,batch:'B2026',expiry:'2028-05',godown:'Main',reorder:20},{id:'2',code:'ITM102',name:'AZITHROMYCIN 500MG',group:'Tablet',unit:'STRIP',hsn:'3004',gst:12,pur:80,rate:95,mrp:120,qty:45,batch:'B2025',expiry:'2027-11',godown:'Main',reorder:10}],
  parties:[{id:'1',name:'CASH / WALK-IN',type:'Customer',phone:'9800000000',gstin:'',limit:0,balance:0},{id:'2',name:'MEDICINE WHOLESALE AGENCIES',type:'Supplier',phone:'9832000000',gstin:'',limit:0,balance:0}],
@@ -250,7 +250,8 @@ function saveBill(){const k=S.k;if(!bill.length)return alert('Add at least one l
  if(db.set.credit&&SK.includes(k)&&pt&&pt.limit>0&&accs()[p]+T-paid>pt.limit&&!confirm('Credit limit exceeded! Continue?'))return;
  const t={id:Date.now()+'',no:k.slice(0,3).toUpperCase()+(db.txns.filter(x=>x.kind==k).length+1),date:$('bd').value,kind:k,party:p,lines:bill,sub,gst:g,total:T,paid,mode:$('bm').value};
  db.txns.push(t);eff(t,1);bill=[];save();alert('Saved '+t.no);showDashboard()}
-function pr(id){const t=db.txns.find(x=>x.id==id),w=open('','_blank');if(!w)return alert('Popup blocked');w.document.write(`<body style="font:12px Tahoma"><h3>SHREE ERP - ${NAMES[t.kind]}</h3><p>No: ${t.no} | Date: ${t.date}<br>Party: ${esc(t.party)}</p><table border="1" cellspacing="0" cellpadding="4" width="100%"><tr><th>Item</th><th>Qty</th><th>Rate</th><th>Disc%</th><th>GST%</th><th>Amount</th></tr>${o(t.lines,l=>`<tr><td>${esc(l.n)}</td><td>${l.q}</td><td>${l.r}</td><td>${l.ds}</td><td>${l.g}</td><td>${f(l.a+l.t)}</td></tr>`)}</table><p>Taxable ${f(t.sub)} | GST ${f(t.gst)} | <b>Total ${f(t.total)}</b></p>`);w.print()}
+function pr(id){const t=db.txns.find(x=>x.id==id),w=open('','_blank');if(!w)return alert('Popup blocked');w.document.write(`<html><head><title>Print - ${t.no}</title><style>body{font-family:Tahoma,Arial,sans-serif;font-size:12px;margin:20px}table{width:100%;border-collapse:collapse;margin-top:10px}th,td{border:1px solid #000;padding:5px;text-align:left}@media print{@page{margin:10mm}}</style></head><body><div style="text-align:center;border-bottom:2px solid #000;padding-bottom:5px"><h2 style="margin:0">SHREE ERP LTD.</h2><p style="margin:2px">Gobindarampur, kakdwip, south 24 parganas</p><h4 style="margin:5px 0 0 0">${NAMES[t.kind].toUpperCase()}</h4></div><div style="display:flex;justify-content:space-between;margin-top:10px"><div><b>Bill No:</b> ${t.no}<br><b>Party:</b> ${esc(t.party)}</div><div><b>Date:</b> ${t.date}<br><b>Mode:</b> ${t.mode||'Cash'}</div></div><table><thead><tr><th>Item</th><th>Qty</th><th>Rate</th><th>Disc%</th><th>GST%</th><th>Amount</th></tr></thead><tbody>${o(t.lines,l=>`<tr><td>${esc(l.n)}</td><td>${l.q}</td><td>${l.r}</td><td>${l.ds}</td><td>${l.g}</td><td>${f(l.a+l.t)}</td></tr>`)}</tbody></table><div style="margin-top:10px;text-align:right"><p>Taxable Amt: ₹${f(t.sub)}<br>GST Amt: ₹${f(t.gst)}<br><b style="font-size:14px">Total Amount: ₹${f(t.total)}</b></p></div><br><br><div style="display:flex;justify-content:space-between"><div>Receiver's Signature</div><div>Authorised Signatory</div></div><script>window.onload=function(){window.print();}</script></body></html>`);w.document.close()}
+function print(){if(S.R){const w=open('','_blank');if(!w)return alert('Popup blocked');w.document.write(`<html><head><title>Print - Report</title><style>body{font-family:Tahoma,Arial,sans-serif;font-size:12px;margin:20px}table{width:100%;border-collapse:collapse;margin-top:10px}th,td{border:1px solid #000;padding:5px;text-align:left}@media print{@page{margin:10mm}}</style></head><body><div style="text-align:center;border-bottom:2px solid #000;padding-bottom:5px"><h2 style="margin:0">SHREE ERP LTD.</h2><p style="margin:2px">Gobindarampur, kakdwip, south 24 parganas</p><h3 style="margin:5px 0 0 0">${S.R.t||'Report'}</h3></div><table><thead><tr>${o(S.R.h,x=>`<th>${x}</th>`)}</tr></thead><tbody>${o(S.R.r,r=>`<tr>${o(r,c=>`<td>${esc(c)}</td>`)}</tr>`)}</tbody></table><script>window.onload=function(){window.print();}</script></body></html>`);w.document.close()}else window.print()}
 function cv(id){const t=db.txns.find(x=>x.id==id);eff(t,-1);t.kind=CV[t.kind];eff(t,1);save();openModule('txns')}
 function tdel(id){if(!confirm('Delete this bill and reverse stock?'))return;const t=db.txns.find(x=>x.id==id);eff(t,-1);db.txns=db.txns.filter(x=>x.id!=id);save();openModule('txns')}
 
@@ -358,4 +359,5 @@ load();hdr();$('mainMenuBar').innerHTML=o(Object.keys(M),n=>`<button data-m="${n
 </script>
 </body>
 </html>
+
 
