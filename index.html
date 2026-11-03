@@ -609,7 +609,7 @@ tr:hover { background: #ffeaa7; }
 
   </div>
 
-  <!-- FOOTER LICENSING & SYSTEM INFO -->
+  <!-- FOOTER LICENSING & STATUS BAR -->
   <div class="footer-info-panel">
     <div class="license-box">
       <strong>SHREE ERP LTD.</strong><br>
@@ -759,7 +759,6 @@ function openModule(viewName) {
         </table>
       </div>`;
   } else if(viewName === 'retail' || viewName === 'wholesale' || viewName === 'purchase') {
-    const isPurchase = viewName === 'purchase';
     html = `
       <div style="display:flex; justify-content:space-between; align-items:center;">
         <h2>${viewName.toUpperCase()} BILLING ENTRY</h2>
@@ -816,7 +815,14 @@ function openModule(viewName) {
                 <td>${t.party || 'Cash'}</td>
                 <td>₹${t.total || t.amount || 0}</td>
               </tr>
-            `).join('')}
+            `)[0] ? [...(db.bills||[]), ...(db.purchases||[]), ...(db.receipts||[]), ...(db.payments||[])].map(t => `
+              <tr>
+                <td>${t.date||'-'}</td>
+                <td>${t.kind || t.type || 'Transaction'}</td>
+                <td>${t.party || 'Cash'}</td>
+                <td>₹${t.total || t.amount || 0}</td>
+              </tr>
+            `).join('') : '<tr><td colspan="4">No ledger records found</td></tr>'}
           </tbody>
         </table>
       </div>`;
@@ -955,7 +961,7 @@ function loadRecentTransactions() {
   tbody.innerHTML = list.map(t => `
     <tr>
       <td>${t.date||'-'}</td>
-      <td>${t.kind || 'Sale'}</td>
+      `, t.kind || 'Sale', `</td>
       <td>${t.party || 'Cash'}</td>
       <td>₹${t.total || 0}</td>
     </tr>
@@ -976,5 +982,3 @@ loadRecentTransactions();
 
 </body>
 </html>
-
-
