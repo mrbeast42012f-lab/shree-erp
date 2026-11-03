@@ -87,7 +87,22 @@ tr:hover{background:#ffeaa7}
     <button class="btn-blue" onclick="openModule('search')">Search Item</button>
   </div>
   <div class="workspace">
-    <aside class="left-panel" id="leftPanel"></aside>
+    <aside class="left-panel">
+      <div class="menu-category-title">MASTERS MENU</div>
+      <div class="side-item" onclick="openModule('items')">Item Master</div>
+      <div class="side-item" onclick="openModule('parties')">Account Groups & Parties</div>
+      <div class="side-item" onclick="openModule('items')">Inventory Master</div>
+      <div class="side-item" onclick="openModule('multi')">Rate & Discount Master</div>
+      <div class="side-item" onclick="openModule('stock')">Opening Balances</div>
+      <div class="side-item" onclick="openModule('multi')">Ease of GST Adoption</div>
+      <div class="menu-category-title" style="margin-top:5px">CONTROL & SETUPS</div>
+      <div class="side-item" onclick="openModule('settings')">Control Room</div>
+      <div class="side-item" onclick="openModule('settings')">Shree Setups</div>
+      <div class="side-item" onclick="openModule('operators')">Passwords & Powers</div>
+      <div class="side-item" onclick="openModule('settings')">Printer Setup</div>
+      <div class="side-item" onclick="openModule('company')">Change Company</div>
+      <div id="leftPanel" style="margin-top:5px"></div>
+    </aside>
     <main class="center-panel" id="centerWorkspace">
       <div id="dashboardView" style="display:flex;flex-direction:column;gap:4px;height:100%">
         <div class="hero-banner">
@@ -147,7 +162,7 @@ tr:hover{background:#ffeaa7}
       <button class="right-btn" onclick="openModule('reorder')">Re-Order</button>
       <button class="right-btn" onclick="openModule('sbook')">Sales Book</button>
       <button class="right-btn" onclick="openModule('txns')">Dispatch Summary</button>
-      <button class="right-btn" onclick="openModule('txns')">Bill Tagging</button>
+      <button class="right-btn" onclick="openModule('tag')">Bill Tagging</button>
       <button class="right-btn" onclick="openModule('mis')">Daily Analysis (MIS)</button>
       <button class="right-btn" onclick="openModule('gp')">Todays Gross Profit</button>
       <button class="right-btn highlight" onclick="showDashboard()">Exit</button>
@@ -183,18 +198,18 @@ dc=n=>f(Math.abs(n))+(n<0?' Cr':' Dr'),esc=s=>String(s??'').replace(/[<>&"]/g,c=
 function load(){let r;try{r=JSON.parse(localStorage.getItem(K))}catch(e){}
  db=Object.assign({items:[{id:'1',code:'ITM101',name:'PARACETAMOL 650MG',group:'Tablet',unit:'STRIP',hsn:'3004',gst:12,pur:12,rate:15.5,mrp:20,qty:150,batch:'B2026',expiry:'2028-05',godown:'Main',reorder:20},{id:'2',code:'ITM102',name:'AZITHROMYCIN 500MG',group:'Tablet',unit:'STRIP',hsn:'3004',gst:12,pur:80,rate:95,mrp:120,qty:45,batch:'B2025',expiry:'2027-11',godown:'Main',reorder:10}],
  parties:[{id:'1',name:'CASH / WALK-IN',type:'Customer',phone:'9800000000',gstin:'',limit:0,balance:0},{id:'2',name:'MEDICINE WHOLESALE AGENCIES',type:'Supplier',phone:'9832000000',gstin:'',limit:0,balance:0}],
- txns:[],vouchers:[],eways:[],transfers:[],groups:[],units:[],hsn:[],areas:[],routes:[],ledgers:[],godowns:[],operators:[],company:[],set:{neg:0,credit:1},user:'Admin'},r||{})}
+ txns:[],vouchers:[],eways:[],cheques:[],delivery:[],gate:[],transfers:[],groups:[],units:[],hsn:[],areas:[],routes:[],ledgers:[],godowns:[],operators:[],company:[],set:{neg:0,credit:1},user:'Admin'},r||{})}
 const save=()=>localStorage.setItem(K,JSON.stringify(db));
 function dl(n,t){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t]));a.download=n;a.click()}
 const flash=m=>{$('systemClock').textContent=m;setTimeout(()=>$('systemClock').textContent='System Ready',1500)};
 
 /* ===== MENU TREE ===== */
-const M={Masters:[['Item Master','items'],['Item Group','groups'],['Unit Master','units'],['HSN Master','hsn'],['Party Master','parties'],['Area Master','areas'],['Route Master','routes'],['Ledger Master','ledgers'],['Godown Master','godowns'],['Multi Editing / GST Update','multi'],['Control Room / Setups','settings'],['Operators & Powers','operators'],['Company Master','company']],
-Transactions:[['Retail Bill','retail'],['Wholesale Bill','wholesale'],['Sale Challan','challan'],['Sale Return','salereturn'],['Credit Note','creditnote'],['Purchase Bill','purchase'],['Purchase Challan','purchasechallan'],['Purchase Return','purchasereturn'],['Debit Note','debitnote'],['Purchase Order','po'],['Bill List / Convert / Delete','txns'],['Pending Bills','pending']],
-Accounts:[['Payment','payment'],['Receipt','receipt'],['Journal','journal'],['Contra','contra'],['Single Entry','single']],
+const M={Masters:[['Item Master','items'],['Item Group','groups'],['Unit Master','units'],['HSN Master','hsn'],['Party Master','parties'],['Area Master','areas'],['Route Master','routes'],['Ledger Master','ledgers'],['Godown Master','godowns'],['Delivery Man','delivery'],['Multi Editing / GST Update','multi'],['Control Room / Setups','settings'],['Operators & Powers','operators'],['Company Master','company']],
+Transactions:[['Retail Bill','retail'],['Wholesale Bill','wholesale'],['Sale Challan','challan'],['Sale Return','salereturn'],['Credit Note','creditnote'],['Purchase Bill','purchase'],['Purchase Challan','purchasechallan'],['Purchase Return','purchasereturn'],['Debit Note','debitnote'],['Purchase Order','po'],['Bill List / Convert / Delete','txns'],['Pending Bills','pending'],['Gate Entry (before Purchase)','gate'],['Bill Tagging','tag']],
+Accounts:[['Payment','payment'],['Receipt','receipt'],['Journal','journal'],['Contra','contra'],['Single Entry','single'],['Cheque / PD Cheque','cheques']],
 Banking:[['Bank Payment','payment'],['Bank Receipt','receipt'],['Bank Book','bank']],
-Books:[['All Ledgers','ledger'],['Day Book','daybook'],['Outstanding & Ageing','outstanding'],['Cash Book','cash'],['Bank Book','bank']],
-'Final Reports':[['Trial Balance','tb'],['Profit & Loss','pl'],['Balance Sheet','bs'],['Cash Flow','cf'],['Ratio Analysis','ratio']],
+Books:[['All Ledgers','ledger'],['Day Book','daybook'],['Outstanding & Ageing','outstanding'],['Cash Book','cash'],['Bank Book','bank'],['Duplicate Voucher','dupv']],
+'Final Reports':[['Trial Balance','tb'],['Profit & Loss','pl'],['Balance Sheet','bs'],['Cash Flow','cf'],['Funds Flow','ff'],['Ratio Analysis','ratio']],
 GST:[['GSTR-1','g1'],['GSTR-2 (Purchase)','g2'],['GSTR-3B','g3'],['HSN Summary','hsnr'],['GSTIN List','gstin'],['JSON Export','gjson'],['Ease of GST (Bulk Update)','multi']],
 'e-Way':[['Generate / Update e-Way','eway']],
 Stocks:[['Stock Status','stock'],['Batch-wise','batch'],['Godown-wise','godown'],['Re-Order','reorder'],['S/R & P/R Expiry','expiry'],['Stock Valuation','val'],['Stock Transfer','transfer']],
@@ -206,17 +221,20 @@ const NAMES={retail:'Retail Bill',wholesale:'Wholesale Bill',challan:'Sale Chall
 const VK={payment:1,receipt:1,journal:1,contra:1,single:1},OUT=['retail','wholesale','challan','purchasereturn'],IN=['purchase','purchasechallan','salereturn'],PURK=['purchase','purchasechallan','purchasereturn','debitnote','po'],CV={challan:'wholesale',purchasechallan:'purchase',po:'purchase'},SK=['retail','wholesale'];
 
 /* ===== MASTERS (generic CRUD) ===== */
-const CR={items:['Item Master',[['code','Code'],['name','Item Name *'],['group','Group'],['unit','Unit'],['hsn','HSN'],['gst','GST %','number'],['pur','Purchase Rate','number'],['rate','Sale Rate','number'],['mrp','MRP','number'],['qty','Stock Qty','number'],['batch','Batch'],['expiry','Expiry','month'],['godown','Godown'],['reorder','Reorder Lvl','number']]],
+const CR={items:['Item Master',[['code','Code'],['name','Item Name *'],['group','Group'],['unit','Unit'],['hsn','HSN'],['gst','GST %','number'],['pur','Purchase Rate','number'],['rate','Sale Rate','number'],['mrp','MRP','number'],['qty','Stock Qty','number'],['batch','Batch'],['expiry','Expiry','month'],['godown','Godown'],['reorder','Reorder Lvl','number'],['barcode','Barcode']]],
 parties:['Party Master',[['name','Party Name *'],['type','Type',['Customer','Supplier']],['phone','Phone'],['gstin','GSTIN'],['area','Area'],['route','Route'],['limit','Credit Limit','number'],['balance','Opening Bal (Dr+ / Cr-)','number']]],
 groups:['Item Group',[['name','Group Name *']]],units:['Unit Master',[['name','Unit *'],['desc','Description']]],hsn:['HSN Master',[['code','HSN/SAC *'],['desc','Description'],['gst','GST %','number']]],
 areas:['Area Master',[['name','Area *']]],routes:['Route Master',[['name','Route *']]],godowns:['Godown Master',[['name','Godown *']]],
 ledgers:['Ledger Master',[['name','Ledger *'],['grp','Group',['Expense','Income','Asset','Liability']],['balance','Opening (Dr+ / Cr-)','number']]],
-operators:['Operators & Powers',[['name','Operator *'],['pass','Password'],['rights','Rights']]],company:['Company Master',[['name','Company *'],['period','Financial Period'],['gstin','GSTIN']]]};
+operators:['Operators & Powers',[['name','Operator *'],['pass','Password'],['rights','Rights']]],company:['Company Master',[['name','Company *'],['period','Financial Period'],['gstin','GSTIN']]],
+cheques:['Cheque / PD Cheque',[['date','Cheque Date','date'],['party','Party'],['bank','Bank'],['no','Cheque No'],['amt','Amount','number'],['type','Type',['Received','Issued']],['status','Status',['Pending','Cleared','Bounced']]]],
+delivery:['Delivery Man',[['name','Name *'],['phone','Phone'],['area','Area / Route']]],
+gate:['Gate Entry',[['date','Date','date'],['party','Supplier'],['lr','LR / Challan No'],['vehicle','Vehicle'],['note','Note']]]};
 const hd=t=>`<div class="hd"><h2>${t}</h2><button class="btn-action" onclick="showDashboard()">← Return to Dashboard</button></div>`;
 function crud(c){const [t,F]=CR[c],e=ed&&ed.c==c?ed.r:{};
  return hd(t)+`<div class="form-grid">${o(F,x=>`<div class="form-group"><label>${x[1]}</label>${Array.isArray(x[2])?`<select id="f_${x[0]}">${o(x[2],v=>`<option${e[x[0]]==v?' selected':''}>${v}</option>`)}</select>`:`<input id="f_${x[0]}" type="${x[2]||'text'}" value="${esc(e[x[0]]??'')}">`}</div>`)}<div class="form-group" style="justify-content:flex-end"><button class="btn-action" onclick="cSave('${c}')">${e.id?'Update':'+ Save'}</button></div></div><div class="data-table-container"><table><thead><tr>${o(F,x=>`<th>${x[1].replace(' *','')}</th>`)}<th>Action</th></tr></thead><tbody>${o(db[c],r=>`<tr>${o(F,x=>`<td>${esc(r[x[0]]??'')}</td>`)}<td><button class="btn-action" onclick="cEdit('${c}','${r.id}')">Edit</button> <button class="btn-danger" onclick="cDel('${c}','${r.id}')">Del</button></td></tr>`)||'<tr><td colspan="20">No records</td></tr>'}</tbody></table></div>`}
 function cSave(c){const F=CR[c][1],r={};F.forEach(x=>{const v=$('f_'+x[0]).value;r[x[0]]=x[2]=='number'?+v||0:v});if(!r[F[0][0]])return alert('Required field is empty');
- if(ed&&ed.c==c&&ed.r.id)Object.assign(db[c].find(z=>z.id==ed.r.id),r);else{r.id=Date.now()+'';db[c].push(r)}ed=null;save();top();openModule(c)}
+ if(ed&&ed.c==c&&ed.r.id)Object.assign(db[c].find(z=>z.id==ed.r.id),r);else{r.id=Date.now()+'';db[c].push(r)}ed=null;save();hdr();openModule(c)}
 function cEdit(c,id){ed={c,r:db[c].find(z=>z.id==id)};openModule(c)}
 function cDel(c,id){if(confirm('Delete?')){db[c]=db[c].filter(z=>z.id!=id);save();openModule(c)}}
 
@@ -268,6 +286,8 @@ const REP={
 ledger(){const A=accs(),n=S.acc&&A[S.acc]!==undefined?S.acc:Object.keys(A)[0];let b=(db.parties.concat(db.ledgers).find(x=>x.name==n)||{}).balance||0;return T('Ledger: '+n,['Date','Ref','Particular','Debit','Credit','Balance'],posts().filter(x=>x.dr==n||x.cr==n).sort(sd).map(x=>{const i=x.dr==n;b+=i?x.m:-x.m;return[x.d,x.n,i?x.cr:x.dr,i?f(x.m):'',i?'':f(x.m),dc(b)]}),`<select onchange="S.acc=this.value;openModule('ledger')">${o(Object.keys(A),a=>`<option${a==n?' selected':''}>${esc(a)}</option>`)}</select>`)},
 daybook:()=>T('Day Book',['Date','Ref','Debit','Credit','Amount'],posts().sort(sd).map(x=>[x.d,x.n,x.dr,x.cr,f(x.m)])),
 outstanding(){const A=accs(),pd=pending();return T('Outstanding & Ageing',['Party','Type','Phone','Balance','Oldest Due Bill','Age (days)'],db.parties.filter(p=>Math.abs(A[p.name])>.005).map(p=>{const b=(pd[p.name]||[])[0];return[p.name,p.type,p.phone,dc(A[p.name]),b?b.date:'-',b?Math.floor((Date.now()-new Date(b.date))/864e5):'-']}))},
+dupv(){const m={};db.vouchers.forEach(v=>{const k=[v.date,v.dr,v.cr,v.amt,v.kind].join('|');m[k]=(m[k]||0)+1});return T('Duplicate Vouchers',['Date','Debit','Credit','Amount','Type','Count'],Object.entries(m).filter(e=>e[1]>1).map(([k,c])=>[...k.split('|'),c]))},
+ff(){const n=NP(),A=n.A,P=db.parties.map(p=>A[p.name]),deb=P.filter(x=>x>0).reduce((a,b)=>a+b,0),cre=-P.filter(x=>x<0).reduce((a,b)=>a+b,0);return T('Funds Flow (Sources & Applications)',['Type','Particulars','Amount'],[['Source','Net Profit',f(n.np)],['Source','Sundry Creditors',f(cre)],['Source','GST Output',f(-n.sm('GSTO'))],['Application','Closing Stock',f(sv())],['Application','Sundry Debtors',f(deb)],['Application','Cash & Bank',f(A['Cash A/c']+A['Bank A/c'])],['Application','GST Input',f(n.sm('GSTI'))]])},
 cash:()=>cb('Cash A/c'),bank:()=>cb('Bank A/c'),
 tb(){const A=accs();let d=0,c=0;const r=Object.keys(A).filter(k=>Math.abs(A[k])>.005).map(k=>{const v=A[k];v>0?d+=v:c-=v;return[k,v>0?f(v):'',v<0?f(-v):'']}),df=d-c;if(Math.abs(df)>.005)r.push(['Opening Balance Difference',df<0?f(-df):'',df>0?f(df):'']);r.push(['TOTAL',f(Math.max(d,c)),f(Math.max(d,c))]);return T('Trial Balance',['Account','Debit','Credit'],r)},
 pl(){const n=NP(),A=n.A,v=a=>A[a]||0,r=[['Net Sales',f(-(v('Sales A/c')+v('Sales Return')))],['Net Purchases',f(v('Purchase A/c')+v('Purchase Return'))],['Gross Profit (sale value − cost of goods sold)',f(n.gp)]];n.ks.filter(a=>grp(a)=='Income').forEach(a=>r.push(['Income: '+a,f(-A[a])]));n.ks.filter(a=>grp(a)=='Expense').forEach(a=>r.push(['Expense: '+a,f(A[a])]));r.push(['NET PROFIT / (LOSS)',f(n.np)]);return T('Profit & Loss',['Particulars','Amount'],r)},
@@ -297,6 +317,7 @@ function csv(){dl('report.csv',[S.R.h,...S.R.r].map(r=>r.map(c=>'"'+String(c).re
 
 /* ===== OTHER VIEWS ===== */
 const V={
+tag:()=>hd('Bill Tagging')+`<div class="data-table-container"><table><thead><tr><th>No</th><th>Date</th><th>Party</th><th>Total</th><th>Tag</th><th></th></tr></thead><tbody>${o(db.txns.slice().reverse().slice(0,100),t=>`<tr><td>${t.no}</td><td>${t.date}</td><td>${esc(t.party)}</td><td>${f(t.total)}</td><td>${esc(t.tag||'')}</td><td><button class="btn-action" onclick="tagIt('${t.id}')">Tag</button></td></tr>`)||'<tr><td colspan="6">No bills</td></tr>'}</tbody></table></div>`,
 txns:()=>hd('Bill List / Convert / Delete')+`<div class="data-table-container"><table><thead><tr><th>No</th><th>Date</th><th>Type</th><th>Party</th><th>Total</th><th>Action</th></tr></thead><tbody>${o(db.txns.slice().reverse().slice(0,100),t=>`<tr><td>${t.no}</td><td>${t.date}</td><td>${NAMES[t.kind]}</td><td>${esc(t.party)}</td><td>${f(t.total)}</td><td><button class="btn-action" onclick="pr('${t.id}')">Print</button> ${CV[t.kind]?`<button class="btn-action" onclick="cv('${t.id}')">→ ${NAMES[CV[t.kind]]}</button> `:''}<button class="btn-danger" onclick="tdel('${t.id}')">Del</button></td></tr>`)||'<tr><td colspan="6">No bills</td></tr>'}</tbody></table></div>`,
 pending(){const pd=pending(),r=[];Object.entries(pd).forEach(([p,l])=>l.forEach(b=>r.push([p,b.no,b.date,f(b.total),f(b.due)])));S.R=T('',['Party','Bill','Date','Total','Due'],r);return hd('Pending Bills')+`<div class="data-table-container"><table><thead><tr><th>Party</th><th>Bill</th><th>Date</th><th>Total</th><th>Due</th></tr></thead><tbody>${o(r,x=>`<tr>${o(x,c=>`<td>${esc(c)}</td>`)}</tr>`)||'<tr><td colspan="5">No pending bills</td></tr>'}</tbody></table></div>`},
 transfer:()=>hd('Stock Transfer')+`<div class="form-grid"><div class="form-group"><label>Item</label><select id="tr_i">${o(db.items,i=>`<option value="${i.id}">${esc(i.name)} [${esc(i.godown||'Main')}]</option>`)}</select></div><div class="form-group"><label>To Godown</label><input id="tr_t"></div><div class="form-group"><label>Qty (record)</label><input type="number" id="tr_q" value="1"></div><div class="form-group" style="justify-content:flex-end"><button class="btn-action" onclick="trSave()">Transfer</button></div></div><div class="data-table-container"><table><thead><tr><th>Date</th><th>Item</th><th>From</th><th>To</th><th>Qty</th></tr></thead><tbody>${o(db.transfers,t=>`<tr><td>${t.d}</td><td>${esc(t.i)}</td><td>${esc(t.f)}</td><td>${esc(t.t)}</td><td>${t.q}</td></tr>`)}</tbody></table></div>`,
@@ -309,6 +330,7 @@ hotkeys:()=>hd('Hot Keys')+`<div class="data-table-container"><table><thead><tr>
 links:()=>hd('Quick Links')+o([['Search in All','search'],['Cloud Backup','backup'],['WhatsApp / SMS / Email','share'],['Hot Keys','hotkeys'],['Control Room','settings'],['e-Way Bill','eway']],x=>`<div class="side-item" onclick="openModule('${x[1]}')">${x[0]}</div>`),
 search:()=>hd('Search in All')+`<input type="text" id="sq" placeholder="Item / Party / Bill..." onkeyup="srch()"><div class="data-table-container" id="sr"></div>`,
 calc:()=>hd('Calculator')+`<input type="text" id="cx" placeholder="e.g. (120*12)/100" onkeydown="if(event.key=='Enter')cal()"> <button class="btn-action" onclick="cal()">=</button> <h2 id="cr"></h2>`};
+function tagIt(id){const t=db.txns.find(x=>x.id==id),v=prompt('Tag / Delivery man / Note',t.tag||'');if(v!==null){t.tag=v;save();openModule('tag')}}
 function trSave(){const it=db.items.find(i=>i.id==$('tr_i').value),t=$('tr_t').value;if(!it||!t)return alert('Enter godown');db.transfers.push({d:td(),i:it.name,f:it.godown||'Main',t,q:+$('tr_q').value||0});it.godown=t;save();openModule('transfer')}
 function meApply(){const fl=$('me_f').value,m=$('me_m').value,mv=$('me_v').value,nv=['gst','rate','mrp','pur'].includes(fl)?+$('me_n').value:$('me_n').value;let n=0;db.items.forEach(i=>{if(m=='all'||(m=='group'&&i.group==mv)||(m=='hsn'&&i.hsn==mv)){i[fl]=nv;n++}});save();alert(n+' items updated')}
 function setSave(){db.set.neg=$('s_n').checked?1:0;db.set.credit=$('s_c').checked?1:0;save();flash('Setup saved')}
@@ -317,14 +339,14 @@ function ewUp(id){const e=db.eways.find(x=>x.id==id),v=prompt('New vehicle no',e
 function ewDel(id){db.eways=db.eways.filter(x=>x.id!=id);save();openModule('eway')}
 function shr(t){const p=db.parties.find(x=>x.name==$('sp').value)||{},m=encodeURIComponent($('sm').value),n=(p.phone||'').replace(/\D/g,'').slice(-10);t=='w'?open('https://wa.me/91'+n+'?text='+m):t=='s'?location.href='sms:'+n+'?body='+m:location.href='mailto:?subject=Outstanding&body='+m}
 function restore(i){const r=new FileReader();r.onload=()=>{try{JSON.parse(r.result);localStorage.setItem(K,r.result);load();save();alert('Restored');showDashboard()}catch(e){alert('Invalid backup file')}};r.readAsText(i.files[0])}
-function resetAll(){if(confirm('Delete ALL data?')){localStorage.removeItem(K);load();top();showDashboard()}}
-function srch(){const q=$('sq').value.toLowerCase(),r=[];if(q){db.items.forEach(i=>(i.name+i.code).toLowerCase().includes(q)&&r.push(['Item',i.name,'Stock '+i.qty+' | Rate '+i.rate]));db.parties.forEach(p=>p.name.toLowerCase().includes(q)&&r.push(['Party',p.name,p.phone||'']));db.txns.forEach(t=>(t.no+t.party).toLowerCase().includes(q)&&r.push(['Bill',t.no+' '+t.party,f(t.total)]))}$('sr').innerHTML=`<table><thead><tr><th>Type</th><th>Name</th><th>Info</th></tr></thead><tbody>${o(r,x=>`<tr>${o(x,c=>`<td>${esc(c)}</td>`)}</tr>`)}</tbody></table>`}
+function resetAll(){if(confirm('Delete ALL data?')){localStorage.removeItem(K);load();hdr();showDashboard()}}
+function srch(){const q=$('sq').value.toLowerCase(),r=[];if(q){db.items.forEach(i=>(i.name+i.code+(i.barcode||'')).toLowerCase().includes(q)&&r.push(['Item',i.name,'Stock '+i.qty+' | Rate '+i.rate]));db.parties.forEach(p=>p.name.toLowerCase().includes(q)&&r.push(['Party',p.name,p.phone||'']));db.txns.forEach(t=>(t.no+t.party).toLowerCase().includes(q)&&r.push(['Bill',t.no+' '+t.party,f(t.total)]))}$('sr').innerHTML=`<table><thead><tr><th>Type</th><th>Name</th><th>Info</th></tr></thead><tbody>${o(r,x=>`<tr>${o(x,c=>`<td>${esc(c)}</td>`)}</tr>`)}</tbody></table>`}
 function cal(){const v=$('cx').value;try{if(/^[\d+\-*\/(). %]+$/.test(v))$('cr').textContent='= '+Function('return '+v)();else $('cr').textContent='Invalid'}catch(e){$('cr').textContent='Invalid'}}
-function chUser(){const n=prompt('Operator name (Admin = default)');if(!n)return;const op=db.operators.find(x=>x.name==n);if(n=='Admin'||(op&&(!op.pass||prompt('Password')==op.pass))){db.user=n;save();top()}else alert('Invalid operator / password')}
+function chUser(){const n=prompt('Operator name (Admin = default)');if(!n)return;const op=db.operators.find(x=>x.name==n);if(n=='Admin'||(op&&(!op.pass||prompt('Password')==op.pass))){db.user=n;save();hdr()}else alert('Invalid operator / password')}
 
 /* ===== NAVIGATION ===== */
-function top(){$('cu').textContent=db.user;$('cc').textContent=(db.company[0]||{}).name||'JANAKINATH BHANDER 2026-2027'}
-function menu(n){document.querySelectorAll('#mainMenuBar button').forEach(b=>b.classList.toggle('active',b.dataset.m==n));$('leftPanel').innerHTML=`<div class="menu-category-title">${n.toUpperCase()} MENU</div>`+o(M[n],x=>`<div class="side-item" onclick="openModule('${x[1]}')">${x[0]}</div>`)}
+function hdr(){$('cu').textContent=db.user;$('cc').textContent=(db.company[0]||{}).name||'JANAKINATH BHANDER 2026-2027'}
+function menu(n){document.querySelectorAll('#mainMenuBar button').forEach(b=>b.classList.toggle('active',b.dataset.m==n));$('leftPanel').innerHTML=`<div class="menu-category-title">${n.toUpperCase()} - ALL OPTIONS</div>`+o(M[n],x=>`<div class="side-item" onclick="openModule('${x[1]}')">${x[0]}</div>`)}
 function showDashboard(){$('dashboardView').classList.remove('hidden');$('moduleViewContainer').classList.add('hidden');const l=db.txns.slice(-5).reverse();$('recentTransBody').innerHTML=l.length?o(l,t=>`<tr><td>${t.date}</td><td>${NAMES[t.kind]}</td><td>${esc(t.party)}</td><td>₹${f(t.total)}</td></tr>`):'<tr><td colspan="4" style="text-align:center">No recent transactions</td></tr>'}
 function openModule(k){const C=$('moduleViewContainer');$('dashboardView').classList.add('hidden');C.classList.remove('hidden');let h;
  if(CR[k])h=crud(k);else if(NAMES[k]){bill=[];S.k=k;h=billView(k)}else if(VK[k])h=vchView(k);else if(k=='gjson'){dl('GSTR1.json',JSON.stringify(REP.g1().r));h=repView('g1')}else if(REP[k])h=repView(k);else if(V[k])h=V[k]();else h=hd(k)+'<p>Module not found</p>';
@@ -332,7 +354,7 @@ function openModule(k){const C=$('moduleViewContainer');$('dashboardView').class
 document.addEventListener('keydown',e=>{if(e.key=='Escape')return showDashboard();const c=(e.ctrlKey?'Ctrl+':'')+(e.shiftKey?'Shift+':'')+(e.key.length==1?e.key.toUpperCase():e.key),h=HK.find(x=>x[0]==c);if(!h)return;e.preventDefault();h[1]=='user'?chUser():h[1]=='dash'?showDashboard():h[1]=='save'?(save(),flash('Saved')):openModule(h[1])});
 function tick(){const d=new Date();$('currentDateStr').textContent=d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});$('currentTimeStr').textContent=d.toLocaleTimeString('en-IN')}
 setInterval(tick,1000);tick();
-load();top();$('mainMenuBar').innerHTML=o(Object.keys(M),n=>`<button data-m="${n}" onclick="menu('${n}')">${n}</button>`)+'<button onclick="showDashboard()">Exit</button>';menu('Masters');showDashboard();
+load();hdr();$('mainMenuBar').innerHTML=o(Object.keys(M),n=>`<button data-m="${n}" onclick="menu('${n}')">${n}</button>`)+'<button onclick="showDashboard()">Exit</button>';menu('Masters');showDashboard();
 </script>
 </body>
 </html>
