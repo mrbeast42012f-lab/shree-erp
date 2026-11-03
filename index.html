@@ -340,6 +340,7 @@ body{
   padding: 0 4px;
   margin: 0 2px;
   border-radius: 2px;
+  cursor: pointer;
 }
 
 /* TABLES & FORMS */
@@ -376,6 +377,7 @@ tr:hover { background: #ffeaa7; }
   display: flex;
   flex-direction: column;
   gap: 8px;
+  overflow-y: auto;
 }
 .form-grid {
   display: grid;
@@ -815,14 +817,7 @@ function openModule(viewName) {
                 <td>${t.party || 'Cash'}</td>
                 <td>₹${t.total || t.amount || 0}</td>
               </tr>
-            `)[0] ? [...(db.bills||[]), ...(db.purchases||[]), ...(db.receipts||[]), ...(db.payments||[])].map(t => `
-              <tr>
-                <td>${t.date||'-'}</td>
-                <td>${t.kind || t.type || 'Transaction'}</td>
-                <td>${t.party || 'Cash'}</td>
-                <td>₹${t.total || t.amount || 0}</td>
-              </tr>
-            `).join('') : '<tr><td colspan="4">No ledger records found</td></tr>'}
+            `).join('') || '<tr><td colspan="4">No ledger records found</td></tr>'}
           </tbody>
         </table>
       </div>`;
@@ -961,7 +956,7 @@ function loadRecentTransactions() {
   tbody.innerHTML = list.map(t => `
     <tr>
       <td>${t.date||'-'}</td>
-      `, t.kind || 'Sale', `</td>
+      <td>${t.kind || 'Sale'}</td>
       <td>${t.party || 'Cash'}</td>
       <td>₹${t.total || 0}</td>
     </tr>
@@ -982,3 +977,4 @@ loadRecentTransactions();
 
 </body>
 </html>
+
