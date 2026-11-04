@@ -64,6 +64,11 @@ tr:hover{background:#ffeaa7}
 .btn-danger{background:linear-gradient(to bottom,#d92b5a,#8c0f32);color:#fff;border:1px solid #5a001a;padding:2px 6px;cursor:pointer;font-weight:bold}
 .hd{display:flex;justify-content:space-between;align-items:center}
 .hd h2{font-size:14px;color:#0c2b64}
+.crumb{display:flex;justify-content:space-between;align-items:center;background:#cbdcf0;border-bottom:1px solid var(--marg-border);padding:2px 6px;font-weight:bold;color:#0c2b64}
+.crumb a{cursor:pointer;text-decoration:underline}
+.crumb button{padding:1px 6px;font-size:10px}
+.side-item:focus,.menubar button:focus{outline:2px solid #ffeb3b;outline-offset:-2px}
+tr.sel{background:#ffd54f!important;outline:1px solid #b8860b}
 .hidden{display:none!important}
 @media(max-width:900px){.workspace{grid-template-columns:1fr}.promo-grid,.dashboard-content-split,.footer-info-panel{grid-template-columns:1fr}}
 </style>
@@ -86,6 +91,7 @@ tr:hover{background:#ffeaa7}
     <button class="btn-pink" onclick="showDashboard()">Dashboard</button>
     <button class="btn-blue" onclick="openModule('search')">Search Item</button>
   </div>
+  <div class="crumb" id="crumb"></div>
   <div class="workspace">
     <aside class="left-panel">
       <div class="menu-category-title">MASTERS MENU</div>
@@ -198,7 +204,7 @@ dc=n=>f(Math.abs(n))+(n<0?' Cr':' Dr'),esc=s=>String(s??'').replace(/[<>&"]/g,c=
 function load(){let r;try{r=JSON.parse(localStorage.getItem(K))}catch(e){}
  db=Object.assign({items:[{id:'1',code:'ITM101',name:'PARACETAMOL 650MG',group:'Tablet',unit:'STRIP',hsn:'3004',gst:12,pur:12,rate:15.5,mrp:20,qty:150,batch:'B2026',expiry:'2028-05',godown:'Main',reorder:20},{id:'2',code:'ITM102',name:'AZITHROMYCIN 500MG',group:'Tablet',unit:'STRIP',hsn:'3004',gst:12,pur:80,rate:95,mrp:120,qty:45,batch:'B2025',expiry:'2027-11',godown:'Main',reorder:10}],
  parties:[{id:'1',name:'CASH / WALK-IN',type:'Customer',phone:'9800000000',gstin:'',limit:0,balance:0},{id:'2',name:'MEDICINE WHOLESALE AGENCIES',type:'Supplier',phone:'9832000000',gstin:'',limit:0,balance:0}],
- txns:[],vouchers:[],eways:[],cheques:[],delivery:[],gate:[],transfers:[],groups:[],units:[],hsn:[],areas:[],routes:[],ledgers:[],godowns:[],operators:[],company:[],set:{neg:0,credit:1},user:'Admin'},r||{})}
+ txns:[],vouchers:[],eways:[],cheques:[],delivery:[],gate:[],mymenu:[],transfers:[],groups:[],units:[],hsn:[],areas:[],routes:[],ledgers:[],godowns:[],operators:[],company:[],set:{neg:0,credit:1},user:'Admin'},r||{})}
 const save=()=>localStorage.setItem(K,JSON.stringify(db));
 function dl(n,t){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t]));a.download=n;a.click()}
 const flash=m=>{$('systemClock').textContent=m;setTimeout(()=>$('systemClock').textContent='System Ready',1500)};
@@ -215,8 +221,10 @@ GST:[['GSTR-1','g1'],['GSTR-2 (Purchase)','g2'],['GSTR-3B','g3'],['HSN Summary',
 Stocks:[['Stock Status','stock'],['Batch-wise','batch'],['Godown-wise','godown'],['Re-Order','reorder'],['S/R & P/R Expiry','expiry'],['Stock Valuation','val'],['Stock Transfer','transfer']],
 'Daily Reports':[['Daily Analysis (MIS)','mis'],["Today's Gross Profit",'gp'],['Sale Analysis (Item)','sa'],['Purchase Analysis','pa'],['Party-wise Sale','psa']],
 Reports:[['Sales Book','sbook'],['Purchase Book','pbook'],['Inventory Report','stock'],['Share (WhatsApp/SMS/Email)','share'],['Cloud Backup / Restore','backup']],
-'Hot Keys':[['All Hot Keys','hotkeys'],['Calculator (F12)','calc']],Links:[['Search in All','search'],['Quick Links','links']]};
-const HK=[['F1','company','Change Company'],['Ctrl+U','user','Change User'],['Ctrl+7','retail','Data Entry (Bill)'],['Ctrl+F9','receipt','Bill Adjustments (Receipt)'],['Shift+F12','mis','Calendar / Daily MIS'],['F12','calc','Calculator'],['Ctrl+F1','parties','Personal Directory (Parties)'],['Ctrl+F11','settings','Printer Setup'],['Ctrl+I','items','Item Master'],['F4','retail','Retail Bill'],['Ctrl+S','save','Flush / Save'],['Ctrl+Q','dash','Quit to Dashboard']];
+'Hot Keys':[['All Hot Keys','hotkeys'],['Calculator (F12)','calc']],Links:[['Search in All','search'],['Quick Links','links']],'My Menu':[['Manage My Menu','mymenu']]};
+const HK=[['F1','company','Change Company'],['Ctrl+U','user','Change User'],['Ctrl+7','retail','Data Entry (Bill)'],['Ctrl+F9','receipt','Bill Adjustments (Receipt)'],['Shift+F12','mis','Calendar / Daily MIS'],['F12','calc','Calculator'],['Ctrl+F1','parties','Personal Directory (Parties)'],['Ctrl+F11','settings','Printer Setup'],['Ctrl+I','items','Item Master'],['F4','retail','Retail Bill'],['Ctrl+S','save','Flush / Save'],['Ctrl+Q','dash','Quit to Dashboard'],['F3','search','Search in All'],['Ctrl+K','search','Search in All'],['Ctrl+D','addmy','Add this screen to My Menu'],['F10','menubar','Focus menu bar (then use arrow keys)']];
+const NV=[['Enter / Shift+Enter','Next / previous field in a form'],['Ctrl+Enter','Save the open form (Save / Update / Generate / Apply)'],['F10, then Left / Right','Switch top menu'],['Down / Up (menu)','Move through options; Enter = open; Up from first = top menu'],['Right (on a menu option)','Jump into the open screen'],['Up / Down (table)','Select a row'],['Enter / Delete (row selected)','First action (Edit/Print) / Delete row'],['Alt+Left / Alt+Right','Back / Forward'],['Ctrl+= / Ctrl+- / Ctrl+0','Zoom in / out / reset'],['Esc','Dashboard']];
+const GS=[['Swipe right','Back'],['Swipe left','Forward'],['Swipe left/right on top menu','Previous / next menu'],['Pull down (reports & lists)','Refresh'],['Long-press a menu option','Add to My Menu'],['Double-tap / double-click a row','Edit / first action'],['Phone Back button','Previous screen (app does not close)']];
 const NAMES={retail:'Retail Bill',wholesale:'Wholesale Bill',challan:'Sale Challan',salereturn:'Sale Return',creditnote:'Credit Note',purchase:'Purchase Bill',purchasechallan:'Purchase Challan',purchasereturn:'Purchase Return',debitnote:'Debit Note',po:'Purchase Order'};
 const VK={payment:1,receipt:1,journal:1,contra:1,single:1},OUT=['retail','wholesale','challan','purchasereturn'],IN=['purchase','purchasechallan','salereturn'],PURK=['purchase','purchasechallan','purchasereturn','debitnote','po'],CV={challan:'wholesale',purchasechallan:'purchase',po:'purchase'},SK=['retail','wholesale'];
 
@@ -242,7 +250,7 @@ function cDel(c,id){if(confirm('Delete?')){db[c]=db[c].filter(z=>z.id!=id);save(
 function billView(k){const P=PURK.includes(k),l=db.parties.filter(p=>P?p.type!='Customer':p.type!='Supplier'),pl=l.length?l:db.parties;
  return hd(NAMES[k])+`<div class="form-grid"><div class="form-group"><label>Date</label><input type="date" id="bd" value="${td()}"></div><div class="form-group"><label>Party</label><select id="bp">${o(pl,p=>`<option>${esc(p.name)}</option>`)}</select></div><div class="form-group"><label>Item</label><select id="bi" onchange="pick()">${o(db.items,i=>`<option value="${i.id}">${esc(i.name)} (${i.qty})</option>`)}</select></div><div class="form-group"><label>Qty</label><input type="number" id="bq" value="1" min="1"></div><div class="form-group"><label>Rate</label><input type="number" id="br"></div><div class="form-group"><label>Disc %</label><input type="number" id="bds" value="0"></div><div class="form-group" style="justify-content:flex-end"><button class="btn-action" onclick="addL()">+ Add Line</button></div></div><div class="data-table-container" id="bl"></div><div class="form-grid"><div class="form-group"><label>Paid Now (₹)</label><input type="number" id="bpd" value="0"></div><div class="form-group"><label>Mode</label><select id="bm"><option>Cash A/c<option>Bank A/c</select></div><div class="form-group" style="justify-content:flex-end"><button class="btn-action" onclick="saveBill()">Save ${NAMES[k]}</button></div></div>`}
 function pick(){const it=db.items.find(i=>i.id==$('bi').value);if(it)$('br').value=PURK.includes(S.k)?it.pur:it.rate}
-function addL(){const it=db.items.find(i=>i.id==$('bi').value);if(!it)return;const q=+$('bq').value||1,r=+$('br').value||0,ds=+$('bds').value||0,a=q*r*(1-ds/100),g=+it.gst||0;bill.push({id:it.id,n:it.name,q,r,ds,g,h:it.hsn||'',c:+it.pur||0,a,t:a*g/100});renderL()}
+function addL(){const it=db.items.find(i=>i.id==$('bi').value);if(!it)return;const q=+$('bq').value||1,r=+$('br').value||0,ds=+$('bds').value||0,a=q*r*(1-ds/100),g=+it.gst||0;bill.push({id:it.id,n:it.name,q,r,ds,g,h:it.hsn||'',c:+it.pur||0,a,t:a*g/100});renderL();$('bq').focus();$('bq').select()}
 function renderL(){const s=bill.reduce((a,l)=>a+l.a,0),g=bill.reduce((a,l)=>a+l.t,0);$('bl').innerHTML=`<table><thead><tr><th>Item</th><th>Qty</th><th>Rate</th><th>Disc%</th><th>GST%</th><th>Amount</th><th></th></tr></thead><tbody>${o(bill,(l,i)=>`<tr><td>${esc(l.n)}</td><td>${l.q}</td><td>${l.r}</td><td>${l.ds}</td><td>${l.g}</td><td>${f(l.a+l.t)}</td><td><button class="btn-danger" onclick="bill.splice(${i},1);renderL()">X</button></td></tr>`)}<tr><td colspan="5"><b>Taxable ${f(s)} + GST ${f(g)}</b></td><td colspan="2"><b>₹${f(s+g)}</b></td></tr></tbody></table>`}
 function eff(t,s){t.lines.forEach(l=>{const it=db.items.find(i=>i.id==l.id);if(it)it.qty+=s*(IN.includes(t.kind)?l.q:OUT.includes(t.kind)?-l.q:0)})}
 function saveBill(){const k=S.k;if(!bill.length)return alert('Add at least one line');const p=$('bp').value,sub=bill.reduce((a,l)=>a+l.a,0),g=bill.reduce((a,l)=>a+l.t,0),T=sub+g,paid=+$('bpd').value||0,pt=db.parties.find(x=>x.name==p);
@@ -316,6 +324,8 @@ function repView(k){const R=REP[k]();S.R=R;return hd(R.t)+R.x+`<div><button clas
 function csv(){dl('report.csv',[S.R.h,...S.R.r].map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n'))}
 
 /* ===== OTHER VIEWS ===== */
+const tbl=(h,r)=>`<div class="data-table-container"><table><thead><tr>${o(h,x=>`<th>${x}</th>`)}</tr></thead><tbody>${o(r,x=>`<tr>${o(x,c=>`<td>${c}</td>`)}</tr>`)}</tbody></table></div>`;
+const mm=()=>db.mymenu.filter(x=>x.user==db.user);
 const V={
 tag:()=>hd('Bill Tagging')+`<div class="data-table-container"><table><thead><tr><th>No</th><th>Date</th><th>Party</th><th>Total</th><th>Tag</th><th></th></tr></thead><tbody>${o(db.txns.slice().reverse().slice(0,100),t=>`<tr><td>${t.no}</td><td>${t.date}</td><td>${esc(t.party)}</td><td>${f(t.total)}</td><td>${esc(t.tag||'')}</td><td><button class="btn-action" onclick="tagIt('${t.id}')">Tag</button></td></tr>`)||'<tr><td colspan="6">No bills</td></tr>'}</tbody></table></div>`,
 txns:()=>hd('Bill List / Convert / Delete')+`<div class="data-table-container"><table><thead><tr><th>No</th><th>Date</th><th>Type</th><th>Party</th><th>Total</th><th>Action</th></tr></thead><tbody>${o(db.txns.slice().reverse().slice(0,100),t=>`<tr><td>${t.no}</td><td>${t.date}</td><td>${NAMES[t.kind]}</td><td>${esc(t.party)}</td><td>${f(t.total)}</td><td><button class="btn-action" onclick="pr('${t.id}')">Print</button> ${CV[t.kind]?`<button class="btn-action" onclick="cv('${t.id}')">→ ${NAMES[CV[t.kind]]}</button> `:''}<button class="btn-danger" onclick="tdel('${t.id}')">Del</button></td></tr>`)||'<tr><td colspan="6">No bills</td></tr>'}</tbody></table></div>`,
@@ -326,7 +336,8 @@ settings:()=>hd('Control Room / Setups')+`<div class="form-grid"><label><input t
 eway(){const sb=db.txns.filter(t=>['retail','wholesale','challan'].includes(t.kind));return hd('e-Way Bill (local record)')+`<div class="form-grid"><div class="form-group"><label>Bill</label><select id="ew_b">${o(sb,t=>`<option value="${t.id}">${t.no} - ${esc(t.party)} - ${f(t.total)}</option>`)}</select></div><div class="form-group"><label>Transporter</label><input id="ew_t"></div><div class="form-group"><label>Vehicle No</label><input id="ew_v"></div><div class="form-group"><label>Distance (km)</label><input type="number" id="ew_d" value="100"></div><div class="form-group" style="justify-content:flex-end"><button class="btn-action" onclick="ewSave()">Generate</button></div></div><div class="data-table-container"><table><thead><tr><th>E-Way No</th><th>Bill</th><th>Transport</th><th>Vehicle</th><th>km</th><th>Valid Till</th><th>Action</th></tr></thead><tbody>${o(db.eways,e=>`<tr><td>${e.no}</td><td>${e.bill}</td><td>${esc(e.tr)}</td><td>${esc(e.veh)}</td><td>${e.km}</td><td>${e.till}</td><td><button class="btn-action" onclick="ewUp('${e.id}')">Update Vehicle</button> <button class="btn-danger" onclick="ewDel('${e.id}')">Del</button></td></tr>`)}</tbody></table></div><p>Note: eta local record; official e-way portal e upload hoy na.</p>`},
 share(){const A=accs(),p=db.parties.find(x=>x.name==S.sp)||db.parties[0]||{name:''},b=A[p.name]||0;return hd('WhatsApp / SMS / Email Share')+`<div class="form-grid"><div class="form-group"><label>Party</label><select id="sp" onchange="S.sp=this.value;openModule('share')">${o(db.parties,x=>`<option${x.name==p.name?' selected':''}>${esc(x.name)}</option>`)}</select></div><div class="form-group"><label>Message</label><textarea id="sm" rows="3">Namaskar ${esc(p.name)}, apnar outstanding ₹${f(Math.abs(b))} ${b<0?'(Cr)':'(Dr)'}. - SHREE ERP</textarea></div></div><div><button class="btn-action" onclick="shr('w')">WhatsApp</button> <button class="btn-action" onclick="shr('s')">SMS</button> <button class="btn-action" onclick="shr('e')">Email</button></div>`},
 backup:()=>hd('Cloud Backup / Restore')+`<p>Backup download kore Google Drive / OneDrive e upload koro.</p><div><button class="btn-action" onclick="dl('shree-erp-backup-'+td()+'.json',JSON.stringify(db))">Download Backup</button> <input type="file" accept=".json" onchange="restore(this)"> <button class="btn-danger" onclick="resetAll()">Reset All Data</button></div>`,
-hotkeys:()=>hd('Hot Keys')+`<div class="data-table-container"><table><thead><tr><th>Key</th><th>Function</th></tr></thead><tbody>${o(HK,h=>`<tr><td>${h[0]}</td><td>${h[2]}</td></tr>`)}<tr><td>Esc</td><td>Dashboard</td></tr></tbody></table></div>`,
+hotkeys:()=>hd('Hot Keys, Navigation & Gestures')+tbl(['Hot Key','Function'],HK.map(h=>[h[0],h[2]]))+tbl(['Navigation','Function'],NV)+tbl(['Gesture','Action'],GS),
+mymenu:()=>hd('My Menu (user-wise shortcuts)')+`<p>Kono screen e giye "★ My Menu" ba Ctrl+D chapo, ba menu option long-press koro.</p><div class="data-table-container"><table><thead><tr><th>Name</th><th>Screen</th><th>Action</th></tr></thead><tbody>${o(mm(),x=>`<tr><td>${esc(x.label)}</td><td>${x.key}</td><td><button class="btn-action" onclick="openModule('${x.key}')">Open</button> <button class="btn-action" onclick="myRen('${x.id}')">Rename</button> <button class="btn-danger" onclick="myDel('${x.id}')">Delete</button></td></tr>`)||'<tr><td colspan="3">My Menu is empty</td></tr>'}</tbody></table></div>`,
 links:()=>hd('Quick Links')+o([['Search in All','search'],['Cloud Backup','backup'],['WhatsApp / SMS / Email','share'],['Hot Keys','hotkeys'],['Control Room','settings'],['e-Way Bill','eway']],x=>`<div class="side-item" onclick="openModule('${x[1]}')">${x[0]}</div>`),
 search:()=>hd('Search in All')+`<input type="text" id="sq" placeholder="Item / Party / Bill..." onkeyup="srch()"><div class="data-table-container" id="sr"></div>`,
 calc:()=>hd('Calculator')+`<input type="text" id="cx" placeholder="e.g. (120*12)/100" onkeydown="if(event.key=='Enter')cal()"> <button class="btn-action" onclick="cal()">=</button> <h2 id="cr"></h2>`};
@@ -346,17 +357,56 @@ function chUser(){const n=prompt('Operator name (Admin = default)');if(!n)return
 
 /* ===== NAVIGATION ===== */
 function hdr(){$('cu').textContent=db.user;$('cc').textContent=(db.company[0]||{}).name||'JANAKINATH BHANDER 2026-2027'}
-function menu(n){document.querySelectorAll('#mainMenuBar button').forEach(b=>b.classList.toggle('active',b.dataset.m==n));$('leftPanel').innerHTML=`<div class="menu-category-title">${n.toUpperCase()} - ALL OPTIONS</div>`+o(M[n],x=>`<div class="side-item" onclick="openModule('${x[1]}')">${x[0]}</div>`)}
-function showDashboard(){$('dashboardView').classList.remove('hidden');$('moduleViewContainer').classList.add('hidden');const l=db.txns.slice(-5).reverse();$('recentTransBody').innerHTML=l.length?o(l,t=>`<tr><td>${t.date}</td><td>${NAMES[t.kind]}</td><td>${esc(t.party)}</td><td>₹${f(t.total)}</td></tr>`):'<tr><td colspan="4" style="text-align:center">No recent transactions</td></tr>'}
-function openModule(k){const C=$('moduleViewContainer');$('dashboardView').classList.add('hidden');C.classList.remove('hidden');let h;
+const ps=k=>{try{history.pushState({k},'','#'+k)}catch(e){}};
+function lbl(k){for(const m in M){const x=M[m].find(y=>y[1]==k);if(x)return{m,l:x[0]}}return{m:'Masters',l:k}}
+function crumb(){const l=S.cur?lbl(S.cur):null;$('crumb').innerHTML=`<span><a onclick="showDashboard()">Home</a>${l?` › <a onclick="menu('${l.m}')">${l.m}</a> › ${esc(l.l)}`:' › Dashboard'}</span><span><button class="btn-action" onclick="history.back()">◀</button> <button class="btn-action" onclick="history.forward()">▶</button> <button class="btn-action" onclick="zoom(-.1)">A−</button> <button class="btn-action" onclick="zoom(.1)">A+</button> <button class="btn-action" onclick="addMy()">★ My Menu</button></span>`}
+function ti(){document.querySelectorAll('.side-item').forEach(x=>x.tabIndex=0)}
+function menu(n){S.m=n;document.querySelectorAll('#mainMenuBar button').forEach(b=>b.classList.toggle('active',b.dataset.m==n));const L=n=='My Menu'?[...mm().map(x=>[x.label,x.key]),['Manage My Menu','mymenu']]:M[n];$('leftPanel').innerHTML=`<div class="menu-category-title">${n.toUpperCase()} - ALL OPTIONS</div>`+o(L,x=>`<div class="side-item" onclick="openModule('${x[1]}')">${esc(x[0])}</div>`)+(n!='My Menu'&&mm().length?`<div class="menu-category-title" style="margin-top:5px">MY MENU</div>`+o(mm(),x=>`<div class="side-item" onclick="openModule('${x.key}')">${esc(x.label)}</div>`):'');ti()}
+function showDashboard(np){if(!np&&S.cur)ps('');S.cur='';S.r=null;$('dashboardView').classList.remove('hidden');$('moduleViewContainer').classList.add('hidden');const l=db.txns.slice(-5).reverse();$('recentTransBody').innerHTML=l.length?o(l,t=>`<tr><td>${t.date}</td><td>${NAMES[t.kind]}</td><td>${esc(t.party)}</td><td>₹${f(t.total)}</td></tr>`):'<tr><td colspan="4" style="text-align:center">No recent transactions</td></tr>';crumb()}
+function openModule(k,np){const C=$('moduleViewContainer');if(!np&&k!=S.cur)ps(k);S.cur=k;S.r=null;$('dashboardView').classList.add('hidden');C.classList.remove('hidden');let h;
  if(CR[k])h=crud(k);else if(NAMES[k]){bill=[];S.k=k;h=billView(k)}else if(VK[k])h=vchView(k);else if(k=='gjson'){dl('GSTR1.json',JSON.stringify(REP.g1().r));h=repView('g1')}else if(REP[k])h=repView(k);else if(V[k])h=V[k]();else h=hd(k)+'<p>Module not found</p>';
- C.innerHTML=h;if(NAMES[k]){pick();renderL()}}
-document.addEventListener('keydown',e=>{if(e.key=='Escape')return showDashboard();const c=(e.ctrlKey?'Ctrl+':'')+(e.shiftKey?'Shift+':'')+(e.key.length==1?e.key.toUpperCase():e.key),h=HK.find(x=>x[0]==c);if(!h)return;e.preventDefault();h[1]=='user'?chUser():h[1]=='dash'?showDashboard():h[1]=='save'?(save(),flash('Saved')):openModule(h[1])});
+ C.innerHTML=h;if(NAMES[k]){pick();renderL()}ti();crumb();C.scrollTop=0}
+/* ===== KEYBOARD NAVIGATION ===== */
+const fcs=s=>[...document.querySelectorAll(s)].filter(x=>x.offsetParent);
+function step(a,d){const l=fcs('#moduleViewContainer input,#moduleViewContainer select,#moduleViewContainer textarea,#moduleViewContainer button').filter(x=>!x.readOnly&&!x.disabled&&x.type!='file'),n=l[l.indexOf(a)+d];if(n){n.focus();try{n.select&&n.select()}catch(e){}}}
+function navKey(e,a){const mb=fcs('#mainMenuBar button'),si=fcs('.left-panel .side-item'),rows=fcs('#moduleViewContainer tbody tr'),k=e.key;
+ if(mb.includes(a)){const i=mb.indexOf(a);if(k=='ArrowRight'){mb[(i+1)%mb.length].focus();return 1}if(k=='ArrowLeft'){mb[(i-1+mb.length)%mb.length].focus();return 1}if(k=='ArrowDown'){const x=fcs('#leftPanel .side-item')[0]||si[0];if(x){x.focus();return 1}}}
+ if(si.includes(a)){const i=si.indexOf(a);if(k=='ArrowDown'){if(si[i+1])si[i+1].focus();return 1}if(k=='ArrowUp'){(i?si[i-1]:mb.find(b=>b.dataset.m==S.m)||mb[0]).focus();return 1}if(k=='ArrowRight'){const x=fcs('#moduleViewContainer input,#moduleViewContainer select,#moduleViewContainer button')[0];if(x){x.focus();return 1}}if(k=='Enter'||k==' '){a.click();return 1}}
+ if(rows.length&&(k=='ArrowDown'||k=='ArrowUp')){S.r=Math.max(0,Math.min(rows.length-1,(S.r==null?-1:S.r)+(k=='ArrowDown'?1:-1)));rows.forEach((r,i)=>r.classList.toggle('sel',i==S.r));rows[S.r].scrollIntoView({block:'nearest'});return 1}
+ if(a==document.body&&S.r!=null&&rows[S.r]){if(k=='Enter'){const b=rows[S.r].querySelector('button');if(b){b.click();return 1}}if(k=='Delete'){const b=rows[S.r].querySelector('.btn-danger');if(b&&confirm('Delete selected row?')){b.click();return 1}}}
+ return 0}
+document.addEventListener('keydown',e=>{const a=document.activeElement,tg=a.tagName,ty=/^(INPUT|SELECT|TEXTAREA)$/.test(tg);
+ if(e.key=='Escape')return showDashboard();
+ if(e.altKey&&/^Arrow(Left|Right)$/.test(e.key)){e.preventDefault();return e.key=='ArrowLeft'?history.back():history.forward()}
+ if(e.ctrlKey&&['=','+','-','0'].includes(e.key)){e.preventDefault();return zoom(e.key=='0'?0:e.key=='-'?-.1:.1)}
+ if(e.ctrlKey&&e.key=='Enter'){const b=[...document.querySelectorAll('#moduleViewContainer button')].find(x=>/^(\+ )?(Save|Update|Generate|Apply|Transfer)/.test(x.textContent.trim()));if(b){e.preventDefault();b.click()}return}
+ if(e.key=='Enter'&&ty&&tg!='TEXTAREA'&&a.closest('#moduleViewContainer')&&!/^(sq|cx)$/.test(a.id)){e.preventDefault();return step(a,e.shiftKey?-1:1)}
+ if(!ty&&!e.ctrlKey&&!e.altKey&&navKey(e,a)){e.preventDefault();return}
+ const c=(e.ctrlKey?'Ctrl+':'')+(e.shiftKey?'Shift+':'')+(e.key.length==1?e.key.toUpperCase():e.key),h=HK.find(x=>x[0]==c);if(!h)return;e.preventDefault();
+ h[1]=='user'?chUser():h[1]=='dash'?showDashboard():h[1]=='save'?(save(),flash('Saved')):h[1]=='addmy'?addMy():h[1]=='menubar'?fcs('#mainMenuBar button')[0].focus():openModule(h[1])});
+function zoom(d){db.set.z=d?Math.min(1.6,Math.max(.7,(db.set.z||1)+d)):1;document.body.style.zoom=db.set.z;save()}
+function addMy(k=S.cur){if(!k)return alert('Pehle kono screen kholo');if(mm().some(x=>x.key==k))return flash('Already in My Menu');db.mymenu.push({id:Date.now()+'',key:k,label:lbl(k).l,user:db.user});save();flash('Added to My Menu');menu(S.m||'Masters')}
+function myRen(id){const x=db.mymenu.find(y=>y.id==id),v=prompt('Rename',x.label);if(v){x.label=v;save();openModule('mymenu')}}
+function myDel(id){db.mymenu=db.mymenu.filter(y=>y.id!=id);save();openModule('mymenu');menu(S.m||'Masters')}
+function refresh(){if(!S.cur||REP[S.cur]||['txns','pending','tag'].includes(S.cur)){S.cur?openModule(S.cur,1):showDashboard(1);flash('Refreshed')}}
+/* ===== TOUCH GESTURES ===== */
+let tx=0,ty0=0,tt=0,lp;
+document.addEventListener('touchstart',e=>{const t=e.touches[0];tx=t.clientX;ty0=t.clientY;tt=Date.now();clearTimeout(lp);const s=e.target.closest('.side-item');if(s)lp=setTimeout(()=>{const m=/openModule\('(\w+)'\)/.exec(s.getAttribute('onclick')||'');if(m){S.lp=1;addMy(m[1]);setTimeout(()=>S.lp=0,600)}},700)},{passive:true});
+document.addEventListener('touchmove',()=>clearTimeout(lp),{passive:true});
+document.addEventListener('touchend',e=>{clearTimeout(lp);const t=e.changedTouches[0],dx=t.clientX-tx,dy=t.clientY-ty0;
+ if(e.target.closest('.menubar')){if(Math.abs(dx)>60&&Math.abs(dy)<40){const b=[...document.querySelectorAll('#mainMenuBar button[data-m]')],i=b.findIndex(x=>x.dataset.m==S.m);menu(b[(i+(dx<0?1:-1)+b.length)%b.length].dataset.m)}return}
+ if(e.target.closest('.data-table-container,.form-grid,input,select,textarea'))return;
+ if(Math.abs(dx)>90&&Math.abs(dy)<45&&Date.now()-tt<600)dx>0?history.back():history.forward();
+ else if(dy>130&&Math.abs(dx)<60&&$('centerWorkspace').scrollTop<5)refresh()},{passive:true});
+document.addEventListener('click',e=>{if(S.lp){S.lp=0;e.stopPropagation();e.preventDefault()}},true);
+document.addEventListener('dblclick',e=>{const r=e.target.closest('#moduleViewContainer tbody tr');if(r){const b=r.querySelector('.btn-action');if(b)b.click()}});
+window.addEventListener('popstate',e=>{const k=e.state&&e.state.k;k?openModule(k,1):showDashboard(1)});
 function tick(){const d=new Date();$('currentDateStr').textContent=d.toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});$('currentTimeStr').textContent=d.toLocaleTimeString('en-IN')}
 setInterval(tick,1000);tick();
-load();hdr();$('mainMenuBar').innerHTML=o(Object.keys(M),n=>`<button data-m="${n}" onclick="menu('${n}')">${n}</button>`)+'<button onclick="showDashboard()">Exit</button>';menu('Masters');showDashboard();
+load();hdr();document.body.style.zoom=db.set.z||1;
+$('mainMenuBar').innerHTML=o(Object.keys(M),n=>`<button data-m="${n}" onclick="menu('${n}')" onfocus="menu('${n}')">${n}</button>`)+'<button onclick="showDashboard()">Exit</button>';menu('Masters');
+const h0=location.hash.slice(1);try{history.replaceState({k:h0},'','#'+h0)}catch(e){}
+if(h0&&(CR[h0]||NAMES[h0]||VK[h0]||REP[h0]||V[h0]))openModule(h0,1);else showDashboard(1);ti();
 </script>
 </body>
 </html>
-
-
